@@ -1,23 +1,27 @@
-public float DISCOUNT = 0.9;
-public float ALPHA = 0.3;
-public float EPSILON = 0.3;
+import java.util.Set;
+import java.util.Map.Entry;
 
 class Learner {
-  public HashMap<String, Float> value = new HashMap<String, Float>();
+  private float DISCOUNT = 0.9;
+  private float LEARNING_RATE = 0.3;
+  private float EPSILON = 0.02;
+  private HashMap<String, Float> value = new HashMap<String, Float>();
+  public Learner() {
+    /*
+    TODO: make this work
+    DISCOUNT = params.getFloat("discount");
+    LEARNING_RATE = params.getFloat("learning_rate");
+    EPSILON = params.getFloat("epsilon");
+    */
+  }
   public float valueOf(State s) {
     if (!value.containsKey(s.toString())) {
-      if (s.won && s.winner()) {
-        value.put(s.toString(), 1.0);
-      } else if(s.won) {
-        value.put(s.toString(), -1.0);
-      } else {
-        value.put(s.toString(), 0.0);
-      }
+     value.put(s.toString(), s.value());
     }
     return value.get(s.toString());
   }
-  public int[] play(State s) {
-    int allMoves[][] = s.moves();
+  public Move play(State s) {
+    Move allMoves[] = s.moves();
     if (allMoves.length == 0) {
       return null;
     }
@@ -26,12 +30,12 @@ class Learner {
       //println("random chosen");
       return allMoves[(int)random(allMoves.length)];
     }
-    int bestMove[] = allMoves[0];
+    Move bestMove = allMoves[0];
     State bestState = null;
-    for (int move[] : s.moves()) {
-      State newState = s.updated(move[0], move[1]);
+    for (Move move : s.moves()) {
+      State newState = s.updated(move);
       if (bestState == null ||
-         (state.toMove ^ (valueOf(newState) < valueOf(bestState)))) {
+         (state.toMove() ^ (valueOf(newState) < valueOf(bestState)))) {
         bestMove = move;
         bestState = newState;
       }
@@ -43,32 +47,33 @@ class Learner {
   public void learn(State s0, State s1) {
     float startValue = valueOf(s0);
     float targetValue = valueOf(s1);
-    float newValue = startValue + (targetValue * DISCOUNT - startValue) * ALPHA;
+    float newValue = startValue + (targetValue * DISCOUNT - startValue) * LEARNING_RATE;
     value.put(s0.toString(), newValue);
     //println("update value " + startValue + " -> " + newValue + " -> (" + targetValue + ")");
   }
   
+  public void learn(State s[]) {
+    for (int i = s.length-1; i > 0; i--) {
+      learn(s[i-1], s[i]);
+    }
+  }
+  
   public void saveJSON(String fname) {
     println("Saving...");
-    JSONArray jsonArray = new JSONArray();
+    JSONObject jsonObject = new JSONObject();
     for (Entry<String, Float> entry : value.entrySet()) {
-      JSONObject jsonObject = new JSONObject();
-      jsonObject.setString("state", entry.getKey());
-      jsonObject.setFloat("value", entry.getValue());
-      jsonArray.append(jsonObject);
+      jsonObject.setFloat(entry.getKey(), entry.getValue());
     }
-    saveJSONArray(jsonArray, fname);
+    saveJSONObject(jsonObject, fname);
     println("Saved " + value.size() + " knowledge to " + fname + "!");
   }
   
   public void loadJSON(String fname) {
-    JSONArray jsonArray = loadJSONArray(fname);
-    for (int i = 0; i < jsonArray.size(); i++) {
-      JSONObject jsonObject = jsonArray.getJSONObject(i);
-      String keyStr = jsonObject.getString("state");
-      float val = jsonObject.getFloat("value");
-      value.put(keyStr, val);
+    JSONObject jsonObject = loadJSONObject(fname);
+    Set<String> keys = jsonObject.keys();
+    for (String key : keys) {
+      value.put(key, jsonObject.getFloat(key));
     }
-    println("Loaded " + jsonArray.size() + " knowledge from " + fname + "!");
+    println("Loaded " + value.size() + " knowledge from " + fname + "!");
   }
 }
