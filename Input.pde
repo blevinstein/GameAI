@@ -7,10 +7,10 @@ void keyPressed() {
       moveMade(cursor); break;
     case 's':
     case 'S':
-      learner.saveJSON("brain.json"); break;
+      saveLearner(learner, "brain.json"); break;
     case 'l':
     case 'L':
-      learner.loadJSON("brain.json"); break;
+      learner = loadLearner("brain.json"); break;
     case 'a':
     case 'A':
       autopilot = !autopilot;
