@@ -1,48 +1,49 @@
 class Square {
-  public static final boolean X = true;
-  public static final boolean O = false;
-  private boolean full;
-  private boolean player;
-  public Square(boolean f, boolean p) {
-    full = f;
-    player = p;
+  public static final int X = 1;
+  public static final int O = 0;
+  private boolean _empty;
+  private int _player;
+  // creates an empty square
+  public Square() {
+    _empty = true;
+  }
+  // creates a marked square
+  public Square(int p) {
+    _empty = false;
+    _player = p;
   }
   
+  // flips Xs and Os
+  public Square flip() {
+    if (_empty)
+      return this;
+    return new Square(_player > 0 ? 0 : 1);
+  }
+  
+  public boolean isEmpty() { return _empty; }
+  public int player() { assert !_empty; return _player; }
+  
   public boolean equals(Square other) {
-    return (full == other.full && player == other.player);
+    return (_empty == other.isEmpty() && _player == other._player);
   }
   
   public String toString() {
-    if (full)
-      if (player)
+    if (!_empty) {
+      if (_player > 0) {
         return "X";
-      else
+      } else {
         return "O";
+      }
+    }
     return " ";
-  }
-  
-  public boolean isEmpty() {
-    return !full;
-  }
-  
-  public boolean player() {
-    assert(!isEmpty());
-    return player;
   }
   
   public static Square fromChar(char c) {
     switch(c) {
-      case 'X': return mark(true);
-      case 'O': return mark(false);
-      case ' ': return empty();
+      case 'X': return new Square(X);
+      case 'O': return new Square(O);
+      case ' ': return new Square();
     }
     return null;
-  }
-  
-  public static Square empty() {
-    return new Square(false, false);
-  }
-  public static Square mark(boolean p) {
-    return new Square(true, p);
   }
 }

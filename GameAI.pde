@@ -3,21 +3,20 @@ ArrayList<State> path;
 Move suggested;
 
 void setup() {
-  size(320,320);
-  //frameRate(10);
+  size(640,320);
+  frameRate(1000);
   path = new ArrayList<State>();
-  state = State.init();
+  state = new State();
 }
 
-boolean npc = true;
-Learner learner = new Learner();
+Learner learner = new Learner(Math.random() < 0.5 ? Square.X : Square.O);
 void draw() {
   background(255);
   fill(0);
-  drawState(state, 10, 10, 100);
+  drawState((State)state, 10, 10, 100);
   if (!state.terminal()) {
-    if (state.toMove() == npc || autopilot) {
-      Move move = learner.play(state);
+    if (state.toMove() == learner.player() || autopilot) {
+      Move move = learner.play(normalize(state));
       if (move != null) {
         moveMade(move);
       } else {
@@ -25,16 +24,17 @@ void draw() {
       }
     }
   } else {
-    if (state.value() == 0.0) {
+    if (state.score(0) == 0.0) {
       println("Tie!");
-    } else if(state.value() > 0) {
+    } else if(state.score(0) > 0) {
       println("X wins!");
     } else {
       println("O wins!");
     }
+    // learn from all moves made in this game
     learner.learn(path.toArray(new State[0]));
     path = new ArrayList<State>();
-    state = State.init();
+    state = new State();
     path.add(state);
   }
 }
@@ -42,20 +42,25 @@ void draw() {
 void moveMade(Move m) {
   if (state.validMove(m)) {
     State newState = state.updated(m);
-    //learner.learn(state, newState);
+    // NOTE: learns from a full path at the end, not after each move
+    // e.g. learner.learn(state, newState);
     state = newState;
     path.add(state);
-    suggested = learner.play(state);
+    suggested = learner.play(normalize(state));
   } else {
     println("Invalid move! " + m);
   }
 }
 
-public void drawState(State state, float x, float y, float size) {
+State normalize(State s) {
+  return s.toMove() == learner.player() ? s : s.flip();
+}
+
+void drawState(State state, float x, float y, float size) {
   // board lines change color upon victory
   stroke(0);
-  if (state.value() != 0.0) {
-    stroke(state.value() > 0.0 ? color(255, 0, 0) : color(0, 0, 255));
+  if (state.score(0) != 0.0) {
+    stroke(state.score(0) > 0.0 ? color(255, 0, 0) : color(0, 0, 255));
   }
   
   // draw the board
@@ -70,7 +75,7 @@ public void drawState(State state, float x, float y, float size) {
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
       if (!state.board(i, j).isEmpty()) {
-        boolean xo = state.board(i,j).player();
+        int xo = state.board(i,j).player();
         stroke(xo == Square.X ? color(255, 0, 0) : color(0, 0, 255));
         fill(xo == Square.X ? color(255, 0, 0) : color(0, 0, 255));
         text(xo == Square.X ? "X" : "O", x + size * (i + 0.5), y + size * (j + 0.5));
@@ -78,10 +83,14 @@ public void drawState(State state, float x, float y, float size) {
     }
   }
   
+  stroke(0); fill(0);
+  textAlign(RIGHT, TOP);
+  text(frameRate, width-10, 10);
+  
   // draw the cursor
   ellipseMode(CENTER);
   noStroke();
-  fill(state.toMove() ? color(255, 0, 0, 125) : color(0, 0, 255, 125));
+  fill(state.toMove() > 0 ? color(255, 0, 0, 125) : color(0, 0, 255, 125));
   ellipse(x + size * (cursor.x + 0.5), y + size * (cursor.y + 0.5), size/2, size/2);
   
   // show suggestion

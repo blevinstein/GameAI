@@ -3,6 +3,7 @@ import java.util.Set;
 public void saveLearner(Learner l, String fname) {
   println("Saving...");
   JSONObject jsonObject = new JSONObject();
+  jsonObject.setString("player", new Square(l.player()).toString());
   for (String state : l.states()) {
     jsonObject.setFloat(state, l.value(state));
   }
@@ -11,12 +12,14 @@ public void saveLearner(Learner l, String fname) {
 }
 
 public Learner loadLearner(String fname) {
-  Learner learner = new Learner();
   JSONObject jsonObject = loadJSONObject(fname);
+  String player = jsonObject.getString("player");
+  Learner learner = new Learner(Square.fromChar(player.charAt(0)).player());
   Set<String> keys = jsonObject.keys();
   for (String key : keys) {
+    if (key.equals("player")) continue;
     learner.setValue(key, jsonObject.getFloat(key));
   }
-  println("Loaded " + jsonObject.size() + " knowledge from " + fname + "!");
+  println("Loaded " + learner.states().size() + " knowledge from " + fname + "!");
   return learner;
 }

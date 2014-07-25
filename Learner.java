@@ -1,29 +1,32 @@
 import java.util.HashMap;
 import java.util.Set;
 
+// represents knowledge with a mapping of AbstractState -> Float
+// can play a game and get better over time
+// obvious weakness: learns every state individually
 class Learner {
   private float DISCOUNT = 0.9f;
   private float LEARNING_RATE = 0.3f;
-  private float EPSILON = 0.02f;
+  private float EPSILON = 0.10f;
   private HashMap<String, Float> _value;
-  public Learner() {
-    _value = new HashMap<String, Float>();
+  private int _player;
+  
+  public int player() { return _player; }
+  
+  public Learner(int player) {
+    this(new HashMap<String, Float>(), player);
   }
-  public Learner(HashMap<String, Float> map) {
+  public Learner(HashMap<String, Float> map, int player) {
     _value = map;
-    /*
-    TODO: make this work
-    DISCOUNT = params.getFloat("discount");
-    LEARNING_RATE = params.getFloat("learning_rate");
-    EPSILON = params.getFloat("epsilon");
-    */
+    _player = player;
   }
+  
   public Set<String> states() {
     return _value.keySet();
   }
-  public float value(State s) {
+  public float value(AbstractState s) {
     if (!_value.containsKey(s.toString())) {
-     _value.put(s.toString(), s.value());
+     _value.put(s.toString(), s.score(_player));
     }
     return _value.get(s.toString());
   }
@@ -34,13 +37,17 @@ class Learner {
       throw new IllegalArgumentException();
     }
   }
-  public void setValue(State s, float v) {
+  public void setValue(AbstractState s, float v) {
     setValue(s.toString(), v);
   }
   public void setValue(String str, float v) {
     _value.put(str, v);
   }
-  public Move play(State s) {
+  
+  // choose a move
+  public Move play(AbstractState s) {
+    assert s.toMove() == _player;
+    // get the set of possible moves
     Move allMoves[] = s.moves();
     if (allMoves.length == 0) {
       return null;
@@ -50,12 +57,13 @@ class Learner {
       //println("random chosen");
       return allMoves[(int)(Math.random() * allMoves.length)];
     }
+    // consider every move and the resulting state; choose the best
     Move bestMove = allMoves[0];
-    State bestState = null;
+    AbstractState bestState = null;
     for (Move move : s.moves()) {
-      State newState = s.updated(move);
+      AbstractState newState = s.updated(move);
       if (bestState == null ||
-         (s.toMove() ^ (value(newState) < value(bestState)))) {
+         (value(newState) > value(bestState))) {
         bestMove = move;
         bestState = newState;
       }
@@ -64,7 +72,9 @@ class Learner {
     return bestMove;
   }
   
-  public void learn(State s0, State s1) {
+  public void learn(AbstractState s0, AbstractState s1) {
+    // the value of a state should approach the discounted value of the next state
+    // i.e., V(s0) -> D * V(s1)
     float startValue = value(s0);
     float targetValue = value(s1);
     float newValue = startValue + (targetValue * DISCOUNT - startValue) * LEARNING_RATE;
@@ -72,7 +82,8 @@ class Learner {
     //println("update value " + startValue + " -> " + newValue + " -> (" + targetValue + ")");
   }
   
-  public void learn(State s[]) {
+  // learn from a chain of states, in reverse order, to allow backwards propogation
+  public void learn(AbstractState s[]) {
     for (int i = s.length-1; i > 0; i--) {
       learn(s[i-1], s[i]);
     }

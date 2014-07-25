@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class State {
+public class State extends AbstractState {
   static int winners[][][] = {{{0,0},{1,1},{2,2}},
                      {{0,2},{1,1},{2,0}},
                      {{0,0},{0,1},{0,2}},
@@ -12,25 +12,45 @@ public class State {
                      {{0,2},{1,2},{2,2}}};
 
   private Square[][] _board;
-  private boolean _toMove;
+  private int _toMove;
   private boolean _terminal = false;
-  private float _value = 0f;
+  private float _score = 0f;
   
   public boolean terminal() { return _terminal; }
-  public boolean toMove() { return _toMove; }
-  public float value() { return _value; }
+  public int toMove() { return _toMove; }
   
-  public State(Square[][] b, boolean tm) {
+  // NOTE: _score is positive for X, negative for O
+  public float score(int player) { return player > 0 ? _score : -_score; }
+  
+  public State() {
+    Square row[] = new Square[3]; Arrays.fill(row, new Square());
+    Square newBoard[][] = new Square[3][]; Arrays.fill(newBoard, row);
+    _board = newBoard;
+    _toMove = Math.random() < 0.5 ? 1 : 0;
+    check();
+  }
+  public State(Square[][] b, int tm) {
     _board = b;
     _toMove = tm;
     check();
+  }
+  public State(String str) {
+    String lines[] = str.split("/");
+    _board = new Square[3][];
+    for(int i = 0; i < 3; i++) {
+      _board[i] = new Square[3];
+      for(int j = 0; j < 3; j++) {
+        _board[i][j] = Square.fromChar(lines[i].charAt(j));
+      }
+    }
+    _toMove = Square.fromChar(lines[3].charAt(0)).player();
   }
   
   public Square board(int i, int j) {
     return _board[i][j];
   }
   
-  // determines terminal and value
+  // determines terminal and score, called after board scores are set
   public void check() {
     // check for 3 in a row
     for (int w = 0; w < winners.length; w++) {
@@ -42,7 +62,8 @@ public class State {
       }
       if (gameWon) {
         _terminal = true;
-        _value = !toMove() ? 1f : -1f;
+        // if it's X turn, he just lost...
+        _score = toMove() > 0 ? -1f : 1f;
       }
     }
     
@@ -62,9 +83,11 @@ public class State {
   }
   
   public boolean equals(State other) {
+    // equals requires toMove == other.toMove AND ...
     if (toMove() != other.toMove()) {
       return false;
     }
+    // ... board == other.board
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         if (!board(i,j).equals(other.board(i,j)))
@@ -97,12 +120,23 @@ public class State {
   }
   
   public State updated(Move m) {
-    assert(validMove(m));
+    assert validMove(m);
     Square newBoard[][] = _board.clone();
     newBoard[m.x] = _board[m.x].clone();
-    newBoard[m.x][m.y] = Square.mark(toMove());
+    newBoard[m.x][m.y] = new Square(toMove());
     
-    return new State(newBoard, !toMove());
+    return new State(newBoard, toMove() > 0 ? 0 : 1);
+  }
+  
+  public State flip() {
+    Square newBoard[][] = new Square[3][];
+    for (int i = 0; i < 3; i++) {
+      newBoard[i] = _board[i].clone();
+      for(int j = 0; j < 3; j++) {
+        newBoard[i][j] = _board[i][j].flip();
+      }
+    }
+    return new State(newBoard, toMove() > 0 ? 0 : 1);
   }
   
   public String toString() {
@@ -113,32 +147,13 @@ public class State {
       }
       output += "/";
     }
-    output += Square.mark(toMove());
+    output += new Square(toMove());
     return output;
   }
   
   public String[] toLines() {
     String lines[] = new String[0];
     return lines;
-  }
-
-  public static State init() {
-    Square row[] = new Square[3]; Arrays.fill(row, Square.empty());
-    Square newBoard[][] = new Square[3][]; Arrays.fill(newBoard, row);
-    return new State(newBoard, Math.random() < 0.5);
-  }
-  
-  public static State fromString(String str) {
-    String lines[] = str.split("/");
-    Square newBoard[][] = new Square[3][];
-    for(int i = 0; i < 3; i++) {
-      newBoard[i] = new Square[3];
-      for(int j = 0; j < 3; j++) {
-        newBoard[i][j] = Square.fromChar(lines[i].charAt(j));
-      }
-    }
-    boolean toMove = Square.fromChar(lines[3].charAt(0)).player();
-    return new State(newBoard, toMove);
   }
 }
 
