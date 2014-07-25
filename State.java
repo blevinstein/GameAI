@@ -34,6 +34,9 @@ public class State extends AbstractState {
     _toMove = tm;
     check();
   }
+  
+  // creates a state from a string representation
+  // e.g. "XX /O  / O /X", last character is toMove
   public State(String str) {
     String lines[] = str.split("/");
     _board = new Square[3][];
@@ -109,7 +112,6 @@ public class State extends AbstractState {
     }
     return m.toArray(new Move[0]);
   }
-  
   public boolean validMove(Move m) {
     return board(m.x,m.y).isEmpty();
   }
@@ -128,6 +130,7 @@ public class State extends AbstractState {
     return new State(newBoard, toMove() > 0 ? 0 : 1);
   }
   
+  // switches Xs and Os
   public State flip() {
     Square newBoard[][] = new Square[3][];
     for (int i = 0; i < 3; i++) {
@@ -139,6 +142,7 @@ public class State extends AbstractState {
     return new State(newBoard, toMove() > 0 ? 0 : 1);
   }
   
+  // see fromString(..) above
   public String toString() {
     String output = "";
     for(int i = 0; i < 3; i++) {
@@ -149,11 +153,6 @@ public class State extends AbstractState {
     }
     output += new Square(toMove());
     return output;
-  }
-  
-  public String[] toLines() {
-    String lines[] = new String[0];
-    return lines;
   }
 }
 

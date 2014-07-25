@@ -1,27 +1,29 @@
-State state;
-ArrayList<State> path;
-Move suggested;
+State state = new State(); // current state of the board
+
+ArrayList<State> path = new ArrayList<State>(); // all moves made this game
+
+Learner learner = new Learner(Math.random() < 0.5 ? Square.X : Square.O);
+
+Move suggested; // the best move, as suggested by the AI
 
 void setup() {
   size(640,320);
   frameRate(1000);
-  path = new ArrayList<State>();
-  state = new State();
 }
 
-Learner learner = new Learner(Math.random() < 0.5 ? Square.X : Square.O);
 void draw() {
+  // clear the screen
   background(255);
-  fill(0);
+  
+  // draw the board
   drawState((State)state, 10, 10, 100);
+  
+  // game loop:
   if (!state.terminal()) {
+    // game has not ended
     if (state.toMove() == learner.player() || autopilot) {
-      Move move = learner.play(normalize(state));
-      if (move != null) {
-        moveMade(move);
-      } else {
-        println("No move chosen!");
-      }
+      // AI makes a move
+      moveMade(learner.play(normalize(state)));
     }
   } else {
     if (state.score(0) == 0.0) {
@@ -32,26 +34,33 @@ void draw() {
       println("O wins!");
     }
     // learn from all moves made in this game
+    // HACK: passing toArray() a zero-element State[] for typing reasons
     learner.learn(path.toArray(new State[0]));
-    path = new ArrayList<State>();
+    // start a new game
     state = new State();
+    // reset the list of moves made
+    path = new ArrayList<State>();
     path.add(state);
   }
 }
 
+// register a move made by the player or AI
 void moveMade(Move m) {
-  if (state.validMove(m)) {
-    State newState = state.updated(m);
-    // NOTE: learns from a full path at the end, not after each move
-    // e.g. learner.learn(state, newState);
-    state = newState;
+  if (m != null && state.validMove(m)) {
+    state = state.updated(m);
     path.add(state);
-    suggested = learner.play(normalize(state));
+    if (!autopilot) {
+      suggested = learner.play(normalize(state));
+    } else {
+      suggested = null;
+    }
   } else {
     println("Invalid move! " + m);
   }
 }
 
+// the learner only knows how to play as one side,
+// so we have to flip the board manually
 State normalize(State s) {
   return s.toMove() == learner.player() ? s : s.flip();
 }
@@ -83,9 +92,10 @@ void drawState(State state, float x, float y, float size) {
     }
   }
   
+  // show frameRate
   stroke(0); fill(0);
   textAlign(RIGHT, TOP);
-  text(frameRate, width-10, 10);
+  text((int)frameRate + " FPS", width-10, 10);
   
   // draw the cursor
   ellipseMode(CENTER);

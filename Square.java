@@ -3,6 +3,7 @@ class Square {
   public static final int O = 0;
   private boolean _empty;
   private int _player;
+  
   // creates an empty square
   public Square() {
     _empty = true;

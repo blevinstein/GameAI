@@ -1,5 +1,9 @@
 import java.util.Set;
 
+// utility methods for saving and loading brains into JSON
+// written in Processing instead of proper Java because
+// Processing has a simpler JSON interface
+
 public void saveLearner(Learner l, String fname) {
   println("Saving...");
   JSONObject jsonObject = new JSONObject();

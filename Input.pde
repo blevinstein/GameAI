@@ -1,6 +1,12 @@
 Move cursor = new Move();
 boolean autopilot = false;
 
+// NOTE: Controls:
+// - arrows to move cursor
+// - spacebar to make a move
+// - S to save brain, L to load brain
+// - A to toggle autopilot
+
 void keyPressed() {
   switch(key) {
     case ' ':

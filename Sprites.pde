@@ -1,5 +1,6 @@
 //sprites = loadSprites("chess_sprites.png", 0, 0, 64, 64);
 
+/*
 ArrayList<PImage> loadSprites(String fname, int x, int y, int w, int h) {
   PImage img = loadImage(fname);
   ArrayList<PImage> sprites = new ArrayList<PImage>();
@@ -12,3 +13,4 @@ ArrayList<PImage> loadSprites(String fname, int x, int y, int w, int h) {
   }
   return sprites;
 }
+*/

@@ -11,7 +11,7 @@ class Learner {
   private HashMap<String, Float> _value;
   private int _player;
   
-  public int player() { return _player; }
+  public int player() { return _player; } // used when calling state.score(player)
   
   public Learner(int player) {
     this(new HashMap<String, Float>(), player);
@@ -21,9 +21,11 @@ class Learner {
     _player = player;
   }
   
+  // returns set of all states in memory
   public Set<String> states() {
     return _value.keySet();
   }
+  // returns remembered value for a state, defaults to state.score(..)
   public float value(AbstractState s) {
     if (!_value.containsKey(s.toString())) {
      _value.put(s.toString(), s.score(_player));
@@ -37,6 +39,7 @@ class Learner {
       throw new IllegalArgumentException();
     }
   }
+  // changes the remembered value for a state
   public void setValue(AbstractState s, float v) {
     setValue(s.toString(), v);
   }
@@ -72,6 +75,7 @@ class Learner {
     return bestMove;
   }
   
+  // learn from two consecutive states in a game
   public void learn(AbstractState s0, AbstractState s1) {
     // the value of a state should approach the discounted value of the next state
     // i.e., V(s0) -> D * V(s1)
