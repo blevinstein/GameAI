@@ -47,6 +47,7 @@ public class State extends AbstractState {
       }
     }
     _toMove = Square.fromChar(lines[3].charAt(0)).player();
+    check();
   }
   
   public Square board(int i, int j) {
@@ -142,7 +143,7 @@ public class State extends AbstractState {
     return new State(newBoard, toMove() > 0 ? 0 : 1);
   }
   
-  // see fromString(..) above
+  // see State(String) above
   public String toString() {
     String output = "";
     for(int i = 0; i < 3; i++) {
@@ -153,6 +154,29 @@ public class State extends AbstractState {
     }
     output += new Square(toMove());
     return output;
+  }
+  
+  // for use with neural network
+  // IDEA: represent each input as -1/0/1
+  public double[] toDoubles() {
+    double vector[] = new double[18];
+    for(int i = 0; i < 3; i++) {
+      for(int j = 0; j < 3; j++) {
+        // input index determined by i, j, x/o
+        int xIdx = (3*i + j) * 2;
+        int oIdx = xIdx + 1;
+        vector[xIdx] = 0.0;
+        vector[oIdx] = 0.0;
+        if (!board(i,j).isEmpty()) {
+          if (board(i,j).player() == Square.X) {
+            vector[xIdx] = 1.0;
+          } else {
+            vector[oIdx] = 1.0;
+          }
+        }
+      }
+    }
+    return vector;
   }
 }
 

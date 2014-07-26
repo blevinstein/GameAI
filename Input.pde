@@ -1,11 +1,13 @@
 Move cursor = new Move();
 boolean autopilot = false;
+boolean versus = false;
 
 // NOTE: Controls:
 // - arrows to move cursor
 // - spacebar to make a move
 // - S to save brain, L to load brain
 // - A to toggle autopilot
+// - V to toggle versus (MemoryLearner vs NetLearner)
 
 void keyPressed() {
   switch(key) {
@@ -13,13 +15,20 @@ void keyPressed() {
       moveMade(cursor); break;
     case 's':
     case 'S':
-      saveLearner(learner, "brain.json"); break;
+      saveLearner(memLearner, "brain.json");
+      saveNet(netLearner.net(), "net.json");
+      break;
     case 'l':
     case 'L':
-      learner = loadLearner("brain.json"); break;
+      memLearner = loadLearner("brain.json");
+      netLearner = new NetLearner(loadNet("net.json"));
+      break;
     case 'a':
     case 'A':
-      autopilot = !autopilot;
+      autopilot = !autopilot; break;
+    case 'v':
+    case 'V':
+      versus = !versus; break;
   }
   switch(keyCode) {
     case UP:

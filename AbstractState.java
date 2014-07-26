@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// TODO: make AbstractState<Move>
 public abstract class AbstractState {
   public abstract boolean terminal();
   
@@ -9,6 +10,11 @@ public abstract class AbstractState {
   
   // return all legal moves from this state
   public abstract Move[] moves();
+  
+  public Move randomMove() {
+    Move allMoves[] = moves();
+    return allMoves[(int)(Math.random() * allMoves.length)];
+  }
   
   // check whether a given move
   public abstract boolean validMove(Move m);

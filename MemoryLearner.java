@@ -4,7 +4,7 @@ import java.util.Set;
 // represents knowledge with a mapping of AbstractState -> Float
 // can play a game and get better over time
 // obvious weakness: learns every state individually
-class Learner {
+class MemoryLearner {
   private float DISCOUNT = 0.9f;
   private float LEARNING_RATE = 0.3f;
   private float EPSILON = 0.10f;
@@ -13,10 +13,10 @@ class Learner {
   
   public int player() { return _player; } // used when calling state.score(player)
   
-  public Learner(int player) {
+  public MemoryLearner(int player) {
     this(new HashMap<String, Float>(), player);
   }
-  public Learner(HashMap<String, Float> map, int player) {
+  public MemoryLearner(HashMap<String, Float> map, int player) {
     _value = map;
     _player = player;
   }
