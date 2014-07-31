@@ -17,11 +17,13 @@ void keyPressed() {
       moveMade(cursor); break;
     case 's':
     case 'S':
+      println();
       saveLearner(memLearner, "brain.json");
       saveNet(netLearner.net(), "net.json");
       break;
     case 'l':
     case 'L':
+      println();
       memLearner = loadLearner("brain.json");
       netLearner = new NetLearner(loadNet("net.json"));
       break;
@@ -33,9 +35,15 @@ void keyPressed() {
       switch (mode) {
         case 0: setMode(netLearner, null, "NxP"); break;
         case 1: setMode(memLearner, memLearner, "MxM"); break;
-        case 2: setMode(netLearner, memLearner, "NxM"); break;
-        case 3: setMode(memLearner, null, "MxP"); break;
+        case 2: setMode(netLearner, netLearner, "NxN"); break;
+        case 3: setMode(netLearner, memLearner, "NxM"); break;
+        case 4: setMode(memLearner, null, "MxP"); break;
       }
+      break;
+    case 'u':
+    case 'U':
+      println();
+      println("X " + wins[Square.X] + " O " + wins[Square.O]);
       break;
   }
   switch(keyCode) {

@@ -5,6 +5,8 @@ NetLearner netLearner = new NetLearner();
 Move suggested; // the best move, as suggested by the AI
 int npc = Square.X;
 
+int wins[] = new int[]{0, 0};
+
 void setup() {
   size(640,320);
   frameRate(1000);
@@ -35,8 +37,10 @@ void mainLoop() {
     if (state.score(Square.X) == 0.0) {
       print("T");
     } else if(state.score(Square.X) > 0) {
+      wins[Square.X]++;
       print("X");
     } else {
+      wins[Square.O]++;
       print("O");
     }
     // feedback to learners
@@ -55,18 +59,15 @@ void mainLoop() {
       // get a move from the current player
       Move m = players[active].play(state.normalize(active));
       if (!state.validMove(m)) {
+        print("_");
         m = state.randomMove();
       }
-      
-      // TODO: remove later
-      Move memMove = memLearner.play(state.normalize(state.toMove()));
-      netLearner.teach(state.normalize(state.toMove()), memMove);
       
       // inform all other players of the move
       // HACK: just does 1 - active; for sake of generality,
       // should do all player where player != active
       if (players[1 - active] != null) {
-        players[1 - active].moveMade(state.normalize(1 - active), m);
+        players[1 - active].moveMade(state.normalize(active), m);
       }
       
       // update the board

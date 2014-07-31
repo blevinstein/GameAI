@@ -56,16 +56,21 @@ public class NeuralNet {
     */
     return mat;
   }
-  //TODO: Java 8 support! Lambdas!
+  
+  // TODO: Java 8 support! Lambdas!
   //
-  // NOTE: Should use tanh instead of 1/(1+e^(-u))
+  // NOTE: Should use tanh instead of 1/(1+e^(-u)) as suggested by
   // http://www.willamette.edu/~gorr/classes/cs449/precond.html
   private static double sigmoid(double x) {
     return 1/(1 + Math.exp(-x));
+    //return Math.tanh(x);
   }
-  // derivative of sigmoid, hard-coded for tanh(x)
+  // derivative of sigmoid
   private static double d_sigmoid(double x) {
     return sigmoid(x) * (1 - sigmoid(x));
+    // dtanh(x)/dx = sech(x)^2
+    //double sech = 1.0 / Math.cosh(x);
+    //return sech * sech;
   }
   
   private static double[] sigmoid(double x[]) {

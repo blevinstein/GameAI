@@ -20,6 +20,7 @@ public abstract class AbstractState {
   public abstract Move[] moves();
   
   public Move randomMove() {
+    if (terminal()) return null; // no valid moves
     Move allMoves[] = moves();
     return allMoves[(int)(Math.random() * allMoves.length)];
   }

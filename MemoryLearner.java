@@ -9,6 +9,7 @@ class MemoryLearner extends AbstractLearner {
   private float DISCOUNT = 0.9f;
   private float LEARNING_RATE = 0.3f;
   private float EPSILON = 0.10f;
+  
   private HashMap<String, Float> _value;
   
   public MemoryLearner() {
@@ -46,15 +47,14 @@ class MemoryLearner extends AbstractLearner {
   
   // choose a move
   public Move query(AbstractState s) {
+    // with some probability, choose randomly
+    if (Math.random() < EPSILON) {
+      return s.randomMove();
+    }
     // get the set of possible moves
     Move allMoves[] = s.moves();
     if (allMoves.length == 0) {
       return null;
-    }
-    // with some probability, choose randomly
-    if (Math.random() < EPSILON) {
-      //println("random chosen");
-      return allMoves[(int)(Math.random() * allMoves.length)];
     }
     // consider every move and the resulting state; choose the best
     Move bestMove = allMoves[0];

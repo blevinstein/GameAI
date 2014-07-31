@@ -45,7 +45,6 @@ public NeuralNet loadNet(String fname) {
 }
 
 public void saveLearner(MemoryLearner l, String fname) {
-  println("Saving...");
   JSONObject jsonObject = new JSONObject();
   for (String state : l.states()) {
     jsonObject.setFloat(state, l.value(state));
