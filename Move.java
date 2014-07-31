@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-class Move {
+class Move extends AbstractMove {
   public int x;
   public int y;
   

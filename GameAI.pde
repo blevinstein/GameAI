@@ -57,7 +57,8 @@ void mainLoop() {
       // wait for user to input move
     } else {
       // get a move from the current player
-      Move m = players[active].play(state.normalize(active));
+      // HACK: this typecast required because I can't instantiate an AbstractLearner<State, Move>[]
+      Move m = ((AbstractLearner<State, Move>)players[active]).play(state.normalize(active));
       if (!state.validMove(m)) {
         print("_");
         m = state.randomMove();

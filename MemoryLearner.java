@@ -5,7 +5,7 @@ import java.util.Set;
 // represents knowledge with a mapping of AbstractState -> Float
 // can play a game and get better over time
 // obvious weakness: learns every state individually
-class MemoryLearner extends AbstractLearner {
+class MemoryLearner extends AbstractLearner<State, Move> {
   private float DISCOUNT = 0.9f;
   private float LEARNING_RATE = 0.3f;
   private float EPSILON = 0.10f;
@@ -46,7 +46,7 @@ class MemoryLearner extends AbstractLearner {
   }
   
   // choose a move
-  public Move query(AbstractState s) {
+  public Move query(State s) {
     // with some probability, choose randomly
     if (Math.random() < EPSILON) {
       return s.randomMove();
@@ -73,14 +73,14 @@ class MemoryLearner extends AbstractLearner {
   
   private ArrayList<AbstractState> shortTermMemory = new ArrayList<AbstractState>();
   
-  public Move play(AbstractState s) {
+  public Move play(State s) {
     Move m = query(s);
     learn(s, s.updated(m));
     // TODO: remember moves and learn in reverse order, to speed backpropagation
     return m;
   }
   
-  public void moveMade(AbstractState s, Move m) {
+  public void moveMade(State s, Move m) {
     learn(s, s.updated(m));
   }
   
@@ -88,7 +88,7 @@ class MemoryLearner extends AbstractLearner {
     // NOTE: ignores positive/negative outcome f
   }
   
-  public void teach(AbstractState s, Move m) {
+  public void teach(State s, Move m) {
     learn(s, s.updated(m));
   }
   

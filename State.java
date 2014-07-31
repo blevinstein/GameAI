@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class State extends AbstractState {
+public class State extends AbstractState<Move, State> {
   static int winners[][][] = {{{0,0},{1,1},{2,2}},
                      {{0,2},{1,1},{2,0}},
                      {{0,0},{0,1},{0,2}},
@@ -137,7 +137,7 @@ public class State extends AbstractState {
     return new State(newBoard, 1 - toMove(), _normalized);
   }
 
-  public AbstractState normalize(int player) {
+  public State normalize(int player) {
     if (player > 0) {
       State s = flip();
       s._normalized = true;

@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 // TODO: make AbstractState<Move>
-public abstract class AbstractState {
+public abstract class AbstractState<M extends AbstractMove, Self> {
   public abstract boolean terminal();
   
   // give the score for each player, to allow a generic Learner interface
@@ -17,22 +17,22 @@ public abstract class AbstractState {
   public abstract float score(int player);
   
   // return all legal moves from this state
-  public abstract Move[] moves();
+  public abstract M[] moves();
   
-  public Move randomMove() {
+  public M randomMove() {
     if (terminal()) return null; // no valid moves
-    Move allMoves[] = moves();
+    M allMoves[] = moves();
     return allMoves[(int)(Math.random() * allMoves.length)];
   }
   
   // check whether a given move
-  public abstract boolean validMove(Move m);
+  public abstract boolean validMove(M m);
   
   // allocates new, identical state
-  public abstract AbstractState clone();
+  public abstract Self clone();
   
   // returns state after move is made
-  public abstract AbstractState updated(Move m);
+  public abstract Self updated(M m);
   
   public abstract String toString();
   public abstract double[] toDoubles();
@@ -40,7 +40,7 @@ public abstract class AbstractState {
   public abstract int toMove();
   
   // change state so that player 0 = p
-  public abstract AbstractState normalize(int p);
+  public abstract Self normalize(int p);
   // flag to allow runtime checking of normalization
   public abstract boolean normalized();
 }

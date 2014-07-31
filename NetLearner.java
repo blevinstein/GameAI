@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 // represents knowledge with a neural network
-class NetLearner extends AbstractLearner {
+class NetLearner extends AbstractLearner<State, Move> {
   private double EPSILON = 0.1;
   
   private NeuralNet _net;
@@ -22,7 +22,7 @@ class NetLearner extends AbstractLearner {
   }
   
   // choose a move
-  public Move query(AbstractState s) {
+  public Move query(State s) {
     // with some probability, choose randomly
     if (Math.random() < EPSILON) {
       return s.randomMove();
@@ -44,7 +44,7 @@ class NetLearner extends AbstractLearner {
   }
   
   // query and save input => output results
-  public Move play(AbstractState s) {
+  public Move play(State s) {
     double input[] = s.toDoubles();
     Move m = query(s);
     
@@ -58,7 +58,7 @@ class NetLearner extends AbstractLearner {
   }
   
   // remembers moves by other player, for training purposes
-  public void moveMade(AbstractState s, Move m) {
+  public void moveMade(State s, Move m) {
     double move[][] = new double[2][];
     move[0] = s.toDoubles();
     move[1] = m.toDoubles();
@@ -66,7 +66,7 @@ class NetLearner extends AbstractLearner {
   }
   
   // learn by explicit assertions about the correct move in a given state
-  public void teach(AbstractState s, Move m) {
+  public void teach(State s, Move m) {
     double input[] = s.toDoubles();
     double target[] = m.toDoubles();
     _net.backpropagate(input, target);
