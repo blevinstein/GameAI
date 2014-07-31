@@ -1,13 +1,15 @@
 Move cursor = new Move();
-boolean autopilot = false;
 boolean versus = false;
 
 // NOTE: Controls:
 // - arrows to move cursor
 // - spacebar to make a move
 // - S to save brain, L to load brain
-// - A to toggle autopilot
-// - V to toggle versus (MemoryLearner vs NetLearner)
+// - M to change mode
+
+AbstractLearner players[] = {netLearner, null};
+String modeStr = "";
+int mode = 0;
 
 void keyPressed() {
   switch(key) {
@@ -23,12 +25,18 @@ void keyPressed() {
       memLearner = loadLearner("brain.json");
       netLearner = new NetLearner(loadNet("net.json"));
       break;
-    case 'a':
-    case 'A':
-      autopilot = !autopilot; break;
-    case 'v':
-    case 'V':
-      versus = !versus; break;
+    case 'm':
+    case 'M':
+      // different "game modes"
+      mode = (mode + 1) % 4;
+      println();
+      switch (mode) {
+        case 0: setMode(netLearner, null, "NxP"); break;
+        case 1: setMode(memLearner, memLearner, "MxM"); break;
+        case 2: setMode(netLearner, memLearner, "NxM"); break;
+        case 3: setMode(memLearner, null, "MxP"); break;
+      }
+      break;
   }
   switch(keyCode) {
     case UP:
@@ -40,4 +48,10 @@ void keyPressed() {
     case RIGHT:
       if (cursor.x < 2) cursor.x++; break;
   }
+}
+
+void setMode(AbstractLearner a, AbstractLearner b, String str) {
+  players[0] = a;
+  players[1] = b;
+  modeStr = str;
 }

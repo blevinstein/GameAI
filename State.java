@@ -15,24 +15,31 @@ public class State extends AbstractState {
   private int _toMove;
   private boolean _terminal = false;
   private float _score = 0f;
+  private boolean _normalized = false;
   
   public boolean terminal() { return _terminal; }
   public int toMove() { return _toMove; }
   
   // NOTE: _score is positive for X, negative for O
-  public float score(int player) { return player > 0 ? _score : -_score; }
+  public float score(int player) { return player == Square.X ? _score : -_score; }
   
   public State() {
-    Square row[] = new Square[3]; Arrays.fill(row, new Square());
-    Square newBoard[][] = new Square[3][]; Arrays.fill(newBoard, row);
-    _board = newBoard;
-    _toMove = Math.random() < 0.5 ? 1 : 0;
-    check();
+    this(emptyBoard(), Math.random() < 0.5 ? Square.X : Square.O);
   }
   public State(Square[][] b, int tm) {
+    this(b, tm, false);
+  }
+  public State(Square[][] b, int tm, boolean normed) {
     _board = b;
     _toMove = tm;
+    _normalized = normed;
     check();
+  }
+  
+  public static Square[][] emptyBoard() {
+    Square row[] = new Square[3]; Arrays.fill(row, new Square());
+    Square newBoard[][] = new Square[3][]; Arrays.fill(newBoard, row);
+    return newBoard;
   }
   
   // creates a state from a string representation
@@ -67,7 +74,7 @@ public class State extends AbstractState {
       if (gameWon) {
         _terminal = true;
         // if it's X turn, he just lost...
-        _score = toMove() > 0 ? -1f : 1f;
+        _score = toMove() == Square.X ? -1f : 1f;
       }
     }
     
@@ -123,12 +130,27 @@ public class State extends AbstractState {
   }
   
   public State updated(Move m) {
-    assert validMove(m);
+    if (!validMove(m)) throw new IllegalArgumentException("Invalid move.");
     Square newBoard[][] = _board.clone();
     newBoard[m.x] = _board[m.x].clone();
     newBoard[m.x][m.y] = new Square(toMove());
-    
-    return new State(newBoard, toMove() > 0 ? 0 : 1);
+    return new State(newBoard, 1 - toMove(), _normalized);
+  }
+
+  public AbstractState normalize(int player) {
+    if (player > 0) {
+      State s = flip();
+      s._normalized = true;
+      return s;
+    } else {
+      State s = clone();
+      s._normalized = true;
+      return s;
+    }
+  }
+  
+  public boolean normalized() {
+    return _normalized;
   }
   
   // switches Xs and Os
@@ -140,7 +162,7 @@ public class State extends AbstractState {
         newBoard[i][j] = _board[i][j].flip();
       }
     }
-    return new State(newBoard, toMove() > 0 ? 0 : 1);
+    return new State(newBoard, 1 - toMove());
   }
   
   // see State(String) above

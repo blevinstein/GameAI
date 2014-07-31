@@ -27,14 +27,4 @@ class Move {
     vector[x*3+y] = 1.0;
     return vector;
   }
-  
-  public static Move fromDoubles(double vector[]) {
-    int index = 0;
-    for (int i = 1; i < 9; i++) { // get index of largest output signal
-      if (vector[i] > vector[index]) {
-        index = i;
-      }
-    }
-    return new Move(index/3, index%3);
-  }
 }

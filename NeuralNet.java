@@ -143,7 +143,7 @@ public class NeuralNet {
     double delta[][] = new double[N][];
     delta[N-1] = new double[outputs[N].length];
     for (int j = 0; j < delta[N-1].length; j++) {
-      delta[N-1][j] = (targets[j] - sigmoid(outputs[N][j])) * d_sigmoid(outputs[N][j]);
+      delta[N-1][j] = (sigmoid(outputs[N][j]) - targets[j]) * d_sigmoid(outputs[N][j]);
     }
     for (int k = N-2; k >= 0; k--) {
       delta[k] = weights[k+1].transpose().preMultiply(delta[k+1]);
@@ -163,9 +163,7 @@ public class NeuralNet {
       RealMatrix layerSlope =
           new ArrayRealVector(outputs[k]).outerProduct(
           new ArrayRealVector(delta[k]));
-      // MAGIC: by my math, this should be .subtract(..) not .add(..)
-      // but it works so I'm not going to change it
-      weights[k] = weights[k].add(layerSlope.scalarMultiply(LEARNING_RATE));
+      weights[k] = weights[k].subtract(layerSlope.scalarMultiply(LEARNING_RATE));
       /*
       System.out.println("new matrix " + k);
       pp(weights[k]);

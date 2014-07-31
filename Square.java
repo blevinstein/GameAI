@@ -10,15 +10,19 @@ class Square {
   }
   // creates a marked square
   public Square(int p) {
-    _empty = false;
-    _player = p;
+    if (p == Square.O || p == Square.X) {
+      _empty = false;
+      _player = p;
+    } else {
+      throw new IllegalArgumentException("Cannot create a square of value " + p + ".");
+    }
   }
   
   // flips Xs and Os
   public Square flip() {
     if (_empty)
       return this;
-    return new Square(_player > 0 ? 0 : 1);
+    return new Square(1 - _player);
   }
   
   public boolean isEmpty() { return _empty; }
@@ -30,7 +34,7 @@ class Square {
   
   public String toString() {
     if (!_empty) {
-      if (_player > 0) {
+      if (_player == Square.X) {
         return "X";
       } else {
         return "O";

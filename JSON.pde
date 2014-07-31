@@ -47,7 +47,6 @@ public NeuralNet loadNet(String fname) {
 public void saveLearner(MemoryLearner l, String fname) {
   println("Saving...");
   JSONObject jsonObject = new JSONObject();
-  jsonObject.setString("player", new Square(l.player()).toString());
   for (String state : l.states()) {
     jsonObject.setFloat(state, l.value(state));
   }
@@ -57,13 +56,12 @@ public void saveLearner(MemoryLearner l, String fname) {
 
 public MemoryLearner loadLearner(String fname) {
   JSONObject jsonObject = loadJSONObject(fname);
-  String player = jsonObject.getString("player");
-  MemoryLearner learner = new MemoryLearner(Square.fromChar(player.charAt(0)).player());
+  HashMap<String, Float> values = new HashMap<String, Float>();
   Set<String> keys = jsonObject.keys();
   for (String key : keys) {
-    if (key.equals("player")) continue;
-    learner.setValue(key, jsonObject.getFloat(key));
+    values.put(key, jsonObject.getFloat(key));
   }
+  MemoryLearner learner = new MemoryLearner(values);
   println("Loaded " + learner.states().size() + " knowledge from " + fname + "!");
   return learner;
 }
