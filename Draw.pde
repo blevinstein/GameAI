@@ -7,7 +7,9 @@ void draw() {
   background(255);
   
   // draw the board
-  drawState((T3State)state, 10, 10, 100);
+  // NOTE: Using this.g.image.getGraphics() as suggested here
+  // http://forum.processing.org/one/topic/drawing-to-papplet-getgraphics-vs-papplet-g-image-getgraphics.html
+  state.draw(this.g.image.getGraphics(), 10, 10, 300, cursor, suggested);
   
   // draw the neural network's thoughts
   drawThoughts(netLearner, 330, 10, 100);
@@ -54,45 +56,5 @@ void drawThoughts(NetLearner learner, float x, float y, float size) {
     for (int j = 0; j < 3; j++) {
       text(String.format("%.2f", output[i*3+j]), x + size * (i + 0.5), y + size * (j + 0.5));
     }
-  }
-}
-
-void drawState(T3State state, float x, float y, float size) {
-  // board lines change color upon victory
-  stroke(0);
-  if (state.score(0) != 0.0) {
-    stroke(state.score(T3Square.X) > 0.0 ? color(255, 0, 0) : color(0, 0, 255));
-  }
-  
-  // draw the board
-  for (int i = 0; i <= 3; i++) {
-    line(x + size*i, y, x + size*i, y + size*3);
-    line(x, y + size*i, x + size*3, y + size*i);
-  }
-  
-  // draw the marks
-  textSize(size/4);
-  textAlign(CENTER, CENTER);
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      if (!state.board(i, j).isEmpty()) {
-        int xo = state.board(i,j).player();
-        stroke(xo == T3Square.X ? color(255, 0, 0) : color(0, 0, 255));
-        fill(xo == T3Square.X ? color(255, 0, 0) : color(0, 0, 255));
-        text(xo == T3Square.X ? "X" : "O", x + size * (i + 0.5), y + size * (j + 0.5));
-      }
-    }
-  }
-  
-  // draw the cursor
-  ellipseMode(CENTER);
-  noStroke();
-  fill(state.toMove() == T3Square.X ? color(255, 0, 0, 125) : color(0, 0, 255, 125));
-  ellipse(x + size * (cursor.x + 0.5), y + size * (cursor.y + 0.5), size/2, size/2);
-  
-  // show suggestion
-  fill(0, 255, 0, 125);
-  if (suggested != null) {
-    rect(x + size * suggested.x, y + size * suggested.y, size, size);
   }
 }

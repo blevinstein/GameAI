@@ -1,3 +1,7 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -199,6 +203,70 @@ public class T3State extends AbstractState<T3Move, T3State> {
       }
     }
     return vector;
+  }
+  
+  void draw(Graphics g, int x, int y, int size) {
+    draw(g, x, y, size, null, null);
+  }
+  
+  void draw(Graphics g, int x, int y, int size, T3Move cursor, T3Move suggested) {
+    int side = size / 3;
+    
+    // board lines change color upon victory
+    g.setColor(Color.BLACK);
+    if (score(T3Square.X) != 0.0) {
+      g.setColor(score(T3Square.X) > 0.0 ? Color.RED : Color.BLUE);
+    }
+    
+    // draw the board
+    for (int i = 0; i <= 3; i++) {
+      g.drawLine(x + side*i, y, x + side*i, y + side*3);
+      g.drawLine(x, y + side*i, x + side*3, y + side*i);
+    }
+    
+    // font handling
+    g.setFont(new Font("Arial", Font.PLAIN, side / 3));
+    FontMetrics fm = g.getFontMetrics();
+    
+    // draw the marks
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        if (!board(i, j).isEmpty()) {
+          // draw an X or O, centered in the square
+          if (board(i,j).player() == T3Square.X) {
+            g.setColor(Color.RED);
+            g.drawString("X",
+                         (int)(x + side * (i + 0.5) - fm.stringWidth("X") / 2),
+                         (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
+          } else {
+            g.setColor(Color.BLUE);
+            g.drawString("O",
+                         (int)(x + side * (i + 0.5) - fm.stringWidth("O") / 2),
+                         (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
+          }
+        }
+      }
+    }
+    
+    // draw the cursor
+    if (cursor != null) {
+      if (toMove() == T3Square.X) {
+        g.setColor(new Color(255, 0, 0, 125));
+      } else {
+        g.setColor(new Color(0, 0, 255, 125));
+      }
+      g.fillOval((int)(x + side * (cursor.x + 0.5) - side / 4),
+                 (int)(y + side * (cursor.y + 0.5) - side / 4),
+                 side / 2, side / 2);
+    }
+    
+    // show suggestion
+    if (suggested != null) {
+      g.setColor(new Color(0, 255, 0, 125));
+      g.fillRect(x + side * suggested.x,
+                 y + side * suggested.y,
+                 side, side);
+    }
   }
 }
 
