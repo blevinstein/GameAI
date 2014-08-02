@@ -1,16 +1,16 @@
-class Square {
+class T3Square {
   public static final int X = 1;
   public static final int O = 0;
   private boolean _empty;
   private int _player;
   
   // creates an empty square
-  public Square() {
+  public T3Square() {
     _empty = true;
   }
   // creates a marked square
-  public Square(int p) {
-    if (p == Square.O || p == Square.X) {
+  public T3Square(int p) {
+    if (p == T3Square.O || p == T3Square.X) {
       _empty = false;
       _player = p;
     } else {
@@ -19,22 +19,22 @@ class Square {
   }
   
   // flips Xs and Os
-  public Square flip() {
+  public T3Square flip() {
     if (_empty)
       return this;
-    return new Square(1 - _player);
+    return new T3Square(1 - _player);
   }
   
   public boolean isEmpty() { return _empty; }
   public int player() { assert !_empty; return _player; }
   
-  public boolean equals(Square other) {
+  public boolean equals(T3Square other) {
     return (_empty == other.isEmpty() && _player == other._player);
   }
   
   public String toString() {
     if (!_empty) {
-      if (_player == Square.X) {
+      if (_player == T3Square.X) {
         return "X";
       } else {
         return "O";
@@ -43,11 +43,11 @@ class Square {
     return " ";
   }
   
-  public static Square fromChar(char c) {
+  public static T3Square fromChar(char c) {
     switch(c) {
-      case 'X': return new Square(X);
-      case 'O': return new Square(O);
-      case ' ': return new Square();
+      case 'X': return new T3Square(X);
+      case 'O': return new T3Square(O);
+      case ' ': return new T3Square();
     }
     return null;
   }

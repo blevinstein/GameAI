@@ -1,4 +1,4 @@
-Move cursor = new Move();
+T3Move cursor = new T3Move();
 boolean versus = false;
 
 // NOTE: Controls:
@@ -43,7 +43,7 @@ void keyPressed() {
     case 'u':
     case 'U':
       println();
-      println("X " + wins[Square.X] + " O " + wins[Square.O]);
+      println("X " + wins[T3Square.X] + " O " + wins[T3Square.O]);
       break;
   }
   switch(keyCode) {

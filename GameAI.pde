@@ -1,9 +1,9 @@
-State state = new State(); // current state of the board
+T3State state = new T3State(); // current state of the board
 MemoryLearner memLearner = new MemoryLearner();
 NetLearner netLearner = new NetLearner();
 
-Move suggested; // the best move, as suggested by the AI
-int npc = Square.X;
+T3Move suggested; // the best move, as suggested by the AI
+int npc = T3Square.X;
 
 int wins[] = new int[]{0, 0};
 
@@ -22,7 +22,7 @@ void setup() {
 }
 
 // register an attempted move by the player or AI
-void moveMade(Move m) {
+void moveMade(T3Move m) {
   // update the board
   if (m != null && state.validMove(m)) {
     state = state.updated(m);
@@ -34,13 +34,13 @@ void moveMade(Move m) {
 
 void mainLoop() {
   if (state.terminal()) {
-    if (state.score(Square.X) == 0.0) {
+    if (state.score(T3Square.X) == 0.0) {
       print("T");
-    } else if(state.score(Square.X) > 0) {
-      wins[Square.X]++;
+    } else if(state.score(T3Square.X) > 0) {
+      wins[T3Square.X]++;
       print("X");
     } else {
-      wins[Square.O]++;
+      wins[T3Square.O]++;
       print("O");
     }
     // feedback to learners
@@ -50,15 +50,15 @@ void mainLoop() {
       }
     }
     // start new game
-    state = new State();
+    state = new T3State();
   } else {
     int active = state.toMove();
     if (players[active] == null) {
       // wait for user to input move
     } else {
       // get a move from the current player
-      // HACK: this typecast required because I can't instantiate an AbstractLearner<State, Move>[]
-      Move m = ((AbstractLearner<State, Move>)players[active]).play(state.normalize(active));
+      // HACK: this typecast required because I can't instantiate an AbstractLearner<T3Move, Move>[]
+     T3Move m = ((AbstractLearner<T3State,T3Move>)players[active]).play(state.normalize(active));
       if (!state.validMove(m)) {
         print("_");
         m = state.randomMove();

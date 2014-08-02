@@ -1,19 +1,19 @@
 import java.util.Arrays;
 
-class Move extends AbstractMove {
+class T3Move extends AbstractMove {
   public int x;
   public int y;
   
-  public Move() {
+  public T3Move() {
     x = 0;
     y = 0;
   }
-  public Move(int i, int j) {
+  public T3Move(int i, int j) {
     x = i;
     y = j;
   }
   
-  public boolean equals(Move other) {
+  public boolean equals(T3Move other) {
     return x == other.x && y == other.y;
   }
   

@@ -5,7 +5,7 @@ import java.util.Set;
 // represents knowledge with a mapping of AbstractState -> Float
 // can play a game and get better over time
 // obvious weakness: learns every state individually
-class MemoryLearner extends AbstractLearner<State, Move> {
+class MemoryLearner extends AbstractLearner<T3State, T3Move> {
   private float DISCOUNT = 0.9f;
   private float LEARNING_RATE = 0.3f;
   private float EPSILON = 0.10f;
@@ -46,20 +46,20 @@ class MemoryLearner extends AbstractLearner<State, Move> {
   }
   
   // choose a move
-  public Move query(State s) {
+  public T3Move query(T3State s) {
     // with some probability, choose randomly
     if (Math.random() < EPSILON) {
       return s.randomMove();
     }
     // get the set of possible moves
-    Move allMoves[] = s.moves();
+    T3Move allMoves[] = s.moves();
     if (allMoves.length == 0) {
       return null;
     }
     // consider every move and the resulting state; choose the best
-    Move bestMove = allMoves[0];
+    T3Move bestMove = allMoves[0];
     AbstractState bestState = null;
-    for (Move move : s.moves()) {
+    for (T3Move move : s.moves()) {
       AbstractState newState = s.updated(move);
       if (bestState == null ||
          (value(newState) > value(bestState))) {
@@ -73,14 +73,14 @@ class MemoryLearner extends AbstractLearner<State, Move> {
   
   private ArrayList<AbstractState> shortTermMemory = new ArrayList<AbstractState>();
   
-  public Move play(State s) {
-    Move m = query(s);
+  public T3Move play(T3State s) {
+    T3Move m = query(s);
     learn(s, s.updated(m));
     // TODO: remember moves and learn in reverse order, to speed backpropagation
     return m;
   }
   
-  public void moveMade(State s, Move m) {
+  public void moveMade(T3State s, T3Move m) {
     learn(s, s.updated(m));
   }
   
@@ -88,7 +88,7 @@ class MemoryLearner extends AbstractLearner<State, Move> {
     // NOTE: ignores positive/negative outcome f
   }
   
-  public void teach(State s, Move m) {
+  public void teach(T3State s, T3Move m) {
     learn(s, s.updated(m));
   }
   

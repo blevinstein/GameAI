@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class State extends AbstractState<Move, State> {
+public class T3State extends AbstractState<T3Move, T3State> {
   static int winners[][][] = {{{0,0},{1,1},{2,2}},
                      {{0,2},{1,1},{2,0}},
                      {{0,0},{0,1},{0,2}},
@@ -11,7 +11,7 @@ public class State extends AbstractState<Move, State> {
                      {{0,1},{1,1},{2,1}},
                      {{0,2},{1,2},{2,2}}};
 
-  private Square[][] _board;
+  private T3Square[][] _board;
   private int _toMove;
   private boolean _terminal = false;
   private float _score = 0f;
@@ -21,43 +21,43 @@ public class State extends AbstractState<Move, State> {
   public int toMove() { return _toMove; }
   
   // NOTE: _score is positive for X, negative for O
-  public float score(int player) { return player == Square.X ? _score : -_score; }
+  public float score(int player) { return player == T3Square.X ? _score : -_score; }
   
-  public State() {
-    this(emptyBoard(), Math.random() < 0.5 ? Square.X : Square.O);
+  public T3State() {
+    this(emptyBoard(), Math.random() < 0.5 ? T3Square.X : T3Square.O);
   }
-  public State(Square[][] b, int tm) {
+  public T3State(T3Square[][] b, int tm) {
     this(b, tm, false);
   }
-  public State(Square[][] b, int tm, boolean normed) {
+  public T3State(T3Square[][] b, int tm, boolean normed) {
     _board = b;
     _toMove = tm;
     _normalized = normed;
     check();
   }
   
-  public static Square[][] emptyBoard() {
-    Square row[] = new Square[3]; Arrays.fill(row, new Square());
-    Square newBoard[][] = new Square[3][]; Arrays.fill(newBoard, row);
+  public static T3Square[][] emptyBoard() {
+    T3Square row[] = new T3Square[3]; Arrays.fill(row, new T3Square());
+    T3Square newBoard[][] = new T3Square[3][]; Arrays.fill(newBoard, row);
     return newBoard;
   }
   
   // creates a state from a string representation
   // e.g. "XX /O  / O /X", last character is toMove
-  public State(String str) {
+  public T3State(String str) {
     String lines[] = str.split("/");
-    _board = new Square[3][];
+    _board = new T3Square[3][];
     for(int i = 0; i < 3; i++) {
-      _board[i] = new Square[3];
+      _board[i] = new T3Square[3];
       for(int j = 0; j < 3; j++) {
-        _board[i][j] = Square.fromChar(lines[i].charAt(j));
+        _board[i][j] = T3Square.fromChar(lines[i].charAt(j));
       }
     }
-    _toMove = Square.fromChar(lines[3].charAt(0)).player();
+    _toMove = T3Square.fromChar(lines[3].charAt(0)).player();
     check();
   }
   
-  public Square board(int i, int j) {
+  public T3Square board(int i, int j) {
     return _board[i][j];
   }
   
@@ -67,14 +67,14 @@ public class State extends AbstractState<Move, State> {
     for (int w = 0; w < winners.length; w++) {
       boolean gameWon = true;
       for (int i = 0; i < 3; i++) {
-        Square sq = board(winners[w][i][0],winners[w][i][1]);
+        T3Square sq = board(winners[w][i][0],winners[w][i][1]);
         if (sq.isEmpty() || sq.player() == toMove())
           gameWon = false;
       }
       if (gameWon) {
         _terminal = true;
         // if it's X turn, he just lost...
-        _score = toMove() == Square.X ? -1f : 1f;
+        _score = toMove() == T3Square.X ? -1f : 1f;
       }
     }
     
@@ -93,7 +93,7 @@ public class State extends AbstractState<Move, State> {
     }
   }
   
-  public boolean equals(State other) {
+  public boolean equals(T3State other) {
     // equals requires toMove == other.toMove AND ...
     if (toMove() != other.toMove()) {
       return false;
@@ -108,42 +108,42 @@ public class State extends AbstractState<Move, State> {
     return true;
   }
   
-  public Move[] moves() {
-    ArrayList<Move> m = new ArrayList<Move>();
+  public T3Move[] moves() {
+    ArrayList<T3Move> m = new ArrayList<T3Move>();
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        Move move = new Move(i, j);
+       T3Move move = new T3Move(i, j);
         if (validMove(move)) {
           m.add(move);
         }
       }
     }
-    return m.toArray(new Move[0]);
+    return m.toArray(new T3Move[0]);
   }
-  public boolean validMove(Move m) {
+  public boolean validMove(T3Move m) {
     return board(m.x,m.y).isEmpty();
   }
   
-  public State clone() {
-    Square newBoard[][] = _board.clone();
-    return new State(newBoard, toMove());
+  public T3State clone() {
+    T3Square newBoard[][] = _board.clone();
+    return new T3State(newBoard, toMove());
   }
   
-  public State updated(Move m) {
+  public T3State updated(T3Move m) {
     if (!validMove(m)) throw new IllegalArgumentException("Invalid move.");
-    Square newBoard[][] = _board.clone();
+    T3Square newBoard[][] = _board.clone();
     newBoard[m.x] = _board[m.x].clone();
-    newBoard[m.x][m.y] = new Square(toMove());
-    return new State(newBoard, 1 - toMove(), _normalized);
+    newBoard[m.x][m.y] = new T3Square(toMove());
+    return new T3State(newBoard, 1 - toMove(), _normalized);
   }
 
-  public State normalize(int player) {
+  public T3State normalize(int player) {
     if (player > 0) {
-      State s = flip();
+      T3State s = flip();
       s._normalized = true;
       return s;
     } else {
-      State s = clone();
+      T3State s = clone();
       s._normalized = true;
       return s;
     }
@@ -154,18 +154,18 @@ public class State extends AbstractState<Move, State> {
   }
   
   // switches Xs and Os
-  public State flip() {
-    Square newBoard[][] = new Square[3][];
+  public T3State flip() {
+    T3Square newBoard[][] = new T3Square[3][];
     for (int i = 0; i < 3; i++) {
       newBoard[i] = _board[i].clone();
       for(int j = 0; j < 3; j++) {
         newBoard[i][j] = _board[i][j].flip();
       }
     }
-    return new State(newBoard, 1 - toMove());
+    return new T3State(newBoard, 1 - toMove());
   }
   
-  // see State(String) above
+  // see T3Move(String) above
   public String toString() {
     String output = "";
     for(int i = 0; i < 3; i++) {
@@ -174,7 +174,7 @@ public class State extends AbstractState<Move, State> {
       }
       output += "/";
     }
-    output += new Square(toMove());
+    output += new T3Square(toMove());
     return output;
   }
   
@@ -190,7 +190,7 @@ public class State extends AbstractState<Move, State> {
         vector[xIdx] = 0.0;
         vector[oIdx] = 0.0;
         if (!board(i,j).isEmpty()) {
-          if (board(i,j).player() == Square.X) {
+          if (board(i,j).player() == T3Square.X) {
             vector[xIdx] = 1.0;
           } else {
             vector[oIdx] = 1.0;

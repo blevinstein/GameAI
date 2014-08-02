@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 // represents knowledge with a neural network
-class NetLearner extends AbstractLearner<State, Move> {
+class NetLearner extends AbstractLearner<T3State, T3Move> {
   private double EPSILON = 0.1;
   
   private NeuralNet _net;
@@ -22,7 +22,7 @@ class NetLearner extends AbstractLearner<State, Move> {
   }
   
   // choose a move
-  public Move query(State s) {
+  public T3Move query(T3State s) {
     // with some probability, choose randomly
     if (Math.random() < EPSILON) {
       return s.randomMove();
@@ -33,20 +33,20 @@ class NetLearner extends AbstractLearner<State, Move> {
     // disable invalid moves
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        if (!s.validMove(new Move(i,j))) {
+        if (!s.validMove(new T3Move(i,j))) {
           output[i*3 + j] = 0;
         }
       }
     }
     int idx = Util.choose(output);
-    Move m = new Move(idx/3, idx%3);
+    T3Move m = new T3Move(idx/3, idx%3);
     return m;
   }
   
   // query and save input => output results
-  public Move play(State s) {
+  public T3Move play(T3State s) {
     double input[] = s.toDoubles();
-    Move m = query(s);
+    T3Move m = query(s);
     
     // save input => output
     double move[][] = new double[2][];
@@ -58,7 +58,7 @@ class NetLearner extends AbstractLearner<State, Move> {
   }
   
   // remembers moves by other player, for training purposes
-  public void moveMade(State s, Move m) {
+  public void moveMade(T3State s, T3Move m) {
     double move[][] = new double[2][];
     move[0] = s.toDoubles();
     move[1] = m.toDoubles();
@@ -66,7 +66,7 @@ class NetLearner extends AbstractLearner<State, Move> {
   }
   
   // learn by explicit assertions about the correct move in a given state
-  public void teach(State s, Move m) {
+  public void teach(T3State s, T3Move m) {
     double input[] = s.toDoubles();
     double target[] = m.toDoubles();
     _net.backpropagate(input, target);

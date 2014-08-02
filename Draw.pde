@@ -7,7 +7,7 @@ void draw() {
   background(255);
   
   // draw the board
-  drawState((State)state, 10, 10, 100);
+  drawState((T3State)state, 10, 10, 100);
   
   // draw the neural network's thoughts
   drawThoughts(netLearner, 330, 10, 100);
@@ -57,11 +57,11 @@ void drawThoughts(NetLearner learner, float x, float y, float size) {
   }
 }
 
-void drawState(State state, float x, float y, float size) {
+void drawState(T3State state, float x, float y, float size) {
   // board lines change color upon victory
   stroke(0);
   if (state.score(0) != 0.0) {
-    stroke(state.score(Square.X) > 0.0 ? color(255, 0, 0) : color(0, 0, 255));
+    stroke(state.score(T3Square.X) > 0.0 ? color(255, 0, 0) : color(0, 0, 255));
   }
   
   // draw the board
@@ -77,9 +77,9 @@ void drawState(State state, float x, float y, float size) {
     for (int j = 0; j < 3; j++) {
       if (!state.board(i, j).isEmpty()) {
         int xo = state.board(i,j).player();
-        stroke(xo == Square.X ? color(255, 0, 0) : color(0, 0, 255));
-        fill(xo == Square.X ? color(255, 0, 0) : color(0, 0, 255));
-        text(xo == Square.X ? "X" : "O", x + size * (i + 0.5), y + size * (j + 0.5));
+        stroke(xo == T3Square.X ? color(255, 0, 0) : color(0, 0, 255));
+        fill(xo == T3Square.X ? color(255, 0, 0) : color(0, 0, 255));
+        text(xo == T3Square.X ? "X" : "O", x + size * (i + 0.5), y + size * (j + 0.5));
       }
     }
   }
@@ -87,7 +87,7 @@ void drawState(State state, float x, float y, float size) {
   // draw the cursor
   ellipseMode(CENTER);
   noStroke();
-  fill(state.toMove() == Square.X ? color(255, 0, 0, 125) : color(0, 0, 255, 125));
+  fill(state.toMove() == T3Square.X ? color(255, 0, 0, 125) : color(0, 0, 255, 125));
   ellipse(x + size * (cursor.x + 0.5), y + size * (cursor.y + 0.5), size/2, size/2);
   
   // show suggestion
