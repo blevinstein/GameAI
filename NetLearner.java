@@ -1,3 +1,7 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -94,5 +98,43 @@ class NetLearner extends AbstractLearner<T3State, T3Move> {
   public void forget() {
     myMoves.clear();
     otherMoves.clear();
+  }
+  
+  void drawThoughts(Graphics g, T3State s, int x, int y, int size) {
+    int side = size / 3;
+    double input[] = s.toDoubles();
+    double output[] = net().process(input);
+    // get max magnitude
+    double max = 0;
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        double value = output[i*3+j];
+        if (Math.abs(value) > max) max = value;
+      }
+    }
+    
+    // draw each square
+    for (int i = 0; i < 3; i++) {
+      for(int j = 0; j < 3; j++) {
+        int gray = (int)(output[i*3+j] / Math.abs(max) * 255);
+        g.setColor(new Color(gray, gray, gray, 125));
+        g.fillRect(x + i * side, y + j * side, side, side);
+        g.setColor(Color.BLACK);
+        g.drawRect(x + i * side, y + j * side, side, side);
+      }
+    }
+    
+    // print weights around the board
+    g.setColor(Color.BLACK);
+    g.setFont(new Font("Arial", Font.PLAIN, side / 6));
+    FontMetrics fm = g.getFontMetrics();
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        String str = String.format("%.2f", output[i*3+j]);
+        g.drawString(str,
+                     (int)(x + side * (i + 0.5) - fm.stringWidth(str) / 2),
+                     (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
+      }
+    }
   }
 }
