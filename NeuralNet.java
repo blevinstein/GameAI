@@ -162,7 +162,6 @@ public class NeuralNet {
     
     // update weights
     for (int k = 0; k < N; k++) { // for each layer
-      // TODO: set delta[k][N-1] = 0
       // layerSlope = delta ** outputs, represents dE/dwij(** = outer product)
       // W -= learning_rate * layerSlope
       RealMatrix layerSlope =

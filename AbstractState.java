@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-// TODO: make AbstractState<Move>
 public abstract class AbstractState<M extends AbstractMove, Self> {
   public abstract boolean terminal();
   
