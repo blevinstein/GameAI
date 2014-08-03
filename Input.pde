@@ -6,15 +6,13 @@ boolean versus = false;
 // - spacebar to make a move
 // - S to save brain, L to load brain
 // - M to change mode
-
-AbstractLearner players[] = {netLearner, null};
 String modeStr = "";
 int mode = 0;
 
 void keyPressed() {
   switch(key) {
     case ' ':
-      moveMade(cursor); break;
+      game.moveMade(cursor); break;
     case 's':
     case 'S':
       println();
@@ -30,7 +28,7 @@ void keyPressed() {
     case 'm':
     case 'M':
       // different "game modes"
-      mode = (mode + 1) % 4;
+      mode = (mode + 1) % 5;
       println();
       switch (mode) {
         case 0: setMode(netLearner, null, "NxP"); break;
@@ -59,7 +57,8 @@ void keyPressed() {
 }
 
 void setMode(AbstractLearner a, AbstractLearner b, String str) {
-  players[0] = a;
-  players[1] = b;
+  player1 = a;
+  player2 = b;
+  game = newGame();
   modeStr = str;
 }

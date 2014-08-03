@@ -8,10 +8,10 @@ void draw() {
   background(255);
   
   // draw the board
-  state.draw(graphics(), 10, 10, 300, cursor, suggested);
+  game.state().draw(graphics(), 10, 10, 300, cursor, suggested);
   
   // draw the neural network's thoughts
-  netLearner.drawThoughts(graphics(), state, 330, 10, 300);
+  netLearner.drawThoughts(graphics(), game.state(), 330, 10, 300);
   
   // show frameRate and mode
   stroke(0); fill(0);

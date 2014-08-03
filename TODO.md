@@ -1,12 +1,13 @@
 TODO
 ====
 
-- abstract drawing operations to allow transition to Java [Swing/FX?]
-- parallel execution (thread pool), grading (for evol. alg.)
-- implement evolutionary algorithm
 - write some goddamn tests before everything breaks..
-- ..and setup JUnit or something, might require migration to full Java
+- transition to Java [Swing/FX]
+- implement trainers, training policies
+- parallel execution (thread pool), grading (for evol. alg.)
 - implement population management for evol. alg.
+- implement evolutionary algorithm
+- ..and setup JUnit or something, might require migration to full Java
 - upload to GitHub?
 
 ASPIRATIONAL

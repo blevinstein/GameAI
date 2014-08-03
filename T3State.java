@@ -134,7 +134,7 @@ public class T3State extends AbstractState<T3Move, T3State> {
   }
   
   public T3State updated(T3Move m) {
-    if (!validMove(m)) throw new IllegalArgumentException("Invalid move.");
+    if (!validMove(m)) throw new IllegalArgumentException("Invalid move: " + m);
     T3Square newBoard[][] = _board.clone();
     newBoard[m.x] = _board[m.x].clone();
     newBoard[m.x][m.y] = new T3Square(toMove());
