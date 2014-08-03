@@ -1,5 +1,4 @@
 T3Move cursor = new T3Move();
-boolean versus = false;
 
 // NOTE: Controls:
 // - arrows to move cursor
@@ -16,14 +15,14 @@ void keyPressed() {
     case 's':
     case 'S':
       println();
-      saveLearner(memLearner, "brain.json");
-      saveNet(netLearner.net(), "net.json");
+      Json.saveMap(memLearner.map(), "brain.json");
+      Json.saveNet(netLearner.net(), "net.json");
       break;
     case 'l':
     case 'L':
       println();
-      memLearner = loadLearner("brain.json");
-      netLearner = new NetLearner(loadNet("net.json"));
+      memLearner = new MemoryLearner(Json.loadMap("brain.json"));
+      netLearner = new NetLearner(Json.loadNet("net.json"));
       break;
     case 'm':
     case 'M':

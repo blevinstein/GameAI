@@ -18,14 +18,13 @@ public class T3State extends AbstractState<T3Move, T3State> {
   private T3Square[][] _board;
   private int _toMove;
   private boolean _terminal = false;
-  private float _score = 0f;
+  private double _score = 0f;
   private boolean _normalized = false;
   
   public boolean terminal() { return _terminal; }
   public int toMove() { return _toMove; }
   
-  // NOTE: _score is positive for X, negative for O
-  public float score(int player) { return player == T3Square.X ? _score : -_score; }
+  public double score(int player) { return player == T3Square.X ? _score : -_score; }
   
   public T3State() {
     this(emptyBoard(), Math.random() < 0.5 ? T3Square.X : T3Square.O);

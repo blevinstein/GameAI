@@ -18,10 +18,10 @@ class NetLearner extends AbstractLearner<T3State, T3Move> {
   private ArrayList<double[][]> otherMoves = new ArrayList<double[][]>();
   
   public NetLearner() {
-    _net = new NeuralNet(new int[]{18, 16, 9});
+    this(new NeuralNet(new int[]{18, 16, 9}));
   }
   public NetLearner(NeuralNet n) {
-    // use given net
+    assert n != null;
     _net = n;
   }
   

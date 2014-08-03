@@ -6,14 +6,13 @@ public abstract class AbstractState<M extends AbstractMove, Self> {
   
   // give the score for each player, to allow a generic Learner interface
   // defaults to player 0, which is useful after normalization
-  public float score() {
-    //assert normalized();
+  public double score() {
     if (!normalized()) {
       throw new IllegalArgumentException("Must normalize state!");
     }
     return score(0);
   }
-  public abstract float score(int player);
+  public abstract double score(int player);
   
   // return all legal moves from this state
   public abstract M[] moves();

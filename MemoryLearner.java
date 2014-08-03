@@ -6,43 +6,44 @@ import java.util.Set;
 // can play a game and get better over time
 // obvious weakness: learns every state individually
 class MemoryLearner extends AbstractLearner<T3State, T3Move> {
-  private float DISCOUNT = 0.9f;
-  private float LEARNING_RATE = 0.3f;
-  private float EPSILON = 0.10f;
+  private double DISCOUNT = 0.9f;
+  private double LEARNING_RATE = 0.3f;
+  private double EPSILON = 0.10f;
   
-  private HashMap<String, Float> _value;
+  private HashMap<String, Double> _map;
+  public HashMap<String, Double> map() { return _map; }
   
   public MemoryLearner() {
-    this(new HashMap<String, Float>());
+    this(new HashMap<String, Double>());
   }
-  public MemoryLearner(HashMap<String, Float> map) {
-    _value = map;
+  public MemoryLearner(HashMap<String, Double> map) {
+    _map = map;
   }
   
   // returns set of all states in memory
   public Set<String> states() {
-    return _value.keySet();
+    return _map.keySet();
   }
   // returns remembered value for a state, defaults to state.score(..)
-  public float value(AbstractState s) {
-    if (!_value.containsKey(s.toString())) {
-     _value.put(s.toString(), s.score());
+  public double value(AbstractState s) {
+    if (!_map.containsKey(s.toString())) {
+     _map.put(s.toString(), s.score());
     }
-    return _value.get(s.toString());
+    return _map.get(s.toString());
   }
-  public float value(String str) {
-    if (_value.containsKey(str)) {
-      return _value.get(str);
+  public double value(String str) {
+    if (_map.containsKey(str)) {
+      return _map.get(str);
     } else {
       throw new IllegalArgumentException();
     }
   }
   // changes the remembered value for a state
-  public void setValue(AbstractState s, float v) {
+  public void setValue(AbstractState s, double v) {
     setValue(s.toString(), v);
   }
-  public void setValue(String str, float v) {
-    _value.put(str, v);
+  public void setValue(String str, double v) {
+    _map.put(str, v);
   }
   
   // choose a move
@@ -96,9 +97,9 @@ class MemoryLearner extends AbstractLearner<T3State, T3Move> {
   private void learn(AbstractState s0, AbstractState s1) {
     // the value of a state should approach the discounted value of the next state
     // i.e., V(s0) -> D * V(s1)
-    float startValue = value(s0);
-    float targetValue = value(s1);
-    float newValue = startValue + (targetValue * DISCOUNT - startValue) * LEARNING_RATE;
+    double startValue = value(s0);
+    double targetValue = value(s1);
+    double newValue = startValue + (targetValue * DISCOUNT - startValue) * LEARNING_RATE;
     setValue(s0, newValue);
     //println("update value " + startValue + " -> " + newValue + " -> (" + targetValue + ")");
   }
