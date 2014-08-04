@@ -2,20 +2,22 @@
   
   <target name="compile">
     <mkdir dir="build" />
-    <javac srcdir="." destdir="build" />
+    <javac srcdir="." destdir="build" includeantruntime="false">
+      <compilerarg value="-Xlint" />
+    </javac>
   </target>
 
-  <target name="jar">
-    <mkdir dir="build" />
-    <jar destfile="build/GameAI.jar" basedir="build">
+  <target name="jar" depends="compile">
+    <mkdir dir="jar" />
+    <jar destfile="jar/GameAI.jar" basedir="build">
       <manifest>
         <attribute name="Main-Class" value="Display" />
       </manifest>
     </jar>
   </target>
 
-  <target name="run">
-    <java jar="build/GameAI.jar" fork="true" />
+  <target name="run" depends="jar">
+    <java jar="jar/GameAI.jar" fork="true" />
   </target>
 
   <target name="clean">

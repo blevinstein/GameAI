@@ -3,7 +3,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Set;
 
-// represents knowledge with a mapping of AbstractState -> Float
+// represents knowledge with a mapping of T3State -> Float
 // can play a game and get better over time
 // obvious weakness: learns every state individually
 class MemoryLearner implements Learner<T3State, T3Move> {
@@ -26,7 +26,7 @@ class MemoryLearner implements Learner<T3State, T3Move> {
     return _map.keySet();
   }
   // returns remembered value for a state, defaults to state.score(..)
-  public double value(AbstractState s) {
+  public double value(T3State s) {
     if (!_map.containsKey(s.toString())) {
      _map.put(s.toString(), s.score());
     }
@@ -40,7 +40,7 @@ class MemoryLearner implements Learner<T3State, T3Move> {
     }
   }
   // changes the remembered value for a state
-  public void setValue(AbstractState s, double v) {
+  public void setValue(T3State s, double v) {
     setValue(s.toString(), v);
   }
   public void setValue(String str, double v) {
@@ -60,9 +60,9 @@ class MemoryLearner implements Learner<T3State, T3Move> {
     }
     // consider every move and the resulting state; choose the best
     T3Move bestMove = allMoves[0];
-    AbstractState bestState = null;
+    T3State bestState = null;
     for (T3Move move : s.moves()) {
-      AbstractState newState = s.updated(move);
+      T3State newState = s.updated(move);
       if (bestState == null ||
          (value(newState) > value(bestState))) {
         bestMove = move;
@@ -73,7 +73,7 @@ class MemoryLearner implements Learner<T3State, T3Move> {
     return bestMove;
   }
   
-  private ArrayList<AbstractState> shortTermMemory = new ArrayList<AbstractState>();
+  private ArrayList<T3State> shortTermMemory = new ArrayList<T3State>();
   
   public T3Move play(T3State s) {
     T3Move m = query(s);
@@ -95,7 +95,7 @@ class MemoryLearner implements Learner<T3State, T3Move> {
   }
   
   // learn from two consecutive states in a game
-  private void learn(AbstractState s0, AbstractState s1) {
+  private void learn(T3State s0, T3State s1) {
     // the value of a state should approach the discounted value of the next state
     // i.e., V(s0) -> D * V(s1)
     double startValue = value(s0);
@@ -106,7 +106,7 @@ class MemoryLearner implements Learner<T3State, T3Move> {
   }
   
   // learn from a chain of states, in reverse order, to allow backwards propogation
-  private void learn(AbstractState s[]) {
+  private void learn(T3State s[]) {
     for (int i = s.length-1; i > 0; i--) {
       learn(s[i-1], s[i]);
     }

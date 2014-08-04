@@ -32,7 +32,7 @@ class Game {
   // returns number of moves made
   public int play() {
     int movesMade = 0;
-    Learner<T3State, T3Move> player = players.get(toMove());
+    Learner<T3State,T3Move> player = players.get(toMove());
     while (canStep()) {
       moveMade(player.play(_state.normalize(toMove())));
       movesMade++;
@@ -50,7 +50,7 @@ class Game {
   public void step() {
     if (!canStep()) throw new IllegalArgumentException("Cannot make move.");
     
-    Learner<T3State, T3Move> player = players.get(toMove());
+    Learner<T3State,T3Move> player = players.get(toMove());
     T3Move m = player.play(_state.normalize(toMove()));
     for (int i = 0; i < 2; i++) {
       if (i == toMove()) continue; // don't tell players about their own moves

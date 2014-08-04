@@ -196,5 +196,7 @@ class Display extends JPanel implements KeyListener {
     frame.setVisible(true);
     display.run();
   }
+
+  private static final long serialVersionUID = 1337;
 }
 

@@ -1,5 +1,5 @@
-interface Learner<S extends AbstractState, M extends Move> {
-  public abstract Move query(S s);
+interface Learner<S extends AbstractState<S, M>, M extends Move> {
+  public abstract M query(S s);
   
   // explicitly teach to make move M in state S
   public abstract void teach(S s, M m);

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public abstract class AbstractState<M extends Move, Self> {
+public abstract class AbstractState<Self, M extends Move> {
   public abstract boolean terminal();
   
   // give the score for each player, to allow a generic Learner interface

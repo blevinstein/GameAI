@@ -35,7 +35,7 @@ class Json {
     }
   }
   
-  public static void saveMap(Map map, String fname) {
+  public static void saveMap(Map<String,Double> map, String fname) {
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(map));
     } catch (IOException e) {
