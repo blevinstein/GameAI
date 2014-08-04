@@ -124,7 +124,7 @@ public class T3State extends AbstractState<T3Move, T3State> {
     return m.toArray(new T3Move[0]);
   }
   public boolean validMove(T3Move m) {
-    return board(m.x,m.y).isEmpty();
+    return board(m.x(),m.y()).isEmpty();
   }
   
   public T3State clone() {
@@ -135,8 +135,8 @@ public class T3State extends AbstractState<T3Move, T3State> {
   public T3State updated(T3Move m) {
     if (!validMove(m)) throw new IllegalArgumentException("Invalid move: " + m);
     T3Square newBoard[][] = _board.clone();
-    newBoard[m.x] = _board[m.x].clone();
-    newBoard[m.x][m.y] = new T3Square(toMove());
+    newBoard[m.x()] = _board[m.x()].clone();
+    newBoard[m.x()][m.y()] = new T3Square(toMove());
     return new T3State(newBoard, 1 - toMove(), _normalized);
   }
 
@@ -254,16 +254,16 @@ public class T3State extends AbstractState<T3Move, T3State> {
       } else {
         g.setColor(new Color(0, 0, 255, 125));
       }
-      g.fillOval((int)(x + side * (cursor.x + 0.5) - side / 4),
-                 (int)(y + side * (cursor.y + 0.5) - side / 4),
+      g.fillOval((int)(x + side * (cursor.x() + 0.5) - side / 4),
+                 (int)(y + side * (cursor.y() + 0.5) - side / 4),
                  side / 2, side / 2);
     }
     
     // show suggestion
     if (suggested != null) {
       g.setColor(new Color(0, 255, 0, 125));
-      g.fillRect(x + side * suggested.x,
-                 y + side * suggested.y,
+      g.fillRect(x + side * suggested.x(),
+                 y + side * suggested.y(),
                  side, side);
     }
   }

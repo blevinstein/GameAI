@@ -1,5 +1,6 @@
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import java.util.Set;
 
 // represents knowledge with a mapping of AbstractState -> Float
@@ -9,15 +10,15 @@ class MemoryLearner extends AbstractLearner<T3State, T3Move> {
   private double DISCOUNT = 0.9f;
   private double LEARNING_RATE = 0.3f;
   private double EPSILON = 0.10f;
-  
-  private HashMap<String, Double> _map;
-  public HashMap<String, Double> map() { return _map; }
+
+  private ConcurrentHashMap<String, Double> _map;
+  public Map<String, Double> map() { return _map; }
   
   public MemoryLearner() {
-    this(new HashMap<String, Double>());
+    this(new ConcurrentHashMap<String, Double>());
   }
-  public MemoryLearner(HashMap<String, Double> map) {
-    _map = map;
+  public MemoryLearner(Map<String, Double> map) {
+    _map = new ConcurrentHashMap(map);
   }
   
   // returns set of all states in memory

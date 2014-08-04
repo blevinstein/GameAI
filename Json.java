@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -48,7 +49,7 @@ class Json {
     }
   }
   
-  public static void saveMap(HashMap map, String fname) {
+  public static void saveMap(Map map, String fname) {
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(map));
     } catch (IOException e) {
@@ -56,10 +57,10 @@ class Json {
     }
   }
   
-  public static HashMap loadMap(String fname) {
+  public static Map<String, Double> loadMap(String fname) {
     try {
-      HashMap<String, Float> hm = new HashMap<String, Float>();
-      hm = (HashMap<String, Float>)gson.fromJson(FileUtils.readFileToString(new File(fname)), hm.getClass());
+      Map<String, Double> hm = new HashMap<String, Double>();
+      hm = gson.fromJson(FileUtils.readFileToString(new File(fname)), hm.getClass());
       return hm;
     } catch (IOException e) {
       System.err.println("Could not load map! " + e);

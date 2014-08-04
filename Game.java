@@ -6,7 +6,7 @@ class Game {
   private T3State _state;
   public T3State state() { return _state; }
   private ArrayList<AbstractLearner<T3State,T3Move>> players;
-  
+
   public Game() {
     this(null, null);
   }
@@ -55,10 +55,10 @@ class Game {
     for (int i = 0; i < 2; i++) {
       if (i == toMove()) continue; // don't tell players about their own moves
       if (players.get(i) == null) continue; // skip null players (users)
+      assert _state.normalize(i).validMove(m);
       players.get(i).moveMade(_state.normalize(i), m);
     }
-    assert _state.validMove(m);
-    _state = _state.updated(m);
+    moveMade(m);
   }
   
   // if applicable, give feedback to players

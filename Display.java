@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Toolkit;
-import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -23,7 +23,7 @@ class Display extends JPanel implements KeyListener {
     
     // load learners
     try {
-      HashMap map = Json.loadMap("brain.json");
+      Map map = Json.loadMap("brain.json");
       if (map != null) memLearner = new MemoryLearner(map);
       
       NeuralNet net = Json.loadNet("net.json");
@@ -32,8 +32,6 @@ class Display extends JPanel implements KeyListener {
     } catch (Exception e) {
       System.err.println("Couldn't load. " + e.getMessage());
     }
-    
-    lastPaintTime = System.currentTimeMillis();
   }
   
   // sleep timing logic in main loop, inspired by Processing
@@ -58,17 +56,12 @@ class Display extends JPanel implements KeyListener {
       }
       long lastTime = System.currentTimeMillis();
       oversleep = lastTime - (beforeTime + duration + waitTime);
-      frameRate = 0.9 * frameRate + 0.1 * 1000 / (lastTime - beforeTime);
+      frameRate = 0.9 * frameRate + 0.1 * 1000 / (lastTime - beforeTime + 0.01);
     }
   }
 
   private double frameRate;
-  private long lastPaintTime;
   public void paintComponent(Graphics g) {
-    
-    // execute game loop
-    mainLoop();
-    
     // clear the screen
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
@@ -80,11 +73,10 @@ class Display extends JPanel implements KeyListener {
     netLearner.drawThoughts(g, game.state(), 330, 10, 300);
     
     // show frameRate and mode
-    //frameRate = (System.currentTimeMillis() - lastPaintTime) / 1000;
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, 25));
     FontMetrics fm = g.getFontMetrics();
-    String str = String.format("%.2f FPS, Mode %s", frameRate, modeStr);
+    String str = String.format("%d FPS, Mode %s", (int)frameRate, modeStr);
     g.drawString(str,
                  getWidth() - 10 - fm.stringWidth(str),
                  10 + fm.getAscent());
@@ -143,16 +135,16 @@ class Display extends JPanel implements KeyListener {
       System.out.println("X " + wins[T3Square.X] + " O " + wins[T3Square.O]);
       break;
     case KeyEvent.VK_UP:
-      if (cursor.y > 0) cursor.y--; 
+      cursor = cursor.up();
       break;
     case KeyEvent.VK_DOWN:
-      if (cursor.y < 2) cursor.y++; 
+      cursor = cursor.down();
       break;
     case KeyEvent.VK_LEFT:
-      if (cursor.x > 0) cursor.x--; 
+      cursor = cursor.left();
       break;
     case KeyEvent.VK_RIGHT:
-      if (cursor.x < 2) cursor.x++; 
+      cursor = cursor.right();
       break;
     case KeyEvent.VK_ESCAPE:
       System.exit(0);
