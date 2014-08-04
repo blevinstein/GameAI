@@ -57,6 +57,7 @@ class Game {
       if (players.get(i) == null) continue; // skip null players (users)
       players.get(i).moveMade(_state.normalize(i), m);
     }
+    assert _state.validMove(m);
     _state = _state.updated(m);
   }
   
