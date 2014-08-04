@@ -155,7 +155,7 @@ class NetLearner implements Learner<T3State, T3Move> {
     return new Genome(ArrayUtils.toPrimitive(list.toArray(new Double[0])));
   }
 
-  public NetLearner fromGenome(Genome g) {
+  public static NetLearner fromGenome(Genome g) {
     double genes[] = g.genes();
     int index = 0;
     

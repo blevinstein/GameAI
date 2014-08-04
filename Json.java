@@ -13,8 +13,28 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
 class Json {
   static Gson gson = new Gson();
+
+  public static void savePop(Population pop, String fname) {
+    double genomes[][] = pop.toDoubles();
+    try {
+      FileUtils.writeStringToFile(new File(fname), gson.toJson(genomes));
+    } catch(IOException e) {
+      System.err.println("Could not save pop!");
+    }
+  }
+
+  public static Population loadPop(String fname, Grader grader) {
+    try {
+      double genomes[][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][].class);
+      return new Population(grader, genomes);
+    } catch(IOException e) {
+      System.err.println("Could not load pop!");
+      return null;
+    }
+  }
+
   public static void saveNet(NeuralNet net, String fname) {
-    RealMatrix weights[] = net.getWeights();
+    RealMatrix weights[] = net.weights();
     double matrices[][][] = net.toDoubles();
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(matrices));

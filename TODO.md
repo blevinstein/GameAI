@@ -14,6 +14,7 @@ ASPIRATIONAL
 - actually learn to play TicTacToe
 - implement other TBS games
 - implement realtime game(s)
+- fix Learner/State/Move to be functional, avoid typing issues
 
 IDEAS
 -----
