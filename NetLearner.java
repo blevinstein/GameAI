@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.linear.RealMatrix;
 
 // represents knowledge with a neural network
 class NetLearner implements Learner<T3State, T3Move> {
@@ -136,5 +138,39 @@ class NetLearner implements Learner<T3State, T3Move> {
                      (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
       }
     }
+  }
+
+  public Genome genome() {
+    RealMatrix weights[] = net().weights();
+
+    ArrayList<Double> list = new ArrayList<Double>();
+    for (int k = 0; k < weights.length; k++) {
+      for (int i = 0; i < weights[k].getRowDimension(); i++) {
+        for (int j = 0; j < weights[k].getColumnDimension(); j++) {
+          list.add(weights[k].getEntry(i, j));
+        }
+      }
+    }
+
+    return new Genome(ArrayUtils.toPrimitive(list.toArray(new Double[0])));
+  }
+
+  public NetLearner fromGenome(Genome g) {
+    double genes[] = g.genes();
+    int index = 0;
+    
+    // create a NetLearner with appropriately sized NeuralNet
+    NetLearner learner = new NetLearner();
+
+    // set each weight to the correct value
+    RealMatrix weights[] = learner.net().weights();
+    for (int k = 0; k < weights.length; k++) {
+      for (int i = 0; i < weights[k].getRowDimension(); i++) {
+        for (int j = 0; j < weights[k].getColumnDimension(); j++) {
+          weights[k].setEntry(i, j, genes[index++]);
+        }
+      }
+    }
+    return learner;
   }
 }

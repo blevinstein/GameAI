@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Util {
   // choose from an array, where the probability of choosing any index
   // is proportional to prob[index]

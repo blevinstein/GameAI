@@ -1,13 +1,13 @@
-<project default="compile">
+<project default="build">
   
-  <target name="compile">
+  <target name="build">
     <mkdir dir="build" />
     <javac srcdir="." destdir="build" includeantruntime="false">
       <compilerarg value="-Xlint" />
     </javac>
   </target>
 
-  <target name="jar" depends="compile">
+  <target name="jar" depends="build">
     <mkdir dir="jar" />
     <jar destfile="jar/GameAI.jar" basedir="build">
       <manifest>

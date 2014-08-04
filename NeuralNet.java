@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
@@ -15,33 +16,33 @@ public class NeuralNet {
   
   private double LEARNING_RATE = 1;
   
-  private RealMatrix weights[];
-  public RealMatrix[] getWeights() { return weights; }
+  private RealMatrix _weights[];
+  public RealMatrix[] weights() { return _weights; }
   
   private final int N; // numbers of layers, for convenience
   
   public NeuralNet(int neurons[]) {
     N = neurons.length-1;
-    weights = new RealMatrix[N];
+    _weights = new RealMatrix[N];
     for (int i = 0; i < N; i++) {
-      weights[i] = newMatrix(neurons[i], neurons[i+1]);
+      _weights[i] = newMatrix(neurons[i], neurons[i+1]);
     }
   }
   
   public NeuralNet(RealMatrix[] w) {
-    weights = w;
-    N = weights.length;
+    _weights = w;
+    N = _weights.length;
   }
 
   public NeuralNet(double[][][] arr) {
     // TODO: implement
     N = arr.length;
-    weights = new RealMatrix[N];
+    _weights = new RealMatrix[N];
     for (int k = 0; k < N; k++) {
-      weights[k] = new Array2DRowRealMatrix(arr[k].length, arr[k][0].length);
+      _weights[k] = new Array2DRowRealMatrix(arr[k].length, arr[k][0].length);
       for (int i = 0; i < arr[k].length; i++) {
         for (int j = 0; j < arr[k][i].length; j++) {
-          weights[k].setEntry(i, j, arr[k][i][j]);
+          _weights[k].setEntry(i, j, arr[k][i][j]);
         }
       }
     }
@@ -136,7 +137,7 @@ public class NeuralNet {
     for(int k = 0; k < N; k++) {
       // store pre-sigmoid values in outputs[][]
       // X * W = Y
-      outputs[k+1] = weights[k].preMultiply(inputs);
+      outputs[k+1] = _weights[k].preMultiply(inputs);
       
       // new X = sigmoid(Y) except last term
       inputs = sigmoid(outputs[k+1]);
@@ -165,7 +166,7 @@ public class NeuralNet {
       delta[N-1][j] = (sigmoid(outputs[N][j]) - targets[j]) * d_sigmoid(outputs[N][j]);
     }
     for (int k = N-2; k >= 0; k--) {
-      delta[k] = weights[k+1].transpose().preMultiply(delta[k+1]);
+      delta[k] = _weights[k+1].transpose().preMultiply(delta[k+1]);
       // multiply each element by d_sigmoid
       for (int j = 0; j < delta[k].length; j++) {
         delta[k][j] = delta[k][j] * d_sigmoid(outputs[k+1][j]);
@@ -181,27 +182,27 @@ public class NeuralNet {
       RealMatrix layerSlope =
           new ArrayRealVector(outputs[k]).outerProduct(
           new ArrayRealVector(delta[k]));
-      weights[k] = weights[k].subtract(layerSlope.scalarMultiply(LEARNING_RATE));
+      _weights[k] = _weights[k].subtract(layerSlope.scalarMultiply(LEARNING_RATE));
       /*
       System.out.println("new matrix " + k);
-      pp(weights[k]);
+      pp(_weights[k]);
       */
     }
     
     // HACK: just checks one element, forces crash when matrix diverges
-    assert !Double.isNaN(weights[0].getEntry(0,0));
+    assert !Double.isNaN(_weights[0].getEntry(0,0));
   }
 
   public double[][][] toDoubles() {
     double arr[][][] = new double[N][][];
     for (int k = 0; k < N; k++) {
-      int rows = weights[k].getRowDimension();
-      int cols = weights[k].getColumnDimension();
+      int rows = _weights[k].getRowDimension();
+      int cols = _weights[k].getColumnDimension();
       arr[k] = new double[rows][];
       for (int i = 0; i < rows; i++) {
         arr[k][i] = new double[cols];
         for (int j = 0; j < cols; j++) {
-          arr[k][i][j] = weights[k].getEntry(i, j);
+          arr[k][i][j] = _weights[k].getEntry(i, j);
         }
       }
     }
