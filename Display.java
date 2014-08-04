@@ -41,26 +41,27 @@ class Display extends JPanel implements KeyListener {
     long oversleep = 0;
     
     while (true) {
-      long beforeTime = System.currentTimeMillis();
+      long beforeTime = System.nanoTime();
       mainLoop();
       repaint();
-      long afterTime = System.currentTimeMillis();
+      long afterTime = System.nanoTime();
       
       // sleep to manage frameRate
       long duration = afterTime - beforeTime;
-      long waitTime = 1000 / targetFrameRate - duration - oversleep;
+      long waitTime = 1000000000L / targetFrameRate - duration - oversleep;
       if (waitTime > 0) {
         try {
-          Thread.sleep(waitTime);
+          Thread.sleep(waitTime / 1000000);
         } catch(InterruptedException e) {}
       }
-      long lastTime = System.currentTimeMillis();
+      long lastTime = System.nanoTime();
       oversleep = lastTime - (beforeTime + duration + waitTime);
-      frameRate = 0.9 * frameRate + 0.1 * 1000 / (lastTime - beforeTime + 0.01);
+      frameRate = ticker.tick();
     }
   }
 
-  private double frameRate;
+  private Ticker ticker = new Ticker(1000);
+  private long frameRate;
   public void paintComponent(Graphics g) {
     // clear the screen
     g.setColor(Color.WHITE);
