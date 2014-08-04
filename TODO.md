@@ -14,3 +14,8 @@ ASPIRATIONAL
 - actually learn to play TicTacToe
 - implement other TBS games
 - implement realtime game(s)
+
+IDEAS
+-----
+
+- multi-neural-net learner, has multiple neural nets to represent different "questions" (with different network sizes), more complicated games

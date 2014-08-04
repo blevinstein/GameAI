@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-class T3Move extends AbstractMove {
+class T3Move implements Move {
   private int _x;
   public int x() { return _x; }
   private int _y;

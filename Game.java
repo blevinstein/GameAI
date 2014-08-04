@@ -5,17 +5,17 @@ import java.util.ArrayList;
 class Game {
   private T3State _state;
   public T3State state() { return _state; }
-  private ArrayList<AbstractLearner<T3State,T3Move>> players;
+  private ArrayList<Learner<T3State,T3Move>> players;
 
   public Game() {
     this(null, null);
   }
-  public Game(AbstractLearner p) {
+  public Game(Learner<T3State,T3Move> p) {
     this(p, null);
   }
-  public Game(AbstractLearner p1, AbstractLearner p2) {
+  public Game(Learner<T3State,T3Move> p1, Learner<T3State,T3Move> p2) {
     _state = new T3State();
-    players = new ArrayList<AbstractLearner<T3State,T3Move>>();
+    players = new ArrayList<Learner<T3State,T3Move>>();
     players.add(p1);
     players.add(p2);
   }
@@ -32,7 +32,7 @@ class Game {
   // returns number of moves made
   public int play() {
     int movesMade = 0;
-    AbstractLearner<T3State, T3Move> player = players.get(toMove());
+    Learner<T3State, T3Move> player = players.get(toMove());
     while (canStep()) {
       moveMade(player.play(_state.normalize(toMove())));
       movesMade++;
@@ -50,7 +50,7 @@ class Game {
   public void step() {
     if (!canStep()) throw new IllegalArgumentException("Cannot make move.");
     
-    AbstractLearner<T3State, T3Move> player = players.get(toMove());
+    Learner<T3State, T3Move> player = players.get(toMove());
     T3Move m = player.play(_state.normalize(toMove()));
     for (int i = 0; i < 2; i++) {
       if (i == toMove()) continue; // don't tell players about their own moves

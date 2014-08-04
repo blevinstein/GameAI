@@ -32,6 +32,20 @@ public class NeuralNet {
     weights = w;
     N = weights.length;
   }
+
+  public NeuralNet(double[][][] arr) {
+    // TODO: implement
+    N = arr.length;
+    weights = new RealMatrix[N];
+    for (int k = 0; k < N; k++) {
+      weights[k] = new Array2DRowRealMatrix(arr[k].length, arr[k][0].length);
+      for (int i = 0; i < arr[k].length; i++) {
+        for (int j = 0; j < arr[k][i].length; j++) {
+          weights[k].setEntry(i, j, arr[k][i][j]);
+        }
+      }
+    }
+  }
   
   // creates an I x O matrix
   public RealMatrix newMatrix(int inputs, int outputs) {
@@ -40,9 +54,9 @@ public class NeuralNet {
     for (int i = 0; i < inputs + 1; i++) {
       for (int j = 0; j < outputs; j++) {
         // TODO: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
-        // mat.setEntry(i, j, (Math.random() * 2 - 1) * (1 / Math.sqrt(inputs)));
+        // mat.setEntry(i, j, Util.random() * (1 / Math.sqrt(inputs)));
         // http://www.willamette.edu/~gorr/classes/cs449/precond.html
-        mat.setEntry(i, j, Math.random() - 0.5);
+        mat.setEntry(i, j, Util.random());
       }
     }
     // last col is [ 0 0 ..  1 ]
@@ -176,5 +190,21 @@ public class NeuralNet {
     
     // HACK: just checks one element, forces crash when matrix diverges
     assert !Double.isNaN(weights[0].getEntry(0,0));
+  }
+
+  public double[][][] toDoubles() {
+    double arr[][][] = new double[N][][];
+    for (int k = 0; k < N; k++) {
+      int rows = weights[k].getRowDimension();
+      int cols = weights[k].getColumnDimension();
+      arr[k] = new double[rows][];
+      for (int i = 0; i < rows; i++) {
+        arr[k][i] = new double[cols];
+        for (int j = 0; j < cols; j++) {
+          arr[k][i][j] = weights[k].getEntry(i, j);
+        }
+      }
+    }
+    return arr;
   }
 }

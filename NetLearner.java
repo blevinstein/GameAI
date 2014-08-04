@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 // represents knowledge with a neural network
-class NetLearner extends AbstractLearner<T3State, T3Move> {
+class NetLearner implements Learner<T3State, T3Move> {
   private double EPSILON = 0.1;
   
   private NeuralNet _net;

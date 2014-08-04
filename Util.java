@@ -11,4 +11,9 @@ public class Util {
     while (chosen > prob[k]) chosen -= prob[k++];
     return k;
   }
+
+  // returns a random number between -1 and 1
+  public static double random() {
+    return Math.random() * 2 - 1;
+  }
 }

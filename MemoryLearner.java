@@ -6,7 +6,7 @@ import java.util.Set;
 // represents knowledge with a mapping of AbstractState -> Float
 // can play a game and get better over time
 // obvious weakness: learns every state individually
-class MemoryLearner extends AbstractLearner<T3State, T3Move> {
+class MemoryLearner implements Learner<T3State, T3Move> {
   private double DISCOUNT = 0.9f;
   private double LEARNING_RATE = 0.3f;
   private double EPSILON = 0.10f;
@@ -18,7 +18,7 @@ class MemoryLearner extends AbstractLearner<T3State, T3Move> {
     this(new ConcurrentHashMap<String, Double>());
   }
   public MemoryLearner(Map<String, Double> map) {
-    _map = new ConcurrentHashMap(map);
+    _map = new ConcurrentHashMap<String,Double>(map);
   }
   
   // returns set of all states in memory

@@ -15,18 +15,7 @@ class Json {
   static Gson gson = new Gson();
   public static void saveNet(NeuralNet net, String fname) {
     RealMatrix weights[] = net.getWeights();
-    double matrices[][][] = new double[weights.length][][];
-    for (int k = 0; k < matrices.length; k++) {
-      double matrix[][] = new double[weights[k].getRowDimension()][];
-      for (int i = 0; i < matrix.length; i++) {
-        double row[] = new double[weights[k].getColumnDimension()];
-        for (int j = 0; j < row.length; j++) {
-          row[j] = weights[k].getEntry(i,j);
-        }
-        matrix[i] = row;
-      }
-      matrices[k] = matrix;
-    }
+    double matrices[][][] = net.toDoubles();
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(matrices));
     } catch(IOException e) {
@@ -39,10 +28,7 @@ class Json {
   
     try {
       double matrices[][][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][][].class);
-      for (int k = 0; k < matrices.length; k++) {
-        weights.add(new Array2DRowRealMatrix(matrices[k]));
-      }
-      return new NeuralNet(weights.toArray(new RealMatrix[0]));
+      return new NeuralNet(matrices);
     } catch (IOException e) {
       System.err.println("Could not load net!");
       return null;
@@ -56,11 +42,11 @@ class Json {
       System.err.println("Could not save map!");
     }
   }
-  
+ 
+  @SuppressWarnings(value = "unchecked")
   public static Map<String, Double> loadMap(String fname) {
     try {
-      Map<String, Double> hm = new HashMap<String, Double>();
-      hm = gson.fromJson(FileUtils.readFileToString(new File(fname)), hm.getClass());
+      Map<String, Double> hm = gson.fromJson(FileUtils.readFileToString(new File(fname)), HashMap.class);
       return hm;
     } catch (IOException e) {
       System.err.println("Could not load map! " + e);

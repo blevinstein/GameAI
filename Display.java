@@ -13,7 +13,7 @@ class Display extends JPanel implements KeyListener {
   private Game game = new Game();
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
-  private AbstractLearner player1 = netLearner, player2 = null;
+  private Learner<T3State,T3Move> player1 = netLearner, player2 = null;
   private int wins[] = new int[]{0, 0};
   private T3Move suggested; // the best move, as suggested by the AI
   
@@ -23,7 +23,7 @@ class Display extends JPanel implements KeyListener {
     
     // load learners
     try {
-      Map map = Json.loadMap("brain.json");
+      Map<String, Double> map = Json.loadMap("brain.json");
       if (map != null) memLearner = new MemoryLearner(map);
       
       NeuralNet net = Json.loadNet("net.json");
@@ -60,7 +60,7 @@ class Display extends JPanel implements KeyListener {
     }
   }
 
-  private Ticker ticker = new Ticker(1000);
+  private Ticker ticker = new Ticker(10);
   private long frameRate;
   public void paintComponent(Graphics g) {
     // clear the screen
@@ -156,7 +156,8 @@ class Display extends JPanel implements KeyListener {
   public void keyTyped(KeyEvent e) {}
   
   // MISC METHODS
-  private void setMode(AbstractLearner a, AbstractLearner b, String str) {
+  private void setMode(Learner<T3State,T3Move> a,
+                       Learner<T3State,T3Move> b, String str) {
     player1 = a;
     player2 = b;
     game = newGame();
