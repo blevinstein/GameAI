@@ -1,6 +1,5 @@
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.PriorityQueue;
 
 class Population {
   // TODO: track best individual, best fitness, etc
@@ -36,9 +35,8 @@ class Population {
   // simulate an epoch, resulting in a more evolved population
   public Population epoch() { return epoch(_pop.size()); }
   public Population epoch(int size) {
-    ArrayList<Genome> newPop = new ArrayList<Genome>();
-    //ArrayList<Genome> newPop = new ArrayList<Genome>(bestN((int)(ELITE * size)));
-    for (int i = 0; i < size; i++) {
+    ArrayList<Genome> newPop = bestN((int)(ELITE * size));
+    while (newPop.size() < size) {
       Genome child;
       if (Math.random() < CROSSOVER_RATE) {
         // sexual mating
@@ -68,7 +66,6 @@ class Population {
       if (f[i] > best || i == 0) best = f[i];
       if (f[i] < worst || i == 0) worst = f[i];
       avg += f[i];
-      f[i] *= f[i];
     }
     avg /= f.length;
     System.out.print("Best " + best + " Worst " + worst + " Avg " + avg);
@@ -78,10 +75,20 @@ class Population {
     return f;
   }
 
-  public List<Genome> bestN(int n) {
-    ArrayList<Genome> list = new ArrayList<Genome>(_pop);
-    Collections.sort(list, (g1, g2) -> Double.compare(_grader.grade(g1),(_grader.grade(g2))));
-    return list.subList(0, n);
+  public ArrayList<Genome> bestN(int n) {
+    // add all elements to a priority queue
+    PriorityQueue<Integer> pq = new PriorityQueue<Integer>(_pop.size(), (i1, i2) -> Double.compare(_fitness[i2],_fitness[i1]));
+    for (int i = 0; i < _pop.size(); i++) {
+      pq.add(i);
+    }
+
+    // pop the top N items off the priority queue
+    ArrayList<Genome> list = new ArrayList<Genome>();
+    for (int i = 0; i < n; i++) {
+      int index = pq.poll();
+      list.add(_pop.get(index));
+    }
+    return list;
   }
 
   // choose a successor, weighted on fitness

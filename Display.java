@@ -39,8 +39,17 @@ class Display extends JPanel implements KeyListener {
   }
   
   public void run() {
-    long oversleep = 0;
-   
+    // evolve population in a separate thread
+    new Thread(() -> {
+      Throttle t = new Throttle(100);
+      while (true) {
+        population = population.epoch();
+        netLearner = NetLearner.fromGenome(population.sample());
+        t.sleep();
+      }
+    }).start();
+
+    // main loop and repainting
     Throttle t = new Throttle(100); // target frame rate
     while (true) {
       mainLoop();
@@ -155,9 +164,6 @@ class Display extends JPanel implements KeyListener {
   }
   private void mainLoop() {
     if (game.done()) {
-      // HACK: should happen in parallel, not tied to display games
-      //population = population.epoch();
-      //netLearner = NetLearner.fromGenome(population.sample());
       // print winner and count wins
       switch(game.winner()) {
         case T3Square.X: wins[T3Square.X]++; break;
