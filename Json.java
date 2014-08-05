@@ -18,6 +18,7 @@ class Json {
     double genomes[][] = pop.toDoubles();
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(genomes));
+      System.out.println("Saved population of " + pop.pop().size() + " to " + fname + ".");
     } catch(IOException e) {
       System.err.println("Could not save pop!");
     }
@@ -26,6 +27,7 @@ class Json {
   public static Population loadPop(String fname, Grader grader) {
     try {
       double genomes[][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][].class);
+      System.out.println("Loaded population of " + genomes.length + ".");
       return new Population(grader, genomes);
     } catch(IOException e) {
       System.err.println("Could not load pop!");
@@ -38,6 +40,7 @@ class Json {
     double matrices[][][] = net.toDoubles();
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(matrices));
+      System.out.println("Saved neural net of dimension " + PP.dimOf(weights) + " to " + fname + ".");
     } catch(IOException e) {
       System.err.println("Could not save net!");
     }
@@ -48,6 +51,7 @@ class Json {
   
     try {
       double matrices[][][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][][].class);
+      System.out.println("Loaded neural net.");
       return new NeuralNet(matrices);
     } catch (IOException e) {
       System.err.println("Could not load net!");
@@ -58,6 +62,7 @@ class Json {
   public static void saveMap(Map<String,Double> map, String fname) {
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(map));
+      System.out.println("Saved map of " + map.size() + " knowledge to " + fname + ".");
     } catch (IOException e) {
       System.err.println("Could not save map!");
     }
@@ -67,6 +72,7 @@ class Json {
   public static Map<String, Double> loadMap(String fname) {
     try {
       Map<String, Double> hm = gson.fromJson(FileUtils.readFileToString(new File(fname)), HashMap.class);
+      System.out.println("Loaded map of " + hm.size() + " knowledge.");
       return hm;
     } catch (IOException e) {
       System.err.println("Could not load map! " + e);

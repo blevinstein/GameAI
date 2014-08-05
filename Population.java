@@ -12,34 +12,39 @@ class Population {
   private Grader _grader;
   private double[] _fitness; // private for HIPPA reasons
 
-  public Population(Population prev, int size) {
-    _grader = prev._grader;
+  public Population(Grader grader, int size, int genomeLen) {
+    _grader = grader;
     _pop = new ArrayList<Genome>();
-    for (int i = 0; i < size; i++) {
-      Genome child;
-      if (Math.random() < CROSSOVER_RATE) {
-        // sexual mating
-        child = prev.sample().crossover(prev.sample());
-      } else {
-        // survival
-        child = prev.sample();
-      }
-      _pop.add(child.mutate(MUTATION_RATE, MAX_MUTATION));
-    }
+    while (_pop.size() < size) _pop.add(new Genome(genomeLen));
     _fitness = calcFitness();
   }
-
   public Population(Grader grader, ArrayList<Genome> pop) {
     _grader = grader;
     _pop = pop;
     _fitness = calcFitness();
   }
-
   public Population(Grader grader, double array[][]) {
     _grader = grader;
     _pop = new ArrayList<Genome>();
     for (double genome[] : array) _pop.add(new Genome(genome));
     _fitness = calcFitness();
+  }
+
+  public Population epoch() { return epoch(_pop.size()); }
+  public Population epoch(int size) {
+    ArrayList<Genome> newPop = new ArrayList<Genome>();
+    for (int i = 0; i < size; i++) {
+      Genome child;
+      if (Math.random() < CROSSOVER_RATE) {
+        // sexual mating
+        child = sample().crossover(sample());
+      } else {
+        // survival
+        child = sample();
+      }
+      newPop.add(child.mutate(MUTATION_RATE, MAX_MUTATION));
+    }
+    return new Population(_grader, newPop);
   }
 
   // returns an array of fitness values corresponding to pop members

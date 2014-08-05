@@ -1,12 +1,16 @@
 class Genome {
   private double[] _genes;
   public double[] genes() { return _genes; }
+  public int size() { return _genes.length; }
 
-  public Genome(double[] genes) {
-    _genes = genes;
-  }
+  // creates genome with random values in [-1..1]
   public Genome(int size) {
     _genes = new double[size];
+    for (int i = 0; i < size; i++) _genes[i] = Util.random();
+  }
+  // double[] -> Genome
+  public Genome(double[] genes) {
+    _genes = genes;
   }
 
   // return a slightly perturbed version

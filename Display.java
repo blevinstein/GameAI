@@ -10,9 +10,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 class Display extends JPanel implements KeyListener {
+  private final int POPULATION_SIZE = 100;
+
   private Game game = new Game();
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
+  Grader grader = new GraderVs(memLearner, 100);
+  private Population population = new Population(grader, POPULATION_SIZE, netLearner.genome().size());
   private Learner<T3State,T3Move> player1 = netLearner, player2 = null;
   private int wins[] = new int[]{0, 0};
   private T3Move suggested; // the best move, as suggested by the AI
@@ -25,9 +29,9 @@ class Display extends JPanel implements KeyListener {
     try {
       Map<String, Double> map = Json.loadMap("brain.json");
       if (map != null) memLearner = new MemoryLearner(map);
-      
-      NeuralNet net = Json.loadNet("net.json");
-      if (net != null) netLearner = new NetLearner(net);
+
+      Population pop = Json.loadPop("pop.json", grader);
+      if (pop != null) population = pop;
       
     } catch (Exception e) {
       System.err.println("Couldn't load. " + e.getMessage());
@@ -101,14 +105,12 @@ class Display extends JPanel implements KeyListener {
       }
       break;
     case KeyEvent.VK_S:
-      System.out.println("Saving...");
       Json.saveMap(memLearner.map(), "brain.json");
-      Json.saveNet(netLearner.net(), "net.json");
+      Json.savePop(population, "pop.json");
       break;
     case KeyEvent.VK_L:
-      System.out.println("Loading...");
       memLearner = new MemoryLearner(Json.loadMap("brain.json"));
-      netLearner = new NetLearner(Json.loadNet("net.json"));
+      population = Json.loadPop("pop.json", grader);
       break;
     case KeyEvent.VK_M:
       // different "game modes"
@@ -168,6 +170,9 @@ class Display extends JPanel implements KeyListener {
   }
   private void mainLoop() {
     if (game.done()) {
+      // HACK: should happen in parallel, not tied to display games
+      population = population.epoch();
+      netLearner = NetLearner.fromGenome(population.sample());
       // print winner and count wins
       switch(game.winner()) {
         case T3Square.X: wins[T3Square.X]++; System.out.print("X"); break;
