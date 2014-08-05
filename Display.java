@@ -38,28 +38,14 @@ class Display extends JPanel implements KeyListener {
     }
   }
   
-  // sleep timing logic in main loop, inspired by Processing
-  // https://code.google.com/p/processing/source/browse/trunk/processing/android/core/src/processing/core/PApplet.java?r=7046
-  private long targetFrameRate = 100;
   public void run() {
     long oversleep = 0;
-    
+   
+    Throttle t = new Throttle(100); // target frame rate
     while (true) {
-      long beforeTime = System.nanoTime();
       mainLoop();
       repaint();
-      long afterTime = System.nanoTime();
-      
-      // sleep to manage frameRate
-      long duration = afterTime - beforeTime;
-      long waitTime = 1000000000L / targetFrameRate - duration - oversleep;
-      if (waitTime > 0) {
-        try {
-          Thread.sleep(waitTime / 1000000);
-        } catch(InterruptedException e) {}
-      }
-      long lastTime = System.nanoTime();
-      oversleep = lastTime - (beforeTime + duration + waitTime);
+      t.sleep();
       frameRate = ticker.tick();
     }
   }
@@ -170,8 +156,8 @@ class Display extends JPanel implements KeyListener {
   private void mainLoop() {
     if (game.done()) {
       // HACK: should happen in parallel, not tied to display games
-      population = population.epoch();
-      netLearner = NetLearner.fromGenome(population.sample());
+      //population = population.epoch();
+      //netLearner = NetLearner.fromGenome(population.sample());
       // print winner and count wins
       switch(game.winner()) {
         case T3Square.X: wins[T3Square.X]++; break;
