@@ -115,7 +115,6 @@ class Display extends JPanel implements KeyListener {
     case KeyEvent.VK_M:
       // different "game modes"
       mode = (mode + 1) % 5;
-      System.out.println();
       switch (mode) {
       case 0: 
         setMode(netLearner, null, "NxP"); 
@@ -175,9 +174,8 @@ class Display extends JPanel implements KeyListener {
       netLearner = NetLearner.fromGenome(population.sample());
       // print winner and count wins
       switch(game.winner()) {
-        case T3Square.X: wins[T3Square.X]++; System.out.print("X"); break;
-        case T3Square.O: wins[T3Square.O]++; System.out.print("O"); break;
-        default: System.out.print("T"); break;
+        case T3Square.X: wins[T3Square.X]++; break;
+        case T3Square.O: wins[T3Square.O]++; break;
       }
       // start new game
       game = newGame();

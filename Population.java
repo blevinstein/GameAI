@@ -1,10 +1,13 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class Population {
   // TODO: track best individual, best fitness, etc
   private final double MAX_MUTATION = 1.0;
   private final double MUTATION_RATE = 0.1;
   private final double CROSSOVER_RATE = 0.7;
+  private final double ELITE = 0.1;
 
   private ArrayList<Genome> _pop;
   public ArrayList<Genome> pop() { return _pop; }
@@ -30,9 +33,11 @@ class Population {
     _fitness = calcFitness();
   }
 
+  // simulate an epoch, resulting in a more evolved population
   public Population epoch() { return epoch(_pop.size()); }
   public Population epoch(int size) {
     ArrayList<Genome> newPop = new ArrayList<Genome>();
+    //ArrayList<Genome> newPop = new ArrayList<Genome>(bestN((int)(ELITE * size)));
     for (int i = 0; i < size; i++) {
       Genome child;
       if (Math.random() < CROSSOVER_RATE) {
@@ -49,14 +54,34 @@ class Population {
 
   // returns an array of fitness values corresponding to pop members
   private double[] calcFitness() {
-    System.out.print("Grading new population..");
+    // TODO: parallelize this
+    System.out.print("Grading new population... ");
+
+    long before = System.currentTimeMillis();
+
     double f[] = new double[_pop.size()];
+    double best = 0;
+    double worst = 0;
+    double avg = 0;
     for (int i = 0; i < f.length; i++) {
       f[i] = _grader.grade(_pop.get(i));
-      System.out.print(".");
+      if (f[i] > best || i == 0) best = f[i];
+      if (f[i] < worst || i == 0) worst = f[i];
+      avg += f[i];
+      f[i] *= f[i];
     }
-    System.out.println();
+    avg /= f.length;
+    System.out.print("Best " + best + " Worst " + worst + " Avg " + avg);
+
+    long duration = System.currentTimeMillis() - before;
+    System.out.println(" " + duration + "ms");
     return f;
+  }
+
+  public List<Genome> bestN(int n) {
+    ArrayList<Genome> list = new ArrayList<Genome>(_pop);
+    Collections.sort(list, (g1, g2) -> Double.compare(_grader.grade(g1),(_grader.grade(g2))));
+    return list.subList(0, n);
   }
 
   // choose a successor, weighted on fitness
