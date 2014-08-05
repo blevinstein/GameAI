@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.PriorityQueue;
 
 class Population {
@@ -6,7 +9,7 @@ class Population {
   private final double MAX_MUTATION = 1.0;
   private final double MUTATION_RATE = 0.1;
   private final double CROSSOVER_RATE = 0.7;
-  private final double ELITE = 0.1;
+  private final double ELITE = 0.05;
 
   private ArrayList<Genome> _pop;
   public ArrayList<Genome> pop() { return _pop; }
@@ -32,7 +35,7 @@ class Population {
     _fitness = calcFitness();
   }
 
-  // simulate an epoch, resulting in a more evolved population
+  // simulate an epoch, returning a more evolved population
   public Population epoch() { return epoch(_pop.size()); }
   public Population epoch(int size) {
     ArrayList<Genome> newPop = bestN((int)(ELITE * size));
@@ -55,21 +58,41 @@ class Population {
     // TODO: parallelize this
     System.out.print("Grading new population... ");
 
+    // create a thread pool
+    //ExecutorService threadPool = Executors.newCachedThreadPool();
+    ExecutorService threadPool = Executors.newFixedThreadPool(8);
+
     long before = System.currentTimeMillis();
 
+    // calculate fitness values in individual threads
     double f[] = new double[_pop.size()];
+    for (int i = 0; i < f.length; i++) {
+      final int j = i;
+      threadPool.submit(() -> {
+        f[j] = _grader.grade(_pop.get(j));
+      });
+    }
+
+    // wait until thread pool is done
+    threadPool.shutdown();
+    while (true) {
+      try {
+        if (threadPool.awaitTermination(5, TimeUnit.MILLISECONDS))
+          break;
+      } catch(InterruptedException e) {}
+    }
+
     double best = 0;
     double worst = 0;
     double avg = 0;
     for (int i = 0; i < f.length; i++) {
-      f[i] = _grader.grade(_pop.get(i));
       if (f[i] > best || i == 0) best = f[i];
       if (f[i] < worst || i == 0) worst = f[i];
       avg += f[i];
     }
     avg /= f.length;
+    
     System.out.print("Best " + best + " Worst " + worst + " Avg " + avg);
-
     long duration = System.currentTimeMillis() - before;
     System.out.println(" " + duration + "ms");
     return f;

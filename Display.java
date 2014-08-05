@@ -11,11 +11,12 @@ import javax.swing.JPanel;
 
 class Display extends JPanel implements KeyListener {
   private final int POPULATION_SIZE = 100;
+  private final int NUM_GAMES = 100;
 
   private Game game = new Game();
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
-  Grader grader = new GraderVs(memLearner, 100);
+  Grader grader = new GraderVs(memLearner, NUM_GAMES);
   private Population population = new Population(grader, POPULATION_SIZE, netLearner.genome().size());
   private Learner<T3State,T3Move> player1 = netLearner, player2 = null;
   private int wins[] = new int[]{0, 0};
@@ -41,11 +42,9 @@ class Display extends JPanel implements KeyListener {
   public void run() {
     // evolve population in a separate thread
     new Thread(() -> {
-      Throttle t = new Throttle(100);
       while (true) {
         population = population.epoch();
         netLearner = NetLearner.fromGenome(population.sample());
-        t.sleep();
       }
     }).start();
 
