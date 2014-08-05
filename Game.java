@@ -59,6 +59,8 @@ class Game {
       players.get(i).moveMade(_state.normalize(i), m);
     }
     moveMade(m);
+
+    feedback();
   }
   
   // if applicable, give feedback to players

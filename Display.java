@@ -44,12 +44,13 @@ class Display extends JPanel implements KeyListener {
     new Thread(() -> {
       while (true) {
         population = population.epoch();
-        netLearner = NetLearner.fromGenome(population.sample());
+        Genome best = population.bestN(1).get(0);
+        netLearner = NetLearner.fromGenome(best);
       }
     }).start();
 
     // main loop and repainting
-    Throttle t = new Throttle(100); // target frame rate
+    Throttle t = new Throttle(60); // target frame rate
     while (true) {
       mainLoop();
       repaint();
