@@ -65,10 +65,12 @@ class Game {
   
   // if applicable, give feedback to players
   private void feedback() {
-    // TODO: allow feedback on every move?
     if (done()) {
       for (int i = 0; i < 2; i++) {
-        players.get(i).feedback(_state.score(i));
+        Learner<T3State,T3Move> player = players.get(i);
+        if (player != null) {
+          player.feedback(_state.score(i));
+        }
       }
     }
   }

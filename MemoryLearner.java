@@ -7,9 +7,9 @@ import java.util.Set;
 // can play a game and get better over time
 // obvious weakness: learns every state individually
 class MemoryLearner implements Learner<T3State, T3Move> {
-  private double DISCOUNT = 0.9f;
-  private double LEARNING_RATE = 0.3f;
-  private double EPSILON = 0.10f;
+  private double DISCOUNT = 0.9;
+  private double LEARNING_RATE = 0.3;
+  private double EPSILON = 0.0;
 
   private ConcurrentHashMap<String, Double> _map;
   public Map<String, Double> map() { return _map; }

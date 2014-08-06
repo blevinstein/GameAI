@@ -16,7 +16,7 @@ class GraderVs implements Grader {
           score += 1.0;
           break;
         case 0: // student wins!
-          score += 3.0;
+          score += 2.0;
           break;
         case 1: // student loses
           break;

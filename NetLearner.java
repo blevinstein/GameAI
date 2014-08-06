@@ -11,7 +11,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 
 // represents knowledge with a neural network
 class NetLearner implements Learner<T3State, T3Move> {
-  private double EPSILON = 0.1;
+  private double EPSILON = 0.0;
   
   private NeuralNet _net;
   public NeuralNet net() { return _net; }
@@ -20,7 +20,7 @@ class NetLearner implements Learner<T3State, T3Move> {
   private ArrayList<double[][]> otherMoves = new ArrayList<double[][]>();
   
   public NetLearner() {
-    this(new NeuralNet(new int[]{18, 16, 9}));
+    this(new NeuralNet(new int[]{18, 14, 9}));
   }
   public NetLearner(NeuralNet n) {
     assert n != null;
@@ -36,16 +36,11 @@ class NetLearner implements Learner<T3State, T3Move> {
     
     double input[] = s.toDoubles();
     double output[] = _net.process(input);
-    // disable invalid moves
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        if (!s.validMove(new T3Move(i,j))) {
-          output[i*3 + j] = 0;
-        }
-      }
-    }
+
     int idx = Util.choose(output);
     T3Move m = new T3Move(idx/3, idx%3);
+    // replace invalid moves wih random moves
+    if (!s.validMove(m)) return s.randomMove();
     return m;
   }
   

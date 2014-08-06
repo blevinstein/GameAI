@@ -55,12 +55,8 @@ class Population {
 
   // returns an array of fitness values corresponding to pop members
   private double[] calcFitness() {
-    // TODO: parallelize this
-    System.out.print("Grading new population... ");
-
     // create a thread pool
-    //ExecutorService threadPool = Executors.newCachedThreadPool();
-    ExecutorService threadPool = Executors.newFixedThreadPool(8);
+    ExecutorService threadPool = Executors.newCachedThreadPool();
 
     long before = System.currentTimeMillis();
 
