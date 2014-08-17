@@ -1,46 +1,52 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.PriorityQueue;
 
-class Population {
+class Population<T extends Genome<T>> {
   // TODO: track best individual, best fitness, etc
-  private final double MAX_MUTATION = 1.0;
-  private final double MUTATION_RATE = 0.1;
   private final double CROSSOVER_RATE = 0.7;
   private final double ELITE = 0.05;
 
-  private ArrayList<Genome> _pop;
-  public ArrayList<Genome> pop() { return _pop; }
+  private ArrayList<T> _pop;
+  public ArrayList<T> pop() { return _pop; }
 
-  private Grader _grader;
+  private Grader<T> _grader;
   private double[] _fitness; // private for HIPPA reasons
 
-  public Population(Grader grader, int size, int genomeLen) {
+  // TODO: add default grader for a type? for any type? add setGrader() method?
+
+  public Population(Grader<T> grader, int size, Callable<T> generator) {
     _grader = grader;
-    _pop = new ArrayList<Genome>();
-    while (_pop.size() < size) _pop.add(new Genome(genomeLen));
+    _pop = new ArrayList<T>();
+    try { // HACK: allow generic exceptions from Callable
+      while (_pop.size() < size) _pop.add(generator.call());
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+    }
     _fitness = calcFitness();
   }
-  public Population(Grader grader, ArrayList<Genome> pop) {
+  public Population(Grader<T> grader, Collection<T> pop) {
     _grader = grader;
-    _pop = pop;
+    _pop = new ArrayList<T>(pop);
     _fitness = calcFitness();
   }
-  public Population(Grader grader, double array[][]) {
+  public Population(Grader<T> grader, T array[]) {
     _grader = grader;
-    _pop = new ArrayList<Genome>();
-    for (double genome[] : array) _pop.add(new Genome(genome));
+    _pop = new ArrayList<T>();
+    for (T genome : array) _pop.add(genome);
     _fitness = calcFitness();
   }
 
   // simulate an epoch, returning a more evolved population
-  public Population epoch() { return epoch(_pop.size()); }
-  public Population epoch(int size) {
-    ArrayList<Genome> newPop = bestN((int)(ELITE * size));
+  public Population<T> epoch() { return epoch(_pop.size()); }
+  public Population<T> epoch(int size) {
+    ArrayList<T> newPop = bestN((int)(ELITE * size));
     while (newPop.size() < size) {
-      Genome child;
+      T child;
       if (Math.random() < CROSSOVER_RATE) {
         // sexual mating
         child = sample().crossover(sample());
@@ -48,9 +54,9 @@ class Population {
         // survival
         child = sample();
       }
-      newPop.add(child.mutate(MUTATION_RATE, MAX_MUTATION));
+      newPop.add(child.mutate());
     }
-    return new Population(_grader, newPop);
+    return new Population<T>(_grader, newPop);
   }
 
   // returns an array of fitness values corresponding to pop members
@@ -94,7 +100,7 @@ class Population {
     return f;
   }
 
-  public ArrayList<Genome> bestN(int n) {
+  public List<T> bestN(int n) {
     // add all elements to a priority queue
     PriorityQueue<Integer> pq = new PriorityQueue<Integer>(_pop.size(), (i1, i2) -> Double.compare(_fitness[i2],_fitness[i1]));
     for (int i = 0; i < _pop.size(); i++) {
@@ -102,7 +108,7 @@ class Population {
     }
 
     // pop the top N items off the priority queue
-    ArrayList<Genome> list = new ArrayList<Genome>();
+    ArrayList<T> list = new ArrayList<T>();
     for (int i = 0; i < n; i++) {
       int index = pq.poll();
       list.add(_pop.get(index));
@@ -111,17 +117,22 @@ class Population {
   }
 
   // choose a successor, weighted on fitness
-  public Genome sample() {
+  public T sample() {
     int index = Util.choose(_fitness);
     return _pop.get(index);
   }
 
+  /*
   // dump to Doubles, to allow saving as JSON
-  public double[][] toDoubles() {
-    double array[][] = new double[_pop.size()][];
+  // HACK: return type double[][][][] is NeuralNet-specific
+  public double[][][][] toDoubles() {
+    double array[][][][] = new double[_pop.size()][][][];
     for (int i = 0; i < _pop.size(); i++) {
-      array[i] = _pop.get(i).genes();
+      // HACK: cast to NeuralNet specifically
+      NeuralNet n = (NeuralNet)_pop.get(i);
+      array[i] = n.toDoubles();
     }
     return array;
   }
+  */
 }

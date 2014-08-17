@@ -9,12 +9,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
-// TODO: add console output when saving/loading
+// TODO: write serializers and deserializers for each class
 
 class Json {
   static Gson gson = new Gson();
 
-  public static void savePop(Population pop, String fname) {
+  /*
+  public static void savePop(Population<T> pop, String fname) {
     double genomes[][] = pop.toDoubles();
     try {
       FileUtils.writeStringToFile(new File(fname), gson.toJson(genomes));
@@ -24,11 +25,11 @@ class Json {
     }
   }
 
-  public static Population loadPop(String fname, Grader grader) {
+  public static <T> Population<T> loadPop(String fname, Grader grader) {
     try {
       double genomes[][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][].class);
       System.out.println("Loaded population of " + genomes.length + ".");
-      return new Population(grader, genomes);
+      return new Population<T>(grader, genomes);
     } catch(IOException e) {
       System.err.println("Could not load pop!");
       return null;
@@ -58,25 +59,26 @@ class Json {
       return null;
     }
   }
-  
-  public static void saveMap(Map<String,Double> map, String fname) {
+  */
+
+  public static <T> void save(T object, String fname) {
+    String type = object.getClass().getName();
     try {
-      FileUtils.writeStringToFile(new File(fname), gson.toJson(map));
-      System.out.println("Saved map of " + map.size() + " knowledge to " + fname + ".");
+      FileUtils.writeStringToFile(new File(fname), gson.toJson(object));
+      System.out.println("Saved a " + type + " to " + fname + ".");
     } catch (IOException e) {
-      System.err.println("Could not save map!");
+      System.err.println("Could not save a " + type + " to " + fname + "!");
     }
   }
- 
-  @SuppressWarnings(value = "unchecked")
-  public static Map<String, Double> loadMap(String fname) {
+
+  public static <T> T load(String fname, Class<T> klass) {
+    String type = klass.getName();
     try {
-      Map<String, Double> hm = gson.fromJson(FileUtils.readFileToString(new File(fname)), HashMap.class);
-      System.out.println("Loaded map of " + hm.size() + " knowledge.");
-      return hm;
+      T object = gson.fromJson(FileUtils.readFileToString(new File(fname)), klass);
+      System.out.println("Loaded a " + type + " from " + fname + ".");
+      return object;
     } catch (IOException e) {
-      System.err.println("Could not load map! " + e);
-      return null;
+      System.err.println("Could not load a " + type + " from " + fname + "!");
     }
   }
 }

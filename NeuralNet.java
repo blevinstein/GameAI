@@ -1,12 +1,14 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Function;
+import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 // represents a neural network using matrices
-public class NeuralNet {
+public class NeuralNet implements Genome<NeuralNet> {
   //[ y0 ]   [ w00 w01 w02 t0 ][ x0 ]
   //[ y1 ] = [ w10 w11 w12 t1 ][ x1 ]
   //[ -1 ]   [ 0   0   0   1  ][ x2 ]
@@ -21,11 +23,24 @@ public class NeuralNet {
   
   private final int N; // numbers of layers, for convenience
   
+  // TODO: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
+  // http://www.willamette.edu/~gorr/classes/cs449/precond.html
   public NeuralNet(int neurons[]) {
     N = neurons.length-1;
     _weights = new RealMatrix[N];
-    for (int i = 0; i < N; i++) {
-      _weights[i] = newMatrix(neurons[i], neurons[i+1]);
+    for (int k = 0; k < N; k++) {
+      // rows and cols have +1 to include bias term
+      int rows = neurons[k] + 1;
+      int cols = neurons[k+1] + 1;
+      _weights[k] = MatrixUtils.createRealMatrix(rows, cols);
+
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+          _weights[k].setEntry(i, j, Util.random());
+        }
+      }
+
+      setupMatrix(_weights[k]);
     }
   }
   
@@ -34,8 +49,8 @@ public class NeuralNet {
     N = _weights.length;
   }
 
+  /*
   public NeuralNet(double[][][] arr) {
-    // TODO: implement
     N = arr.length;
     _weights = new RealMatrix[N];
     for (int k = 0; k < N; k++) {
@@ -47,47 +62,28 @@ public class NeuralNet {
       }
     }
   }
-  
-  // creates an I x O matrix
-  public RealMatrix newMatrix(int inputs, int outputs) {
-    RealMatrix mat = new Array2DRowRealMatrix(inputs+1, outputs+1);
-    // initialize matrix values between -1 and 1 times max_weight
-    for (int i = 0; i < inputs + 1; i++) {
-      for (int j = 0; j < outputs; j++) {
-        // TODO: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
-        // mat.setEntry(i, j, Util.random() * (1 / Math.sqrt(inputs)));
-        // http://www.willamette.edu/~gorr/classes/cs449/precond.html
-        mat.setEntry(i, j, Util.random());
-      }
-    }
-    // last col is [ 0 0 ..  1 ]
-    for (int i = 0; i < inputs; i++) {
-      mat.setEntry(i, outputs, 0);
-    }
-    mat.setEntry(inputs, outputs, 1);
-    /*
-    System.out.println("new matrix");
-    pp(mat);
-    */
-    return mat;
+  */
+
+  // sets last column of matrix to [ 0 0 .. 0 1 ]
+  private static void setupMatrix(RealMatrix m) {
+    int rows = m.getRowDimension();
+    int cols = m.getColumnDimension();
+    for (int i = 0; i < rows; i++) m.setEntry(i, cols-1, 0.0);
+    m.setEntry(rows-1, cols-1, 1.0);
   }
-  
-  // TODO: Java 8 support! Lambdas!
-  //
-  // NOTE: Should use tanh instead of 1/(1+e^(-u)) as suggested by
+
+  // TODO: Should use tanh instead of 1/(1+e^(-u)) as suggested by
   // http://www.willamette.edu/~gorr/classes/cs449/precond.html
-  private static double sigmoid(double x) {
-    return 1/(1 + Math.exp(-x));
-    //return Math.tanh(x);
+  // TODO: use Java 8 lambdas?
+  double sigmoid(double x) { return 1 / (1 + Math.exp(-x)); }
+  double d_sigmoid(double x) {
+    // NOTE: sacrificing pretty syntax to avoid calling sigmoid() twice
+    double s = sigmoid(x);
+    return s * (1 - s);
   }
-  // derivative of sigmoid
-  private static double d_sigmoid(double x) {
-    return sigmoid(x) * (1 - sigmoid(x));
-    // dtanh(x)/dx = sech(x)^2
-    //double sech = 1.0 / Math.cosh(x);
-    //return sech * sech;
-  }
-  
+ 
+  // TODO: replace with map(sigmoid, x[])
+  /*
   private static double[] sigmoid(double x[]) {
     int M = x.length;
     double y[] = new double[M];
@@ -98,6 +94,7 @@ public class NeuralNet {
     y[M-1] = x[M-1];
     return y;
   }
+  */
   
   // TODO: allow normalizing input, xi' = (xi - offset) * scalar
   // TODO: allow normalizing output/feedback
@@ -121,7 +118,7 @@ public class NeuralNet {
     double output[] = layers[layers.length - 1];
     
     // remove extra -1, [ y0 y1 -1 ]
-    return unwrap(sigmoid(output));
+    return Arrays.stream(unwrap(output)).map(x -> sigmoid(x)).toArray();
   }
   
   // propagate a series of values through the network
@@ -140,7 +137,7 @@ public class NeuralNet {
       outputs[k+1] = _weights[k].preMultiply(inputs);
       
       // new X = sigmoid(Y) except last term
-      inputs = sigmoid(outputs[k+1]);
+      inputs = Arrays.stream(outputs[k+1]).map(x -> sigmoid(x)).toArray();
     }
     return outputs;
   }
@@ -170,8 +167,7 @@ public class NeuralNet {
       // multiply each element by d_sigmoid
       for (int j = 0; j < delta[k].length; j++) {
         delta[k][j] = delta[k][j] * d_sigmoid(outputs[k+1][j]);
-      }
-      // last element set to 0 to backprop bias correctly
+      } // last element set to 0 to backprop bias correctly
       delta[k][delta[k].length-1] = 0;
     }
     
@@ -193,6 +189,7 @@ public class NeuralNet {
     assert !Double.isNaN(_weights[0].getEntry(0,0));
   }
 
+  /*
   public double[][][] toDoubles() {
     double arr[][][] = new double[N][][];
     for (int k = 0; k < N; k++) {
@@ -207,5 +204,51 @@ public class NeuralNet {
       }
     }
     return arr;
+  }
+  */
+
+  // methods to implement Genome<T>, allow inclusion in a population
+  private final double MAX_MUTATION = 1.0;
+  private final double MUTATION_RATE = 0.1;
+  public NeuralNet mutate() {
+    // TODO: allow architecture (layers and sizes) to mutate
+    RealMatrix w[] = new RealMatrix[N];
+    for (int k = 0; k < N; k++) {
+      int rows = _weights[k].getRowDimension();
+      int cols = _weights[k].getColumnDimension();
+      w[k] = MatrixUtils.createRealMatrix(rows, cols);
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+          double value = _weights[k].getEntry(i, j);
+          // with probability MUTATION_RATE..
+          if (Math.random() < MUTATION_RATE) {
+            // ..alter the weight by less than MAX_MUTATION
+            value += Util.random() * MAX_MUTATION;
+          }
+          w[k].setEntry(i, j, value);
+        }
+      }
+    }
+    return new NeuralNet(w);
+  }
+  public NeuralNet crossover(NeuralNet other) {
+    // TODO: handle crossover between varied architectures?
+    // TODO: don't just cut between matrices
+    RealMatrix otherWeights[] = other.weights();
+
+    assert _weights.length == otherWeights.length;
+    
+    RealMatrix newWeights[] = new RealMatrix[N];
+    // choose a point to cut
+    int cross = (int)(Math.random() * (N+1));
+    // return this[0..x] :: other[x..N]
+    for (int i = 0; i < N; i++) {
+      if (i < cross) {
+        newWeights[i] = _weights[i].copy();
+      } else {
+        newWeights[i] = otherWeights[i].copy();
+      }
+    }
+    return new NeuralNet(newWeights);
   }
 }

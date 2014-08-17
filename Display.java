@@ -16,22 +16,39 @@ class Display extends JPanel implements KeyListener {
   private Game game = new Game();
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
-  Grader grader = new GraderVs(memLearner, NUM_GAMES);
-  private Population population = new Population(grader, POPULATION_SIZE, netLearner.genome().size());
+  
+  // set grading policy, Learner -> double
+  Grader<NetLearner> grader = (student) -> {
+    double score = 0;
+    for (int i = 0; i < NUM_GAMES; i++) {
+      Game g = new Game(student, memLearner);
+      g.play();
+      switch (g.winner()) {
+        case -1: score += 1.0; break; // tie
+        case  0: score += 2.0; break; // student wins
+        case  1:               break; // student loses
+      }
+    }
+    return score;
+  };
+
+  // HACK: creates a NetLearner to get the right size of neural net
+  private Population<NeuralNet> population = new Population<NeuralNet>(grader, POPULATION_SIZE, () -> new NetLearner().net());
   private Learner<T3State,T3Move> player1 = netLearner, player2 = null;
   private int wins[] = new int[]{0, 0};
   private T3Move suggested; // the best move, as suggested by the AI
-  
+
+  @SuppressWarnings("unchecked")
   public Display() {
     
     setMode(netLearner, null, "NxP");
     
     // load learners
     try {
-      Map<String, Double> map = Json.loadMap("brain.json");
+      Map<String, Double> map; map = Json.load("brain.json", map.getClass());
       if (map != null) memLearner = new MemoryLearner(map);
 
-      Population pop = Json.loadPop("pop.json", grader);
+      Population<NeuralNet> pop = Json.loadPop("pop.json", grader);
       if (pop != null) population = pop;
       
     } catch (Exception e) {
@@ -55,8 +72,7 @@ class Display extends JPanel implements KeyListener {
     // evolve population
     while (true) {
       population = population.epoch();
-      Genome best = population.bestN(1).get(0);
-      netLearner = NetLearner.fromGenome(best);
+      netLearner = new NetLearner(population.bestN(1).get(0));
     }
   }
 

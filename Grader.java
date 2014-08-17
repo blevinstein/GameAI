@@ -1,3 +1,3 @@
-interface Grader {
-  public double grade(Genome g);
+interface Grader<T> {
+  public double grade(T g);
 }

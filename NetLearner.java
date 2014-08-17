@@ -134,38 +134,4 @@ class NetLearner implements Learner<T3State, T3Move> {
       }
     }
   }
-
-  public Genome genome() {
-    RealMatrix weights[] = net().weights();
-
-    ArrayList<Double> list = new ArrayList<Double>();
-    for (int k = 0; k < weights.length; k++) {
-      for (int i = 0; i < weights[k].getRowDimension(); i++) {
-        for (int j = 0; j < weights[k].getColumnDimension(); j++) {
-          list.add(weights[k].getEntry(i, j));
-        }
-      }
-    }
-
-    return new Genome(ArrayUtils.toPrimitive(list.toArray(new Double[0])));
-  }
-
-  public static NetLearner fromGenome(Genome g) {
-    double genes[] = g.genes();
-    int index = 0;
-    
-    // create a NetLearner with appropriately sized NeuralNet
-    NetLearner learner = new NetLearner();
-
-    // set each weight to the correct value
-    RealMatrix weights[] = learner.net().weights();
-    for (int k = 0; k < weights.length; k++) {
-      for (int i = 0; i < weights[k].getRowDimension(); i++) {
-        for (int j = 0; j < weights[k].getColumnDimension(); j++) {
-          weights[k].setEntry(i, j, genes[index++]);
-        }
-      }
-    }
-    return learner;
-  }
 }
