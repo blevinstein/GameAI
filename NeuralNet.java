@@ -49,7 +49,6 @@ public class NeuralNet implements Genome<NeuralNet> {
     N = _weights.length;
   }
 
-  /*
   public NeuralNet(double[][][] arr) {
     N = arr.length;
     _weights = new RealMatrix[N];
@@ -62,7 +61,6 @@ public class NeuralNet implements Genome<NeuralNet> {
       }
     }
   }
-  */
 
   // sets last column of matrix to [ 0 0 .. 0 1 ]
   private static void setupMatrix(RealMatrix m) {
@@ -189,7 +187,6 @@ public class NeuralNet implements Genome<NeuralNet> {
     assert !Double.isNaN(_weights[0].getEntry(0,0));
   }
 
-  /*
   public double[][][] toDoubles() {
     double arr[][][] = new double[N][][];
     for (int k = 0; k < N; k++) {
@@ -205,7 +202,6 @@ public class NeuralNet implements Genome<NeuralNet> {
     }
     return arr;
   }
-  */
 
   // methods to implement Genome<T>, allow inclusion in a population
   private final double MAX_MUTATION = 1.0;

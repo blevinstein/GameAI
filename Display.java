@@ -11,46 +11,47 @@ import javax.swing.JPanel;
 
 class Display extends JPanel implements KeyListener {
   private final int POPULATION_SIZE = 100;
-  private final int NUM_GAMES = 100;
 
   private Game game = new Game();
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
   
-  // set grading policy, Learner -> double
-  Grader<NetLearner> grader = (student) -> {
-    double score = 0;
-    for (int i = 0; i < NUM_GAMES; i++) {
-      Game g = new Game(student, memLearner);
-      g.play();
-      switch (g.winner()) {
-        case -1: score += 1.0; break; // tie
-        case  0: score += 2.0; break; // student wins
-        case  1:               break; // student loses
-      }
-    }
-    return score;
-  };
-
-  // HACK: creates a NetLearner to get the right size of neural net
-  private Population<NeuralNet> population = new Population<NeuralNet>(grader, POPULATION_SIZE, () -> new NetLearner().net());
+  private Population<NeuralNet> population;
   private Learner<T3State,T3Move> player1 = netLearner, player2 = null;
   private int wins[] = new int[]{0, 0};
   private T3Move suggested; // the best move, as suggested by the AI
 
   @SuppressWarnings("unchecked")
   public Display() {
-    
+    // set grading policy, Learner -> double
+    DefaultGrader.registerDefaultGrader((network) -> {
+      NetLearner student = new NetLearner(network);
+      // simulate 100 games, 1 point for ties, 2 points for wins
+      double score = 0;
+      for (int i = 0; i < 100; i++) {
+        Game g = new Game(student, memLearner);
+        g.play();
+        switch (g.winner()) {
+          case -1: score += 1.0; break; // tie
+          case  0: score += 2.0; break; // student wins
+          case  1:               break; // student loses
+        }
+      }
+      return score;
+    }, NeuralNet.class);
+   
+    // HACK: creates a NetLearner to get the right size of neural net
+    population = new Population<NeuralNet>(POPULATION_SIZE, () -> new NetLearner().net());
+
     setMode(netLearner, null, "NxP");
     
     // load learners
     try {
-      Map<String, Double> map; map = Json.load("brain.json", map.getClass());
+      Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
       if (map != null) memLearner = new MemoryLearner(map);
 
-      Population<NeuralNet> pop = Json.loadPop("pop.json", grader);
+      Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
       if (pop != null) population = pop;
-      
     } catch (Exception e) {
       System.err.println("Couldn't load. " + e.getMessage());
     }
@@ -59,20 +60,22 @@ class Display extends JPanel implements KeyListener {
   public void run() {
     // separate thread
     new Thread(() -> {
-      // main loop and repainting
-      Throttle t = new Throttle(60); // target frame rate
+      // evolve population
+      Throttle t = new Throttle(2);
       while (true) {
-        mainLoop();
-        repaint();
+        population = population.epoch();
+        netLearner = new NetLearner(population.bestN(1).get(0));
         t.sleep();
-        frameRate = ticker.tick();
       }
     }).start();
 
-    // evolve population
+    // main loop and repainting
+    Throttle throttle = new Throttle(60); // target frame rate
     while (true) {
-      population = population.epoch();
-      netLearner = new NetLearner(population.bestN(1).get(0));
+      mainLoop();
+      repaint();
+      throttle.sleep();
+      frameRate = ticker.tick();
     }
   }
 
@@ -103,10 +106,10 @@ class Display extends JPanel implements KeyListener {
   // - arrows to move cursor
   // - spacebar to make a move
   // - S to save brain, L to load brain
-  // - M to change mode
   private String modeStr = "";
   private int mode = 0;
   private T3Move cursor = new T3Move();
+  @SuppressWarnings("unchecked")
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
     case KeyEvent.VK_SPACE:
@@ -117,33 +120,14 @@ class Display extends JPanel implements KeyListener {
       }
       break;
     case KeyEvent.VK_S:
-      Json.saveMap(memLearner.map(), "brain.json");
-      Json.savePop(population, "pop.json");
+      Json.save(memLearner.map(), "brain.json");
+      Json.save(population, "pop.json");
       break;
     case KeyEvent.VK_L:
-      memLearner = new MemoryLearner(Json.loadMap("brain.json"));
-      population = Json.loadPop("pop.json", grader);
-      break;
-    case KeyEvent.VK_M:
-      // different "game modes"
-      mode = (mode + 1) % 5;
-      switch (mode) {
-      case 0: 
-        setMode(netLearner, null, "NxP"); 
-        break;
-      case 1: 
-        setMode(memLearner, memLearner, "MxM"); 
-        break;
-      case 2: 
-        setMode(netLearner, netLearner, "NxN"); 
-        break;
-      case 3: 
-        setMode(netLearner, memLearner, "NxM"); 
-        break;
-      case 4: 
-        setMode(memLearner, null, "MxP"); 
-        break;
-      }
+      Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
+      if (map != null) memLearner = new MemoryLearner(map);
+      Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
+      if (pop != null) population = pop;
       break;
     case KeyEvent.VK_U:
       System.out.println("X " + wins[T3Square.X] + " O " + wins[T3Square.O]);

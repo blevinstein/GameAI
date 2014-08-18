@@ -1,62 +1,88 @@
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSerializationContext;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
-// TODO: write serializers and deserializers for each class
-
 class Json {
-  static Gson gson = new Gson();
+  static Gson gson = init();
 
+  public static Gson init() {
+    GsonBuilder builder = new GsonBuilder();
+    builder.setPrettyPrinting();
+    builder.registerTypeAdapter(Population.class, new PopulationSerializer());
+    builder.registerTypeAdapter(Population.class, new PopulationDeserializer());
+    /*
+    builder.registerTypeAdapter(NeuralNet.class, new NeuralNetSerializer());
+    builder.registerTypeAdapter(NeuralNet.class, new NeuralNetDeserializer());
+    */
+    return builder.create();
+  }
+
+  private static class PopulationSerializer
+      implements JsonSerializer<Population<NeuralNet>> {
+    public JsonElement serialize(Population<NeuralNet> src,
+                                 Type typeOfSrc,
+                                 JsonSerializationContext context) {
+      JsonArray array = new JsonArray();
+      for (NeuralNet net : src.pop()) {
+        array.add(gson.toJsonTree(net.toDoubles()));
+      }
+      return array;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static class PopulationDeserializer
+      implements JsonDeserializer<Population<?>> {
+    public Population<NeuralNet> deserialize(JsonElement json,
+                                             Type type,
+                                             JsonDeserializationContext context)
+                                             throws JsonParseException {
+      double[][][][] array = gson.fromJson(json, double[][][][].class);
+      List<NeuralNet> list = new ArrayList<NeuralNet>();
+      for (double[][][] subarray : array) list.add(new NeuralNet(subarray));
+      return new Population<NeuralNet>(list);
+    }
+  }
+
+  // TODO: make Population[Des,S]erializer work for Population<?>
   /*
-  public static void savePop(Population<T> pop, String fname) {
-    double genomes[][] = pop.toDoubles();
-    try {
-      FileUtils.writeStringToFile(new File(fname), gson.toJson(genomes));
-      System.out.println("Saved population of " + pop.pop().size() + " to " + fname + ".");
-    } catch(IOException e) {
-      System.err.println("Could not save pop!");
-    }
-  }
-
-  public static <T> Population<T> loadPop(String fname, Grader grader) {
-    try {
-      double genomes[][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][].class);
-      System.out.println("Loaded population of " + genomes.length + ".");
-      return new Population<T>(grader, genomes);
-    } catch(IOException e) {
-      System.err.println("Could not load pop!");
-      return null;
-    }
-  }
-
-  public static void saveNet(NeuralNet net, String fname) {
-    RealMatrix weights[] = net.weights();
-    double matrices[][][] = net.toDoubles();
-    try {
-      FileUtils.writeStringToFile(new File(fname), gson.toJson(matrices));
-      System.out.println("Saved neural net of dimension " + PP.dimOf(weights) + " to " + fname + ".");
-    } catch(IOException e) {
-      System.err.println("Could not save net!");
+  public static class NeuralNetSerializer
+      implements JsonSerializer<NeuralNet> {
+    public JsonElement serialize(NeuralNet src,
+                                 Type typeOfSrc,
+                                 JsonSerializationContext context) {
+      System.out.println("NeuralNet Serializer");
+      // serialize as double[][][]
+      return gson.toJsonTree(src.toDoubles());
     }
   }
   
-  public static NeuralNet loadNet(String fname) {
-    ArrayList<RealMatrix> weights = new ArrayList<RealMatrix>();
-  
-    try {
-      double matrices[][][] = gson.fromJson(FileUtils.readFileToString(new File(fname)), double[][][].class);
-      System.out.println("Loaded neural net.");
-      return new NeuralNet(matrices);
-    } catch (IOException e) {
-      System.err.println("Could not load net!");
-      return null;
+  public static class NeuralNetDeserializer
+      implements JsonDeserializer<NeuralNet> {
+    public NeuralNet deserialize(JsonElement json,
+                                  Type type,
+                                  JsonDeserializationContext context)
+                                  throws JsonParseException {
+      System.out.println("NeuralNet Deserializer");
+      // deserialize from double[][][]
+      return new NeuralNet(gson.fromJson(json, double[][][].class));
     }
   }
   */
@@ -79,6 +105,7 @@ class Json {
       return object;
     } catch (IOException e) {
       System.err.println("Could not load a " + type + " from " + fname + "!");
+      return null;
     }
   }
 }
