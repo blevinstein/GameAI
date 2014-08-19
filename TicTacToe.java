@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-class Display extends JPanel implements KeyListener {
+class TicTacToe extends JPanel implements KeyListener {
   private final int POPULATION_SIZE = 100;
 
   private Game game = new Game();
@@ -22,14 +22,15 @@ class Display extends JPanel implements KeyListener {
   private T3Move suggested; // the best move, as suggested by the AI
 
   @SuppressWarnings("unchecked")
-  public Display() {
+  public TicTacToe() {
     // set grading policy, Learner -> double
     DefaultGrader.registerDefaultGrader((network) -> {
       NetLearner student = new NetLearner(network);
       // simulate 100 games, 1 point for ties, 2 points for wins
       double score = 0;
       for (int i = 0; i < 100; i++) {
-        Game g = new Game(student, memLearner);
+        Game g = new Game(student, memLearner); // NOTE: student is player 0
+        System.out.println("memlearner " + memLearner.map().size());
         g.play();
         switch (g.winner()) {
           case -1: score += 1.0; break; // tie
@@ -63,7 +64,10 @@ class Display extends JPanel implements KeyListener {
       // evolve population
       Throttle t = new Throttle(2);
       while (true) {
+        long before = System.currentTimeMillis();
         population = population.epoch();
+        long after = System.currentTimeMillis();
+        System.out.println(population.stats() + " Duration " + (after - before) + " ms");
         netLearner = new NetLearner(population.bestN(1).get(0));
         t.sleep();
       }
@@ -129,6 +133,27 @@ class Display extends JPanel implements KeyListener {
       Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
       if (pop != null) population = pop;
       break;
+    case KeyEvent.VK_M:
+      // different "game modes"
+      mode = (mode + 1) % 5;
+      switch (mode) {
+      case 0: 
+        setMode(netLearner, null, "NxP"); 
+        break;
+      case 1: 
+        setMode(memLearner, memLearner, "MxM"); 
+        break;
+      case 2: 
+        setMode(netLearner, netLearner, "NxN"); 
+        break;
+      case 3: 
+        setMode(netLearner, memLearner, "NxM"); 
+        break;
+      case 4: 
+        setMode(memLearner, null, "MxP"); 
+        break;
+      }
+      break;
     case KeyEvent.VK_U:
       System.out.println("X " + wins[T3Square.X] + " O " + wins[T3Square.O]);
       break;
@@ -185,7 +210,7 @@ class Display extends JPanel implements KeyListener {
     frame.setSize(640, 320 + 25);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    Display display = new Display();
+    TicTacToe display = new TicTacToe();
     frame.add(display);
     frame.addKeyListener(display);
 

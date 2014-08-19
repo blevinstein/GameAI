@@ -8,7 +8,6 @@ import java.util.function.Supplier;
 import java.util.PriorityQueue;
 
 class Population<T extends Genome<T>> {
-  // TODO: track best individual, best fitness, etc
   private final double CROSSOVER_RATE = 0.7;
   private final double ELITE = 0.05;
 
@@ -67,8 +66,6 @@ class Population<T extends Genome<T>> {
     // create a thread pool
     ExecutorService threadPool = Executors.newCachedThreadPool();
 
-    long before = System.currentTimeMillis();
-
     // calculate fitness values in individual threads
     double f[] = new double[_pop.size()];
     for (int i = 0; i < f.length; i++) {
@@ -87,24 +84,21 @@ class Population<T extends Genome<T>> {
       } catch(InterruptedException e) {}
     }
 
-    /*
-    // print various information about the population
-    // TODO: generalize and move somewhere else
+    return f;
+  }
+
+  // return various information about the population
+  public String stats() {
     double best = 0;
     double worst = 0;
     double avg = 0;
-    for (int i = 0; i < f.length; i++) {
-      if (f[i] > best || i == 0) best = f[i];
-      if (f[i] < worst || i == 0) worst = f[i];
-      avg += f[i];
+    for (int i = 0; i < _fitness.length; i++) {
+      if (_fitness[i] > best || i == 0) best = _fitness[i];
+      if (_fitness[i] < worst || i == 0) worst = _fitness[i];
+      avg += _fitness[i];
     }
-    avg /= f.length;
-    System.out.print("Best " + best + " Worst " + worst + " Avg " + avg);
-    long duration = System.currentTimeMillis() - before;
-    System.out.println(" " + duration + "ms");
-    */
-    
-    return f;
+    avg /= _fitness.length;
+    return String.format("Best %.0f Worst %.0f Avg %.1f", best, worst, avg);
   }
 
   public List<T> bestN(int n) {

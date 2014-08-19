@@ -32,9 +32,9 @@ class Game {
   // returns number of moves made
   public int play() {
     int movesMade = 0;
-    Learner<T3State,T3Move> player = players.get(toMove());
     while (canStep()) {
-      moveMade(player.play(_state.normalize(toMove())));
+      step();
+      //moveMade(player.play(_state.normalize(toMove())));
       movesMade++;
     }
     return movesMade;

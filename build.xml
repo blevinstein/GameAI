@@ -7,17 +7,14 @@
     </javac>
   </target>
 
-  <target name="jar" depends="build">
+  <target name="t3" depends="build">
     <mkdir dir="jar" />
-    <jar destfile="jar/GameAI.jar" basedir="build">
+    <jar destfile="jar/TicTacToe.jar" basedir="build">
       <manifest>
-        <attribute name="Main-Class" value="Display" />
+        <attribute name="Main-Class" value="TicTacToe" />
       </manifest>
     </jar>
-  </target>
-
-  <target name="run" depends="jar">
-    <java jar="jar/GameAI.jar" fork="true" />
+    <java jar="jar/TicTacToe.jar" fork="true" />
   </target>
 
   <target name="clean">
