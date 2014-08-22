@@ -97,7 +97,7 @@ class NetLearner implements Learner<T3State, T3Move> {
     otherMoves.clear();
   }
   
-  void drawThoughts(Graphics g, T3State s, int x, int y, int size) {
+  public void drawThoughts(Graphics g, T3State s, int x, int y, int size) {
     int side = size / 3;
     double input[] = s.toDoubles();
     double output[] = net().process(input);

@@ -181,10 +181,11 @@ public class T3State extends AbstractState<T3State,T3Move> {
     return output;
   }
   
-  // for use with neural network
-  // IDEA: represent each input as -1/0/1
+  // each board square is represented as two bits
   public double[] toDoubles() {
     double vector[] = new double[18];
+    // currently, iterates over i and j, calculating index
+    // could also iterate over bits 0-17 and calculate i,j from index
     for(int i = 0; i < 3; i++) {
       for(int j = 0; j < 3; j++) {
         // input index determined by i, j, x/o

@@ -1,3 +1,7 @@
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -79,20 +83,6 @@ public class NeuralNet implements Genome<NeuralNet> {
     double s = sigmoid(x);
     return s * (1 - s);
   }
- 
-  // TODO: replace with map(sigmoid, x[])
-  /*
-  private static double[] sigmoid(double x[]) {
-    int M = x.length;
-    double y[] = new double[M];
-    for (int i = 0; i < M; i++) {
-      y[i] = sigmoid(x[i]);
-    }
-    // leave last element unchanged
-    y[M-1] = x[M-1];
-    return y;
-  }
-  */
   
   // TODO: allow normalizing input, xi' = (xi - offset) * scalar
   // TODO: allow normalizing output/feedback
@@ -136,6 +126,7 @@ public class NeuralNet implements Genome<NeuralNet> {
       
       // new X = sigmoid(Y) except last term
       inputs = Arrays.stream(outputs[k+1]).map(x -> sigmoid(x)).toArray();
+      inputs[inputs.length-1] = -1;
     }
     return outputs;
   }
@@ -246,5 +237,45 @@ public class NeuralNet implements Genome<NeuralNet> {
       }
     }
     return new NeuralNet(newWeights);
+  }
+
+  // draws from [x,y] to [x+sx, y+sy]
+  public void drawState(Graphics g, double inputs[], int x, int y, int sx, int sy) {
+    // perform propagation
+    inputs = wrap(inputs);
+    double outputs[][] = propagate(inputs);
+
+    // make background gray
+    g.setColor(new Color(0.5f, 0.5f, 0.5f));
+    g.fillRect(x, y, sx, sy);
+
+    // calculate spacing [dx, dy]
+    // calculate neuron size (diameter)
+    int maxNeurons = _weights[0].getRowDimension();
+    for (int i = 0; i < N; i++) {
+      int neurons = _weights[i].getColumnDimension();
+      if (neurons > maxNeurons) maxNeurons = neurons;
+    }
+    double dy = sy / maxNeurons;
+    double dx = sx / outputs.length;
+    // NOTE: 2/3 = arbitrary constant less than 1.0
+    int diameter = (int)(Math.min(dx, dy) * 2.0/3);
+
+    // draw neurons
+    for (int i = 0; i < outputs.length; i++) { // each layer
+      for (int j = 0; j < outputs[i].length; j++) { // each neuron
+        // NOTE: outputs[][] holds pre-sigmoid values
+        // NOTE: assumes sigmoid(x) returns in range [0,1] not [-1,1]
+        float gray = (float)sigmoid(outputs[i][j]);
+        g.setColor(new Color(gray, gray, gray));
+        // center on square [i,j] with given side length, diameter
+        g.fillOval((int)(x + dx*(0.5f + i) - diameter/2),
+                   (int)(y + dy*(0.5f + j) - diameter/2),
+                   diameter, diameter);
+      }
+    }
+
+    // draw synapses
+    // TODO
   }
 }

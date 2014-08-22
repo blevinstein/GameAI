@@ -30,12 +30,19 @@ class TicTacToe extends JPanel implements KeyListener {
       double score = 0;
       for (int i = 0; i < 100; i++) {
         Game g = new Game(student, memLearner); // NOTE: student is player 0
-        System.out.println("memlearner " + memLearner.map().size());
+        // TODO: possible bug, memlearner doesn't learn?
+        //System.out.println("memlearner " + memLearner.map().size());
         g.play();
         switch (g.winner()) {
           case -1: score += 1.0; break; // tie
           case  0: score += 2.0; break; // student wins
           case  1:               break; // student loses
+        }
+        // DEBUG
+        if (score == 200) {
+          System.out.println("student played X");
+          System.out.println(g.state());
+          System.out.println("memlearner knows " + memLearner.map().size());
         }
       }
       return score;
@@ -94,7 +101,8 @@ class TicTacToe extends JPanel implements KeyListener {
     game.state().draw(g, 10, 10, 300, cursor, suggested);
     
     // draw the neural network's thoughts
-    netLearner.drawThoughts(g, game.state(), 330, 10, 300);
+    //netLearner.drawThoughts(g, game.state(), 330, 10, 300);
+    netLearner.net().drawState(g, game.state().toDoubles(), 10, 330, 1024 - 20, 768 - 330 - 20);
     
     // show frameRate and mode
     g.setColor(Color.BLACK);
@@ -207,7 +215,7 @@ class TicTacToe extends JPanel implements KeyListener {
   // DRIVER
   public static void main(String[] args) {
     JFrame frame = new JFrame();
-    frame.setSize(640, 320 + 25);
+    frame.setSize(1024, 768 + 25);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     TicTacToe display = new TicTacToe();

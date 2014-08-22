@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 // represents a game of Tic Tac Toe
-// TODO: make it Game<State>?
+// TODO: generalize to Game<State,Move>?
 class Game {
   private T3State _state;
   public T3State state() { return _state; }
@@ -34,7 +34,6 @@ class Game {
     int movesMade = 0;
     while (canStep()) {
       step();
-      //moveMade(player.play(_state.normalize(toMove())));
       movesMade++;
     }
     return movesMade;
@@ -52,7 +51,7 @@ class Game {
     
     Learner<T3State,T3Move> player = players.get(toMove());
     T3Move m = player.play(_state.normalize(toMove()));
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < players.size(); i++) {
       if (i == toMove()) continue; // don't tell players about their own moves
       if (players.get(i) == null) continue; // skip null players (users)
       assert _state.normalize(i).validMove(m);
