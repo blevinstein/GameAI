@@ -25,7 +25,10 @@ class NetLab extends JPanel implements KeyListener {
   private Function<double[],double[]> f =
     inputs -> new double[]{(inputs[0] > 0) ^ (inputs[1] > 0) ? 1.0 : -1.0};
 
-  // implicit no-argument constructor
+  public NetLab() {
+    this.setFocusable(true);
+    this.addKeyListener(this);
+  }
   
   boolean training = false;
   public void run() {

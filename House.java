@@ -16,14 +16,13 @@ public class House {
     JTabbedPane tabs = new JTabbedPane();
     frame.add(tabs);
 
-    NetLab display = new NetLab();
-    tabs.add("Net Lab", display);
-    tabs.addKeyListener(display); // HACK
+    // give each lab a tab and a thread
+    NetLab netlab = new NetLab();
+    tabs.add("Net Lab", netlab);
+    new Thread(() -> netlab.run()).start();
 
-    JPanel empty = new JPanel();
-    tabs.add("Empty", empty);
+    tabs.add("Empty", new JPanel());
 
     frame.setVisible(true);
-    display.run();
   }
 }
