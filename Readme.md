@@ -1,6 +1,11 @@
 Some experiments with machine learning to play games. Currently just
   Tic-Tac-Toe.
 
+To play with this code, you just need Java and Ant, then run one of:
+
+ant t3 (tic-tac-toe program)
+ant diag (neural network diagnostic program)
+
 TODO
 ====
 - rename NetDiag => House
