@@ -59,7 +59,8 @@ class TicTacToe extends JPanel implements KeyListener {
     }, NeuralNet.class);
    
     // HACK: creates a NetLearner to get the right size of neural net
-    population = new Population<NeuralNet>(POPULATION_SIZE, () -> new NetLearner().net());
+    population = new Population<NeuralNet>(POPULATION_SIZE,
+        () -> new NetLearner().net());
 
     setMode(netLearner, null, "NxP");
     

@@ -17,11 +17,14 @@ public class House {
     frame.add(tabs);
 
     // give each lab a tab and a thread
+    
     NetLab netlab = new NetLab();
     tabs.add("Net Lab", netlab);
     new Thread(() -> netlab.run()).start();
 
-    tabs.add("Empty", new JPanel());
+    PopLab poplab = new PopLab();
+    tabs.add("Pop Lab", poplab);
+    new Thread(() -> poplab.run()).start();
 
     frame.setVisible(true);
   }

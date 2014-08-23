@@ -31,6 +31,7 @@ class Population<T extends Genome<T>> {
   public ArrayList<T> pop() { return _pop; }
 
   private double[] _fitness; // private for HIPPA reasons
+  public double[] fitness() { return _fitness; }
   
   private Grader<T> _grader;
   public void setGrader(Grader<T> grader) { _grader = grader; }
@@ -113,7 +114,7 @@ class Population<T extends Genome<T>> {
       avg += _fitness[i];
     }
     avg /= _fitness.length;
-    return String.format("Best %.0f Worst %.0f Avg %.1f", best, worst, avg);
+    return String.format("Best %.0f Worst %.0f Avg %.2f", best, worst, avg);
   }
 
   public List<T> bestN(int n) {

@@ -18,10 +18,9 @@ import javax.swing.JPanel;
 // - T to start/stop training
 // - R to recent correct/incorrect count
 
-// TODO: add more complex diagnostics for Populations (in another class/panel)
 class NetLab extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});
-  private boolean[] state = new boolean[]{true, false};
+  private boolean[] state = randomBits(2);
   private Function<double[],double[]> f =
     inputs -> new double[]{(inputs[0] > 0) ^ (inputs[1] > 0) ? 1.0 : -1.0};
 
@@ -48,10 +47,17 @@ class NetLab extends JPanel implements KeyListener {
     net.drawState(g, Util.btod(state), 10, 10, getWidth()-20, getHeight()-20);
   }
 
+  private boolean[] randomBits(int n) {
+    boolean b[] = new boolean[n];
+    for (int i = 0; i < n; i++) {
+      b[i] = Math.random() < 0.5;
+    }
+    return b;
+  }
+
   public void trainRandom() {
     // choose an input and calculate correct output
-    state = new boolean[]{Math.random() < 0.5,
-                          Math.random() < 0.5};
+    state = randomBits(2);
     double target[] = f.apply(Util.btod(state));
     boolean targetBit = Util.dtob(target)[0];
     // train the neural network
@@ -73,15 +79,13 @@ class NetLab extends JPanel implements KeyListener {
     repaint();
   }
 
-  private int correct = 0, incorrect = 0; // DEBUG
+  private int correct = 0, incorrect = 0;
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_L:
         NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
-        if (newNet != null) {
-          net = newNet;
-          repaint();
-        }
+        if (newNet != null) net = newNet;
+        repaint();
         break;
       case KeyEvent.VK_R:
         correct = incorrect = 0;
