@@ -289,6 +289,9 @@ public class NeuralNet implements Genome<NeuralNet> {
     // draw neurons
     for (int i = 0; i < outputs.length; i++) { // each layer
       for (int j = 0; j < outputs[i].length; j++) { // each neuron
+        // skip the last bias element
+        if (i == outputs.length-1 && j == outputs[i].length-1) continue;
+
         // calculate grayscale color to use
         /*
         // HACK: outputs[][] holds pre-sigmoid values, except output[0] = inputs
@@ -303,7 +306,7 @@ public class NeuralNet implements Genome<NeuralNet> {
 
         // draw outgoing synapses
         if (i+1 < outputs.length) { // except for last row
-          for (int m = 0; m < outputs[i+1].length; m++) { // each outgoing synapse
+          for (int m = 0; m < outputs[i+1].length-1; m++) { // each synapse
             double weight = _weights[i].getEntry(j, m);
 
             if (weight == 0) continue; // skip synapses which aren't connected
@@ -332,20 +335,25 @@ public class NeuralNet implements Genome<NeuralNet> {
           }
         }
 
-        // circle is centered on square [i,j] with given side length, diameter
-        // border is black
+        // diameter is halved for bias nodes
+        int d = j == outputs[i].length-1 ?
+                diameter / 2 :
+                diameter;
+        // circle is centered on square [i,j] with given side length, diameter d
         g.setColor(gray);
-        g.fillOval((int)(x + dx*(0.5 + i) - diameter/2),
-                   (int)(y + dy*(0.5 + j) - diameter/2),
-                   diameter, diameter);
+        g.fillOval((int)(x + dx*(0.5 + i) - d/2),
+                   (int)(y + dy*(0.5 + j) - d/2),
+                   d, d);
+        // draw border
         g.setColor(Color.BLACK);
-        g.drawOval((int)(x + dx*(0.5 + i) - diameter/2),
-                   (int)(y + dy*(0.5 + j) - diameter/2),
-                   diameter, diameter);
+        g.drawOval((int)(x + dx*(0.5 + i) - d/2),
+                   (int)(y + dy*(0.5 + j) - d/2),
+                   d, d);
 
         // display the neuron's pre- and post-sigmoid values
+        // NOTE: inputs (outputs[0]) and biases (outputs[i].last) don't get sigmoided
         g.setColor(contrast);
-        String str = i == 0 ?
+        String str = i == 0 || j == outputs[i].length-1 ?
                      String.format("%.2f", outputs[i][j]) :
                      String.format("%.2f => %.2f", outputs[i][j], sigmoid(outputs[i][j]));
         Util.placeText(g, Util.CENTER, str,

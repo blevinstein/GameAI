@@ -3,9 +3,8 @@ Some experiments with machine learning to play games. Currently just
 
 TODO
 ====
-- NeuralNet.drawState should depict bias inputs more distinctly
-- rename NetDiag House
-- give NetDiag separate tabs (labs), add a tab for population inspection
+- rename NetDiag => House
+- give NetDiag separate tabs ("labs"), add a tab for population inspection
 - play with pruning and other means of intervention in network
 - abstract out input (double[]) and output from neural networks
 - fix uglines of double[] <=> boolean[], dtob, btod, etc

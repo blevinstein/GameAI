@@ -12,6 +12,11 @@ import javax.swing.JPanel;
 // In theory, something like a visual inspection of the neural net in action,
 // to complement other types of testing, and to provide a more intuitive
 // view of the network when diagnosing behavioral issues.
+//
+// Controls:
+// - S to save net, L to load net
+// - T to start/stop training
+// - R to recent correct/incorrect count
 
 // TODO: add more complex diagnostics for Populations (in another class/panel)
 class NetDiag extends JPanel implements KeyListener {
@@ -73,6 +78,9 @@ class NetDiag extends JPanel implements KeyListener {
           net = newNet;
           repaint();
         }
+        break;
+      case KeyEvent.VK_R:
+        correct = incorrect = 0;
         break;
       case KeyEvent.VK_S:
         Json.save(net, "patient.json");
