@@ -8,7 +8,7 @@ import java.util.function.Function;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-// Driver for an application which helps diagnose neural net behavior.
+// This lab helps diagnose neural net behavior.
 // In theory, something like a visual inspection of the neural net in action,
 // to complement other types of testing, and to provide a more intuitive
 // view of the network when diagnosing behavioral issues.
@@ -19,13 +19,14 @@ import javax.swing.JPanel;
 // - R to recent correct/incorrect count
 
 // TODO: add more complex diagnostics for Populations (in another class/panel)
-class NetDiag extends JPanel implements KeyListener {
+class NetLab extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});
   private boolean[] state = new boolean[]{true, false};
   private Function<double[],double[]> f =
     inputs -> new double[]{(inputs[0] > 0) ^ (inputs[1] > 0) ? 1.0 : -1.0};
-  // implicit no-argument constructor
 
+  // implicit no-argument constructor
+  
   boolean training = false;
   public void run() {
     Throttle t = new Throttle(100); // 100fps max
@@ -95,19 +96,6 @@ class NetDiag extends JPanel implements KeyListener {
   }
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
-
-  public static void main(String[] args) {
-    JFrame frame = new JFrame();
-    frame.setSize(1024, 768+25);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    NetDiag display = new NetDiag();
-    frame.add(display);
-    frame.addKeyListener(display);
-
-    frame.setVisible(true);
-    display.run();
-  }
 
   private static final long serialVersionUID = 1;
 }

@@ -17,14 +17,14 @@
     <java jar="jar/TicTacToe.jar" fork="true" />
   </target>
 
-  <target name="diag" depends="build">
+  <target name="house" depends="build">
     <mkdir dir="jar" />
-    <jar destfile="jar/NetDiag.jar" basedir="build">
+    <jar destfile="jar/House.jar" basedir="build">
       <manifest>
-        <attribute name="Main-Class" value="NetDiag" />
+        <attribute name="Main-Class" value="House" />
       </manifest>
     </jar>
-    <java jar="jar/NetDiag.jar" fork="true" />
+    <java jar="jar/House.jar" fork="true" />
   </target>
 
   <target name="clean">
