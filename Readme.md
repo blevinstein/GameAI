@@ -4,13 +4,14 @@ Some experiments with machine learning to play games. Currently just
 TODO
 ====
 - NeuralNet.drawState should depict bias inputs more distinctly
+- rename NetDiag House
+- give NetDiag separate tabs (labs), add a tab for population inspection
 - play with pruning and other means of intervention in network
-- fix uglines of double[] <=> boolean[], dtob, btod, etc
-- at least make tests for neural net propagate etc
 - abstract out input (double[]) and output from neural networks
+- fix uglines of double[] <=> boolean[], dtob, btod, etc
 - implement mutation in neural net architecture
 - write some goddamn tests before everything breaks.. JUnit or something?
-- implement trainers, training policies
+- at least make tests for neural net propagate etc
 
 OBSERVATIONS
 ------------
@@ -18,6 +19,8 @@ These are some of the observations I've made while watching the neural network,
   and may lead to improvements in the algorithm.
 - Backpropagation sometimes leads to "dead neurons", with incoming and/or
   outgoing weights close to zero.
+- Learning rates need careful tuning. Perhaps I should implement local learning
+  rates, or allow learning rates to mutate.
 
 ASPIRATIONAL
 ------------
