@@ -25,7 +25,7 @@ public class NeuralNet implements Genome<NeuralNet> {
   // yi = Sum(wij * xj - ti)
   // t = threshold
   
-  private double LEARNING_RATE = 0.05;
+  private double LEARNING_RATE = 0.01;
   
   private RealMatrix _weights[];
   public RealMatrix[] weights() { return _weights; }
@@ -174,6 +174,9 @@ public class NeuralNet implements Genome<NeuralNet> {
     
     // update weights
     for (int k = 0; k < N; k++) { // for each layer
+      // TODO: set local learning rates
+      // http://www.willamette.edu/~gorr/classes/cs449/precond.html
+      
       // layerSlope = delta ** outputs, represents dE/dwij(** = outer product)
       // W -= learning_rate * layerSlope
       RealMatrix layerSlope =
@@ -302,9 +305,14 @@ public class NeuralNet implements Genome<NeuralNet> {
         if (i+1 < outputs.length) { // except for last row
           for (int m = 0; m < outputs[i+1].length; m++) { // each outgoing synapse
             double weight = _weights[i].getEntry(j, m);
+
+            if (weight == 0) continue; // skip synapses which aren't connected
+
             double mag = Math.abs(weight);
             // NOTE: 0.5 = arbitrary constant less than 1
             int width = (int)(mag / (1 + mag) * diameter * 0.5);
+            
+            // draw synapse
             g2.setColor(tgray);
             g2.setStroke(new BasicStroke(width));
             g2.drawLine((int)(x + dx*(0.5 + i)),
@@ -315,6 +323,8 @@ public class NeuralNet implements Genome<NeuralNet> {
 
             // display the synapse weight
             g2.setColor(contrast);
+            // t is used to determine placement along the synapse, to avoid
+            //   labels overlapping. For simple midpoint text, set t=0.5.
             double t = (j + 1.0) / (outputs[i].length + 1.0);
             Util.placeText(g, Util.CENTER, String.format("%.2f", weight),
                            (int)(x + dx*(i + 0.5 + t)),
@@ -333,9 +343,11 @@ public class NeuralNet implements Genome<NeuralNet> {
                    (int)(y + dy*(0.5 + j) - diameter/2),
                    diameter, diameter);
 
-        // display the neuron's pre-sigmoid value
+        // display the neuron's pre- and post-sigmoid values
         g.setColor(contrast);
-        String str = String.format("%.2f => %.2f", outputs[i][j], sigmoid(outputs[i][j]));
+        String str = i == 0 ?
+                     String.format("%.2f", outputs[i][j]) :
+                     String.format("%.2f => %.2f", outputs[i][j], sigmoid(outputs[i][j]));
         Util.placeText(g, Util.CENTER, str,
                        (int)(x + dx*(0.5 + i)),
                        (int)(y + dy*(0.5 + j)));

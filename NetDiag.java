@@ -67,9 +67,17 @@ class NetDiag extends JPanel implements KeyListener {
   private int correct = 0, incorrect = 0; // DEBUG
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
+      case KeyEvent.VK_L:
+        NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
+        if (newNet != null) {
+          net = newNet;
+          repaint();
+        }
+        break;
+      case KeyEvent.VK_S:
+        Json.save(net, "patient.json");
+        break;
       case KeyEvent.VK_T:
-        //trainRandom();
-        //repaint();
         training = !training;
         break;
       case KeyEvent.VK_ESCAPE:
