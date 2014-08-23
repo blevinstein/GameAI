@@ -41,7 +41,7 @@ class NetDiag extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     // TODO: add tab panel, each tab is a different tool
-    net.drawState(g, Util.btod(state), 10, 10, 1024-20, 768-20);
+    net.drawState(g, Util.btod(state), 10, 10, getWidth()-20, getHeight()-20);
   }
 
   public void trainRandom() {

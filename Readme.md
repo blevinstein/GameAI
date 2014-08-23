@@ -20,6 +20,8 @@ These are some of the observations I've made while watching the neural network,
   outgoing weights close to zero.
 - Learning rates need careful tuning. Perhaps I should implement local learning
   rates, or allow learning rates to mutate.
+- Weights near zero are like a trap: they decrease their effect, and thus their
+  exposure to modification during backpropagation. Should trying avoiding them.
 
 ASPIRATIONAL
 ------------
