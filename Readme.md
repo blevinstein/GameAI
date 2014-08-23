@@ -3,6 +3,8 @@ Some experiments with machine learning to play games. Currently just Tic-Tac-Toe
 TODO
 ====
 
+- play with pruning and other means of intervention in network
+- fix uglines of double[] <=> boolean[], dtob, btod, etc
 - at least make tests for neural net propagate etc
 - abstract out input (double[]) and output from neural networks
 - implement mutation in neural net architecture
