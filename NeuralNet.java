@@ -22,15 +22,13 @@ public class NeuralNet implements Genome<NeuralNet> {
   // yi = Sum(wij * xj - ti)
   // t = threshold
   
-  private double LEARNING_RATE = 0.1;
+  private double LEARNING_RATE = 0.05;
   
   private RealMatrix _weights[];
   public RealMatrix[] weights() { return _weights; }
   
   private final int N; // numbers of layers, for convenience
   
-  // TODO: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
-  // http://www.willamette.edu/~gorr/classes/cs449/precond.html
   public NeuralNet(int neurons[]) {
     N = neurons.length-1;
     _weights = new RealMatrix[N];
@@ -42,7 +40,9 @@ public class NeuralNet implements Genome<NeuralNet> {
 
       for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-          _weights[k].setEntry(i, j, Util.random());
+          // NOTE: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
+          // http://www.willamette.edu/~gorr/classes/cs449/precond.html
+          _weights[k].setEntry(i, j, Util.random() / Math.sqrt(rows));
         }
       }
 
@@ -76,9 +76,8 @@ public class NeuralNet implements Genome<NeuralNet> {
     m.setEntry(rows-1, cols-1, 1.0);
   }
 
-  // TODO: Should use tanh instead of 1/(1+e^(-u)) as suggested by
+  // NOTE: use tanh instead of 1/(1+e^(-u)) as suggested by
   // http://www.willamette.edu/~gorr/classes/cs449/precond.html
-  // TODO: use Java 8 lambdas?
   /*
   double sigmoid(double x) { return 1 / (1 + Math.exp(-x)); }
   double d_sigmoid(double x) {
@@ -87,7 +86,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     return s * (1 - s);
   }
   */
-  double sigmoid(double x) { return Math.tanh(x); }                   // S = tanh(x)
+  double sigmoid(double x) { return Math.tanh(x); }                        // S = tanh(x)
   double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t*t; }  // dS/dx = 1 - tanh(x)^2
   
   // TODO: allow normalizing input, xi' = (xi - offset) * scalar

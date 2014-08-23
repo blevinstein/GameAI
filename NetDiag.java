@@ -12,13 +12,17 @@ import javax.swing.JPanel;
 // TODO: add more complex diagnostics for Populations (in another class)
 class NetDiag extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});
-  private double[] state = new double[]{0.0, 1.0};
+  private boolean[] state = new boolean[]{true, false};
   private Function<double[],double[]> f =
     inputs -> new double[]{(inputs[0] > 0) ^ (inputs[1] > 0) ? 1.0 : -1.0};
   // implicit no-argument constructor
 
+  boolean training = false;
   public void run() {
+    Throttle t = new Throttle(100); // 100fps max
     while (true) {
+      if (training) trainRandom();
+      t.sleep();
     }
   }
 
@@ -28,26 +32,41 @@ class NetDiag extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     // TODO: add tab panel, each tab is a different tool
-    net.drawState(g, state, 10, 10, 1024-20, 768-20);
+    net.drawState(g, Util.btod(state), 10, 10, 1024-20, 768-20);
   }
 
+  public void trainRandom() {
+    // choose an input and calculate correct output
+    state = new boolean[]{Math.random() < 0.5,
+                          Math.random() < 0.5};
+    double target[] = f.apply(Util.btod(state));
+    boolean targetBit = Util.dtob(target)[0];
+    // train the neural network
+    net.backpropagate(Util.btod(state), target);
+    // check the network's answer
+    boolean answer = net.process(Util.btod(state))[0] > 0;
+    // DEBUG
+    if (answer == targetBit) {
+      correct++;
+    } else {
+      incorrect++;
+    }
+    System.out.println(String.format("train %2d ^ %2d = %2d (%2d) Success %.2f%%",
+                                      state[0]  ? 1 : 0,
+                                      state[1]  ? 1 : 0,
+                                      targetBit ? 1 : 0,
+                                      answer    ? 1 : 0,
+                                      correct * 100.0 / (correct + incorrect)));
+    repaint();
+  }
+
+  private int correct = 0, incorrect = 0; // DEBUG
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_T:
-        // choose an input and calculate correct output
-        state = new double[]{Util.randomBit(),
-                             Util.randomBit()};
-        double target[] = f.apply(state);
-        // train the neural network
-        net.backpropagate(state, target);
-        // check the network's answer
-        double answer = net.process(state)[0] > 0 ? 1.0 : -1.0;
-        // DEBUG
-        System.out.println(String.format("train %d ^ %d = %d (%d)", Math.round(state[0]),
-                                                                    Math.round(state[1]),
-                                                                    Math.round(target[0]),
-                                                                    Math.round(answer)));
-        repaint();
+        //trainRandom();
+        //repaint();
+        training = !training;
         break;
       case KeyEvent.VK_ESCAPE:
         System.exit(0);

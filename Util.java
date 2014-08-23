@@ -1,7 +1,8 @@
-import java.util.ArrayList;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Util {
   // choose from an array, where the probability of choosing any index
@@ -36,7 +37,16 @@ public class Util {
     }
   }
 
-  public static double randomBit() {
-    return Math.random() < 0.5 ? 1.0 : -1.0;
+  public static boolean[] dtob(double values[]) {
+    boolean b[] = new boolean[values.length];
+    for (int i = 0; i < values.length; i++)
+      b[i] = values[i] > 0;
+    return b;
+  }
+  public static double[] btod(boolean bits[]) {
+    double d[] = new double[bits.length];
+    for (int i = 0; i < bits.length; i++)
+      d[i] = bits[i] ? 1.0 : -1.0;
+    return d;
   }
 }
