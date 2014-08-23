@@ -1,3 +1,5 @@
+// Represents the state of a square in Tic Tac Toe.
+
 class T3Square {
   public static final int X = 1;
   public static final int O = 0;

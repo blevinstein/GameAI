@@ -1,6 +1,9 @@
 import org.apache.commons.math3.linear.RealMatrix;
 
 // DEBUG tool
+//
+// Some quick classes written to "pretty print" certain types.
+// Should be systematized or deleted eventually.
 class PP {
   public static void pp(double d[]) {
     String output = "[ ";

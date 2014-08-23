@@ -19,19 +19,46 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
+// Used for static code related to Json output.
+//
+// Objects can be serialized or deserialized using save and load. To allow
+// handling of NewClass, implement a NewClassSerializer and/or
+// NewClassDeserializer and register them in init.
+
 class Json {
   static Gson gson = init();
 
-  public static Gson init() {
+  private static Gson init() {
     GsonBuilder builder = new GsonBuilder();
     builder.setPrettyPrinting();
     builder.registerTypeAdapter(Population.class, new PopulationSerializer());
     builder.registerTypeAdapter(Population.class, new PopulationDeserializer());
-    /*
     builder.registerTypeAdapter(NeuralNet.class, new NeuralNetSerializer());
     builder.registerTypeAdapter(NeuralNet.class, new NeuralNetDeserializer());
-    */
     return builder.create();
+  }
+
+  public static <T> void save(T object, String fname) {
+    String type = object.getClass().getName();
+    try {
+      FileUtils.writeStringToFile(new File(fname), gson.toJson(object));
+      System.out.println("Saved a " + type + " to " + fname + ".");
+    } catch (IOException e) {
+      System.err.println("Could not save a " + type + " to " + fname + "!");
+    }
+  }
+
+  public static <T> T load(String fname, Class<T> klass) {
+    String type = klass.getName();
+    try {
+      T object = gson.fromJson(FileUtils.readFileToString(new File(fname)),
+                                                          klass);
+      System.out.println("Loaded a " + type + " from " + fname + ".");
+      return object;
+    } catch (IOException e) {
+      System.err.println("Could not load a " + type + " from " + fname + "!");
+      return null;
+    }
   }
 
   private static class PopulationSerializer
@@ -49,7 +76,7 @@ class Json {
 
   @SuppressWarnings("unchecked")
   private static class PopulationDeserializer
-      implements JsonDeserializer<Population<?>> {
+      implements JsonDeserializer<Population<NeuralNet>> {
     public Population<NeuralNet> deserialize(JsonElement json,
                                              Type type,
                                              JsonDeserializationContext context)
@@ -62,7 +89,6 @@ class Json {
   }
 
   // TODO: make Population[Des,S]erializer work for Population<?>
-  /*
   public static class NeuralNetSerializer
       implements JsonSerializer<NeuralNet> {
     public JsonElement serialize(NeuralNet src,
@@ -83,29 +109,6 @@ class Json {
       System.out.println("NeuralNet Deserializer");
       // deserialize from double[][][]
       return new NeuralNet(gson.fromJson(json, double[][][].class));
-    }
-  }
-  */
-
-  public static <T> void save(T object, String fname) {
-    String type = object.getClass().getName();
-    try {
-      FileUtils.writeStringToFile(new File(fname), gson.toJson(object));
-      System.out.println("Saved a " + type + " to " + fname + ".");
-    } catch (IOException e) {
-      System.err.println("Could not save a " + type + " to " + fname + "!");
-    }
-  }
-
-  public static <T> T load(String fname, Class<T> klass) {
-    String type = klass.getName();
-    try {
-      T object = gson.fromJson(FileUtils.readFileToString(new File(fname)), klass);
-      System.out.println("Loaded a " + type + " from " + fname + ".");
-      return object;
-    } catch (IOException e) {
-      System.err.println("Could not load a " + type + " from " + fname + "!");
-      return null;
     }
   }
 }

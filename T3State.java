@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// Represents the state of the board in Tic Tac Toe.
+
 public class T3State extends AbstractState<T3State,T3Move> {
   static int winners[][][] = {{{0,0},{1,1},{2,2}},
                      {{0,2},{1,1},{2,0}},

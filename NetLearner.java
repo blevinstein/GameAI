@@ -8,9 +8,13 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-// represents knowledge with a neural network
+// Learns how to play TicTacToe using a neural network.
+//
+// Input is 18 bits (for each square, hasX?, and hasO?)
+// Output is 9 bits (for each square, move weight)
+
 class NetLearner implements Learner<T3State, T3Move> {
-  private double EPSILON = 0.0;
+  private double EPSILON = 0.1;
   
   private NeuralNet _net;
   public NeuralNet net() { return _net; }
@@ -38,7 +42,9 @@ class NetLearner implements Learner<T3State, T3Move> {
 
     int idx = Util.choose(output);
     T3Move m = new T3Move(idx/3, idx%3);
+
     // replace invalid moves wih random moves
+    // NOTE: alternative: set output[i] = 0 for invalid moves, then choose
     if (!s.validMove(m)) return s.randomMove();
     return m;
   }
@@ -100,20 +106,24 @@ class NetLearner implements Learner<T3State, T3Move> {
     int side = size / 3;
     double input[] = s.toDoubles();
     double output[] = net().process(input);
+
+    // NOTE: output += 1 to make positive, assumes output in [-1,1]
+    output = Arrays.stream(output).map(o -> o+1).toArray();
+    
     // get max magnitude
     double max = 0;
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         double value = output[i*3+j];
-        if (Math.abs(value) > max) max = value;
+        if (Math.abs(value) > Math.abs(max)) max = value;
       }
     }
     
     // draw each square
     for (int i = 0; i < 3; i++) {
       for(int j = 0; j < 3; j++) {
-        int gray = (int)(output[i*3+j] / Math.abs(max) * 255);
-        g.setColor(new Color(gray, gray, gray, 125));
+        float gray = (float)(output[i*3+j] / Math.abs(max));
+        g.setColor(new Color(gray, gray, gray, 0.5f));
         g.fillRect(x + i * side, y + j * side, side, side);
         g.setColor(Color.BLACK);
         g.drawRect(x + i * side, y + j * side, side, side);

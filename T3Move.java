@@ -1,5 +1,7 @@
 import java.util.Arrays;
 
+// Represents a move in Tic Tac Toe.
+
 class T3Move implements Move {
   private int _x;
   public int x() { return _x; }

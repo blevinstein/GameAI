@@ -1,7 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// represents a state of a game, e.g. Tic Tac Toe
+
 public abstract class AbstractState<Self, M extends Move> {
+  // return whether the state is "terminal" i.e. no moves can be made
   public abstract boolean terminal();
   
   // give the score for each player, to allow a generic Learner interface
@@ -16,7 +19,8 @@ public abstract class AbstractState<Self, M extends Move> {
   
   // return all legal moves from this state
   public abstract M[] moves();
-  
+ 
+  // choose a random legal move
   public M randomMove() {
     if (terminal()) return null; // no valid moves
     M allMoves[] = moves();
@@ -33,8 +37,12 @@ public abstract class AbstractState<Self, M extends Move> {
   public abstract Self updated(M m);
   
   public abstract String toString();
+
+  // used for sending state to a neural net
+  // TODO: replace double[] with a better abstraction
   public abstract double[] toDoubles();
-  
+
+  // which is player is "to move" next
   public abstract int toMove();
   
   // change state so that player 0 = p

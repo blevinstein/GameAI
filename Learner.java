@@ -1,3 +1,18 @@
+// Represents a "learner", who attempts to come up with the best move for a
+// given state, and can be taught by direct example:
+//
+// teach(s, m) // "the correct move in state s is move m"
+//
+// or by giving feedbck:
+//
+// while(!done) {
+//   move = query(state)
+//   // update state
+// }
+// feedback(value of state) // positive for good, negative for bad
+//
+// although some implementations may only learn from one of the two methods.
+
 interface Learner<S extends AbstractState<S, M>, M extends Move> {
   public abstract M query(S s);
   

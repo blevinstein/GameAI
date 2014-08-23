@@ -8,6 +8,15 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+// This is the driver for a program that simulates games of tic tac toe
+// between various "learning" programs and the user.
+//
+// Controls:
+// - arrows to move cursor
+// - spacebar to make a move
+// - S to save brain, L to load brain
+// - U to stdoutput the win/loss record of X and O
+
 class TicTacToe extends JPanel implements KeyListener {
   private final int POPULATION_SIZE = 100;
 
@@ -112,10 +121,6 @@ class TicTacToe extends JPanel implements KeyListener {
     Util.placeText(g, Util.NE, str, getWidth()-10, 10);
   }
 
-  // NOTE: Controls:
-  // - arrows to move cursor
-  // - spacebar to make a move
-  // - S to save brain, L to load brain
   private String modeStr = "";
   private int mode = 0;
   private T3Move cursor = new T3Move();
@@ -196,7 +201,7 @@ class TicTacToe extends JPanel implements KeyListener {
   }
   private void mainLoop() {
     if (game.done()) {
-      // print winner and count wins
+      // count wins
       switch(game.winner()) {
         case T3Square.X: wins[T3Square.X]++; break;
         case T3Square.O: wins[T3Square.O]++; break;
@@ -213,7 +218,8 @@ class TicTacToe extends JPanel implements KeyListener {
   // DRIVER
   public static void main(String[] args) {
     JFrame frame = new JFrame();
-    frame.setSize(1024, 768 + 25);
+    //frame.setSize(1024, 768 + 25);
+    frame.setSize(640, 320 + 25);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     TicTacToe display = new TicTacToe();

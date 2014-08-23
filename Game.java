@@ -1,7 +1,11 @@
 import java.util.ArrayList;
 
-// represents a game of Tic Tac Toe
-// TODO: generalize to Game<State,Move>?
+// Represents a game of Tic Tac Toe.
+//
+// Can be advanced one move (step), or played until completion or IO block
+// (play). Moves are made by calling moveMade, which assumes the correct
+// player (toMove) is acting.
+
 class Game {
   private T3State _state;
   public T3State state() { return _state; }

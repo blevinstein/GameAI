@@ -13,7 +13,10 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
-// represents a neural network using matrices
+// Represents a neural net using matrices.
+//
+// Implements Genome so that it can be a member of a Population.
+
 public class NeuralNet implements Genome<NeuralNet> {
   //[ y0 ]   [ w00 w01 w02 t0 ][ x0 ]
   //[ y1 ] = [ w10 w11 w12 t1 ][ x1 ]
@@ -86,8 +89,8 @@ public class NeuralNet implements Genome<NeuralNet> {
     return s * (1 - s);
   }
   */
-  double sigmoid(double x) { return Math.tanh(x); }                        // S = tanh(x)
-  double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t*t; }  // dS/dx = 1 - tanh(x)^2
+  private double sigmoid(double x) { return Math.tanh(x); }                        // S = tanh(x)
+  private double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t*t; }  // dS/dx = 1 - tanh(x)^2
   
   // TODO: allow normalizing input, xi' = (xi - offset) * scalar
   // TODO: allow normalizing output/feedback
@@ -102,7 +105,8 @@ public class NeuralNet implements Genome<NeuralNet> {
   public static double[] unwrap(double vector[]) {
     return Arrays.copyOf(vector, vector.length - 1);
   }
-  
+ 
+  // give outputs for a set of inputs
   public double[] process(double[] inputs) {
     // append -1, e.g. [ x0 x1 x2 -1 ]
     inputs = wrap(inputs);
@@ -140,6 +144,7 @@ public class NeuralNet implements Genome<NeuralNet> {
   
   // backpropagate a correct value back through the network
   // returns the error E, calculated as Sum[(xi-ti)^2] where ti are targets
+  // assumes that inputs and targets are NOT pre-wrapped (-1 appended)
   public void backpropagate(double[] inputs, double[] targets) {
     // append extra -1
     inputs = wrap(inputs);
@@ -187,6 +192,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     assert !Double.isNaN(_weights[0].getEntry(0,0));
   }
 
+  // translate into a 3D array for easy serialization
   public double[][][] toDoubles() {
     double arr[][][] = new double[N][][];
     for (int k = 0; k < N; k++) {
@@ -203,7 +209,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     return arr;
   }
 
-  // methods to implement Genome<T>, allow inclusion in a population
+  // methods to implement Genome<Self>, allow inclusion in a population
   private final double MAX_MUTATION = 1.0;
   private final double MUTATION_RATE = 0.1;
   public NeuralNet mutate() {
@@ -248,7 +254,11 @@ public class NeuralNet implements Genome<NeuralNet> {
     return new NeuralNet(newWeights);
   }
 
-  // draws from [x,y] to [x+sx, y+sy]
+  // Draws from [x,y] to [x+sx, y+sy].
+  // Depicts neurons in layers, connected by synapses.
+  // Neurons and synapses colored according to activation.
+  // Synapse width corresponds to weight.
+  // Arrowed "1.0 => 0.76" on neuron gives the input and output of the sigmoid.
   public void drawState(Graphics g, double inputs[], int x, int y, int sx, int sy) {
     // needed for drawing with Stroke's
     Graphics2D g2 = (Graphics2D)g;
@@ -270,7 +280,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     }
     double dy = sy / maxNeurons;
     double dx = sx / outputs.length;
-    // NOTE: 0.5 = arbitrary constant less than 1.0
+    // NOTE: 0.5 = arbitrary constant less than 1.0, for spacing
     int diameter = (int)(Math.min(dx, dy) * 0.5);
 
     // draw neurons
@@ -325,7 +335,7 @@ public class NeuralNet implements Genome<NeuralNet> {
 
         // display the neuron's pre-sigmoid value
         g.setColor(contrast);
-        String str = String.format("%.2f -> %.2f", outputs[i][j], sigmoid(outputs[i][j]));
+        String str = String.format("%.2f => %.2f", outputs[i][j], sigmoid(outputs[i][j]));
         Util.placeText(g, Util.CENTER, str,
                        (int)(x + dx*(0.5 + i)),
                        (int)(y + dy*(0.5 + j)));

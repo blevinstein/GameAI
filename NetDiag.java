@@ -8,8 +8,12 @@ import java.util.function.Function;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-// NOTE: used for diagnosing NeuralNet behavior
-// TODO: add more complex diagnostics for Populations (in another class)
+// Driver for an application which helps diagnose neural net behavior.
+// In theory, something like a visual inspection of the neural net in action,
+// to complement other types of testing, and to provide a more intuitive
+// view of the network when diagnosing behavioral issues.
+
+// TODO: add more complex diagnostics for Populations (in another class/panel)
 class NetDiag extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});
   private boolean[] state = new boolean[]{true, false};

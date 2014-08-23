@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// Various static utility functions.
+
 public class Util {
   // choose from an array, where the probability of choosing any index
   // is proportional to prob[index]

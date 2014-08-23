@@ -7,6 +7,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import java.util.PriorityQueue;
 
+// Represents a population of individuals, to be bred and evolved according to
+//   evolutionary algorithm.
+//
+// Each generation gets a copy of the top ELITE portion of the previous.
+// Other individuals are generated based on CROSSOVER_RATE.
+//   With probability CROSSOVER_RATE, a new individual is sexually produced by
+//   sampling two individuals from the _fitness-weighted population.
+//   With probability 1-CROSSOVER_RATE, a new individual is copied from the old,
+//   sampling from the _fitness-weighted population.
+//
+// New generations are the same size as old, unless explicitly indicated.
+//
+// epoch()
+// epoch(new_size)
+
 class Population<T extends Genome<T>> {
   private final double CROSSOVER_RATE = 0.7;
   private final double ELITE = 0.05;

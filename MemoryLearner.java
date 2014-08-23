@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.Set;
 
 // represents knowledge with a mapping of T3State -> Float
-// can play a game and get better over time
-// obvious weakness: learns every state individually
+// can play a game (tic tac toe) and get better over time
+
 class MemoryLearner implements Learner<T3State, T3Move> {
   private double DISCOUNT = 0.9;
   private double LEARNING_RATE = 0.3;

@@ -1,6 +1,10 @@
 import java.util.HashMap;
 import java.util.Map;
 
+// Used to register a default grader for a population.
+// Avoids the nasty issue of serializing and deserializing graders when working
+// with populations. Not a great design pattern.
+
 class DefaultGrader {
   private static Map<String, Grader<?>> _map = new HashMap<String, Grader<?>>();
 
