@@ -17,6 +17,16 @@
     <java jar="jar/TicTacToe.jar" fork="true" />
   </target>
 
+  <target name="diag" depends="build">
+    <mkdir dir="jar" />
+    <jar destfile="jar/NetDiag.jar" basedir="build">
+      <manifest>
+        <attribute name="Main-Class" value="NetDiag" />
+      </manifest>
+    </jar>
+    <java jar="jar/NetDiag.jar" fork="true" />
+  </target>
+
   <target name="clean">
     <delete dir="build" />
   </target>

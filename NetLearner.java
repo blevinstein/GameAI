@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,13 +123,12 @@ class NetLearner implements Learner<T3State, T3Move> {
     // print weights around the board
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, side / 6));
-    FontMetrics fm = g.getFontMetrics();
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         String str = String.format("%.2f", output[i*3+j]);
-        g.drawString(str,
-                     (int)(x + side * (i + 0.5) - fm.stringWidth(str) / 2),
-                     (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
+        Util.placeText(g, Util.CENTER, str,
+                       (int)(x + side * (i + 0.5)),
+                       (int)(y + side * (j + 0.5)));
       }
     }
   }

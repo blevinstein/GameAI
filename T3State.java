@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -226,7 +225,6 @@ public class T3State extends AbstractState<T3State,T3Move> {
     
     // font handling
     g.setFont(new Font("Arial", Font.PLAIN, side / 3));
-    FontMetrics fm = g.getFontMetrics();
     
     // draw the marks
     for (int i = 0; i < 3; i++) {
@@ -235,14 +233,14 @@ public class T3State extends AbstractState<T3State,T3Move> {
           // draw an X or O, centered in the square
           if (board(i,j).player() == T3Square.X) {
             g.setColor(Color.RED);
-            g.drawString("X",
-                         (int)(x + side * (i + 0.5) - fm.stringWidth("X") / 2),
-                         (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
+            Util.placeText(g, Util.CENTER, "X",
+                             (int)(x + side*(i+0.5)),
+                             (int)(y + side*(j+0.5)));
           } else {
             g.setColor(Color.BLUE);
-            g.drawString("O",
-                         (int)(x + side * (i + 0.5) - fm.stringWidth("O") / 2),
-                         (int)(y + side * (j + 0.5) + fm.getAscent() / 2));
+            Util.placeText(g, Util.CENTER, "O",
+                             (int)(x + side*(i+0.5)),
+                             (int)(y + side*(j+0.5)));
           }
         }
       }

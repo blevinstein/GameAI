@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 
 public class Util {
   // choose from an array, where the probability of choosing any index
@@ -17,5 +20,26 @@ public class Util {
   // returns a random number between -1 and 1
   public static double random() {
     return Math.random() * 2 - 1;
+  }
+
+  public static final int CENTER = 0, NE = 1;
+  public static void placeText(Graphics g, int align, String s, int x, int y) {
+    FontMetrics fm = g.getFontMetrics();
+    switch(align) {
+      case CENTER:
+        g.drawString(s, x - fm.stringWidth(s)/2, y + fm.getAscent()/2);
+        break;
+      case NE:
+        g.drawString(s, x - fm.stringWidth(s)/2, y + fm.getAscent()/2);
+        break;
+      // TODO: add more cases
+    }
+  }
+
+  // interpolate(0) => x
+  // interpolate(1) => y
+  // with linear interpolation
+  public static double interpolate(double x, double y, double i) {
+    return x + (y-x) * i;
   }
 }

@@ -1,7 +1,9 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -241,6 +243,9 @@ public class NeuralNet implements Genome<NeuralNet> {
 
   // draws from [x,y] to [x+sx, y+sy]
   public void drawState(Graphics g, double inputs[], int x, int y, int sx, int sy) {
+    // needed for drawing with Stroke's
+    Graphics2D g2 = (Graphics2D)g;
+
     // perform propagation
     inputs = wrap(inputs);
     double outputs[][] = propagate(inputs);
@@ -258,24 +263,64 @@ public class NeuralNet implements Genome<NeuralNet> {
     }
     double dy = sy / maxNeurons;
     double dx = sx / outputs.length;
-    // NOTE: 2/3 = arbitrary constant less than 1.0
-    int diameter = (int)(Math.min(dx, dy) * 2.0/3);
+    // NOTE: 0.5 = arbitrary constant less than 1.0
+    int diameter = (int)(Math.min(dx, dy) * 0.5);
 
     // draw neurons
     for (int i = 0; i < outputs.length; i++) { // each layer
       for (int j = 0; j < outputs[i].length; j++) { // each neuron
-        // NOTE: outputs[][] holds pre-sigmoid values
+        // calculate grayscale color to use
         // NOTE: assumes sigmoid(x) returns in range [0,1] not [-1,1]
-        float gray = (float)sigmoid(outputs[i][j]);
-        g.setColor(new Color(gray, gray, gray));
-        // center on square [i,j] with given side length, diameter
-        g.fillOval((int)(x + dx*(0.5f + i) - diameter/2),
-                   (int)(y + dy*(0.5f + j) - diameter/2),
+        // HACK: outputs[][] holds pre-sigmoid values, except output[0] = inputs
+        float value = (i == 0) ?                     // if input
+                      (float)outputs[i][j] :         // don't sigmoid
+                      (float)sigmoid(outputs[i][j]); // else, sigmoid
+        Color gray = new Color(value, value, value);
+        Color tgray = new Color(value, value, value, 0.5f); // translucent gray
+        Color contrast = value > 0.5 ? Color.BLACK : Color.WHITE;
+
+        // draw outgoing synapses
+        if (i+1 < outputs.length) { // except for last row
+          for (int m = 0; m < outputs[i+1].length; m++) { // each outgoing synapse
+            double weight = _weights[i].getEntry(j, m);
+            double mag = Math.abs(weight);
+            // NOTE: 0.5 = arbitrary constant less than 1
+            int width = (int)(mag / (1 + mag) * diameter * 0.5);
+            g2.setColor(tgray);
+            g2.setStroke(new BasicStroke(width));
+            g2.drawLine((int)(x + dx*(0.5 + i)),
+                        (int)(y + dy*(0.5 + j)),
+                        (int)(x + dx*(1.5 + i)),
+                        (int)(y + dy*(0.5 + m)));
+            g2.setStroke(new BasicStroke(1.0f));
+
+            // display the synapse weight
+            g2.setColor(contrast);
+            double t = (j + 1.0) / (outputs[i].length + 1.0);
+            Util.placeText(g, Util.CENTER, String.format("%.2f", weight),
+                           (int)(x + dx*(i + 0.5 + t)),
+                           (int)(y + dy*(0.5 + j + (m-j)*t)));
+          }
+        }
+
+        // circle is centered on square [i,j] with given side length, diameter
+        // border is black
+        g.setColor(gray);
+        g.fillOval((int)(x + dx*(0.5 + i) - diameter/2),
+                   (int)(y + dy*(0.5 + j) - diameter/2),
                    diameter, diameter);
+        g.setColor(Color.BLACK);
+        g.drawOval((int)(x + dx*(0.5 + i) - diameter/2),
+                   (int)(y + dy*(0.5 + j) - diameter/2),
+                   diameter, diameter);
+
+        // display the neuron's pre-sigmoid value
+        g.setColor(contrast);
+        String str = String.format("%.2f", outputs[i][j]);
+        Util.placeText(g, Util.CENTER, str,
+                       (int)(x + dx*(0.5 + i)),
+                       (int)(y + dy*(0.5 + j)));
       }
     }
-
-    // draw synapses
-    // TODO
   }
 }

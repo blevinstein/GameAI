@@ -2,7 +2,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.Map;
@@ -39,11 +38,13 @@ class TicTacToe extends JPanel implements KeyListener {
           case  1:               break; // student loses
         }
         // DEBUG
+        /*
         if (score == 200) {
           System.out.println("student played X");
           System.out.println(g.state());
           System.out.println("memlearner knows " + memLearner.map().size());
         }
+        */
       }
       return score;
     }, NeuralNet.class);
@@ -101,17 +102,14 @@ class TicTacToe extends JPanel implements KeyListener {
     game.state().draw(g, 10, 10, 300, cursor, suggested);
     
     // draw the neural network's thoughts
-    //netLearner.drawThoughts(g, game.state(), 330, 10, 300);
-    netLearner.net().drawState(g, game.state().toDoubles(), 10, 330, 1024 - 20, 768 - 330 - 20);
+    netLearner.drawThoughts(g, game.state(), 330, 10, 300);
+    //netLearner.net().drawState(g, game.state().toDoubles(), 10, 330, 1024 - 20, 768 - 330 - 20);
     
     // show frameRate and mode
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, 25));
-    FontMetrics fm = g.getFontMetrics();
     String str = String.format("%d FPS, Mode %s", (int)frameRate, modeStr);
-    g.drawString(str,
-                 getWidth() - 10 - fm.stringWidth(str),
-                 10 + fm.getAscent());
+    Util.placeText(g, Util.NE, str, getWidth()-10, 10);
   }
 
   // NOTE: Controls:
@@ -226,6 +224,6 @@ class TicTacToe extends JPanel implements KeyListener {
     display.run();
   }
 
-  private static final long serialVersionUID = 1337;
+  private static final long serialVersionUID = 1;
 }
 
