@@ -22,7 +22,7 @@ public class NeuralNet implements Genome<NeuralNet> {
   // yi = Sum(wij * xj - ti)
   // t = threshold
   
-  private double LEARNING_RATE = 1;
+  private double LEARNING_RATE = 0.1;
   
   private RealMatrix _weights[];
   public RealMatrix[] weights() { return _weights; }
@@ -79,12 +79,16 @@ public class NeuralNet implements Genome<NeuralNet> {
   // TODO: Should use tanh instead of 1/(1+e^(-u)) as suggested by
   // http://www.willamette.edu/~gorr/classes/cs449/precond.html
   // TODO: use Java 8 lambdas?
+  /*
   double sigmoid(double x) { return 1 / (1 + Math.exp(-x)); }
   double d_sigmoid(double x) {
     // NOTE: sacrificing pretty syntax to avoid calling sigmoid() twice
     double s = sigmoid(x);
     return s * (1 - s);
   }
+  */
+  double sigmoid(double x) { return Math.tanh(x); }                   // S = tanh(x)
+  double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t*t; }  // dS/dx = 1 - tanh(x)^2
   
   // TODO: allow normalizing input, xi' = (xi - offset) * scalar
   // TODO: allow normalizing output/feedback
@@ -93,7 +97,7 @@ public class NeuralNet implements Genome<NeuralNet> {
   // a trailing -1
   public static double[] wrap(double vector[]) {
     double ret[] = Arrays.copyOf(vector, vector.length + 1);
-    ret[ret.length-1] = 1;
+    ret[ret.length-1] = -1;
     return ret;
   }
   public static double[] unwrap(double vector[]) {
@@ -108,6 +112,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     double output[] = layers[layers.length - 1];
     
     // remove extra -1, [ y0 y1 -1 ]
+    // NOTE: output is sigmoided, only allows binary (not scalar) outputs
     return Arrays.stream(unwrap(output)).map(x -> sigmoid(x)).toArray();
   }
   
@@ -118,6 +123,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     // propagate across each layer, saving pre-sigmoid output
     // length+1 to include input layer
     double outputs[][] = new double[N+1][];
+    // NOTE: no sigmoid function applied to initial inputs
     outputs[0] = inputs;
     
     // for each layer
@@ -170,6 +176,8 @@ public class NeuralNet implements Genome<NeuralNet> {
           new ArrayRealVector(outputs[k]).outerProduct(
           new ArrayRealVector(delta[k]));
       _weights[k] = _weights[k].subtract(layerSlope.scalarMultiply(LEARNING_RATE));
+      // HACK: makes sure last column is still [ 0 0 .. 1 ]
+      setupMatrix(_weights[k]);
       /*
       System.out.println("new matrix " + k);
       pp(_weights[k]);
@@ -270,11 +278,13 @@ public class NeuralNet implements Genome<NeuralNet> {
     for (int i = 0; i < outputs.length; i++) { // each layer
       for (int j = 0; j < outputs[i].length; j++) { // each neuron
         // calculate grayscale color to use
-        // NOTE: assumes sigmoid(x) returns in range [0,1] not [-1,1]
+        /*
         // HACK: outputs[][] holds pre-sigmoid values, except output[0] = inputs
-        float value = (i == 0) ?                     // if input
-                      (float)outputs[i][j] :         // don't sigmoid
-                      (float)sigmoid(outputs[i][j]); // else, sigmoid
+        float value = (i == 0) ?              // if inputs
+                      outputs[i][j] :         // no sigmoid
+                      sigmoid(outputs[i][j]); // else sigmoid
+        */
+        float value = (float)(sigmoid(outputs[i][j]) * 0.5 + 0.5);
         Color gray = new Color(value, value, value);
         Color tgray = new Color(value, value, value, 0.5f); // translucent gray
         Color contrast = value > 0.5 ? Color.BLACK : Color.WHITE;
@@ -316,7 +326,7 @@ public class NeuralNet implements Genome<NeuralNet> {
 
         // display the neuron's pre-sigmoid value
         g.setColor(contrast);
-        String str = String.format("%.2f", outputs[i][j]);
+        String str = String.format("%.2f -> %.2f", outputs[i][j], sigmoid(outputs[i][j]));
         Util.placeText(g, Util.CENTER, str,
                        (int)(x + dx*(0.5 + i)),
                        (int)(y + dy*(0.5 + j)));

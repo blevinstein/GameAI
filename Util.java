@@ -36,10 +36,7 @@ public class Util {
     }
   }
 
-  // interpolate(0) => x
-  // interpolate(1) => y
-  // with linear interpolation
-  public static double interpolate(double x, double y, double i) {
-    return x + (y-x) * i;
+  public static double randomBit() {
+    return Math.random() < 0.5 ? 1.0 : -1.0;
   }
 }

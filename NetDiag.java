@@ -13,7 +13,8 @@ import javax.swing.JPanel;
 class NetDiag extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});
   private double[] state = new double[]{0.0, 1.0};
-  private Function<double[],double[]> f = inputs -> new double[]{Math.round(inputs[0]) ^ Math.round(inputs[1])};
+  private Function<double[],double[]> f =
+    inputs -> new double[]{(inputs[0] > 0) ^ (inputs[1] > 0) ? 1.0 : -1.0};
   // implicit no-argument constructor
 
   public void run() {
@@ -33,11 +34,19 @@ class NetDiag extends JPanel implements KeyListener {
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_T:
+        // choose an input and calculate correct output
+        state = new double[]{Util.randomBit(),
+                             Util.randomBit()};
+        double target[] = f.apply(state);
         // train the neural network
-        state = new double[]{Math.round(Math.random()),
-                                      Math.round(Math.random())};
-        double[] target = f.apply(state);
         net.backpropagate(state, target);
+        // check the network's answer
+        double answer = net.process(state)[0] > 0 ? 1.0 : -1.0;
+        // DEBUG
+        System.out.println(String.format("train %d ^ %d = %d (%d)", Math.round(state[0]),
+                                                                    Math.round(state[1]),
+                                                                    Math.round(target[0]),
+                                                                    Math.round(answer)));
         repaint();
         break;
       case KeyEvent.VK_ESCAPE:
