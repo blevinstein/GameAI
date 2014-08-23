@@ -46,7 +46,8 @@ public class NeuralNet implements Genome<NeuralNet> {
         for (int j = 0; j < cols; j++) {
           // NOTE: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
           // http://www.willamette.edu/~gorr/classes/cs449/precond.html
-          // NOTE: currently using only -max_weight and max_weight as initial weights
+          // _weights[k].setEntry(i, j, Util.random() / Math.sqrt(rows));
+          // NOTE: currently using only -max_weight and max_weight
           _weights[k].setEntry(i, j,
               (Math.random() < 0.5 ? 1 : -1) / Math.sqrt(rows));
         }

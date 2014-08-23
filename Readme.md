@@ -21,7 +21,9 @@ These are some of the observations I've made while watching the neural network,
 - Learning rates need careful tuning. Perhaps I should implement local learning
   rates, or allow learning rates to mutate.
 - Weights near zero are like a trap: they decrease their effect, and thus their
-  exposure to modification during backpropagation. Should trying avoiding them.
+  exposure to modification during backpropagation. Better results when removing
+  initial weights farther from zero. Still see problems when a whole layer of
+  synapses (i.e. one matrix) contains small values.
 
 ASPIRATIONAL
 ------------
