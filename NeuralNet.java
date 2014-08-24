@@ -44,17 +44,16 @@ public class NeuralNet implements Genome<NeuralNet> {
       // initialize weights
       for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-          // NOTE: max_weight = 1 / sqrt(Ai) where Ai = fan-in to node i
+          // NOTE: initial weight = +-1 / sqrt(Ai) where Ai = fan-in to node i
           // http://www.willamette.edu/~gorr/classes/cs449/precond.html
           // _weights[k].setEntry(i, j, Util.random() / Math.sqrt(rows));
-          // NOTE: currently using only -max_weight and max_weight
-          _weights[k].setEntry(i, j,
-              (Math.random() < 0.5 ? 1 : -1) / Math.sqrt(rows));
+          _weights[k].setEntry(i, j, (Math.random() < 0.5 ? 1 : -1));
         }
       }
-
-      setupMatrix(_weights[k]);
     }
+
+    // scale matrices and set last column
+    normalize();
   }
   
   public NeuralNet(RealMatrix[] w) {
@@ -187,16 +186,42 @@ public class NeuralNet implements Genome<NeuralNet> {
           new ArrayRealVector(outputs[k]).outerProduct(
           new ArrayRealVector(delta[k]));
       _weights[k] = _weights[k].subtract(layerSlope.scalarMultiply(LEARNING_RATE));
-      // HACK: makes sure last column is still [ 0 0 .. 1 ]
-      setupMatrix(_weights[k]);
-      /*
-      System.out.println("new matrix " + k);
-      pp(_weights[k]);
-      */
     }
+
+    // scale matrices and set last column
+    normalize();
     
     // HACK: just checks one element, forces crash when matrix diverges
     assert !Double.isNaN(_weights[0].getEntry(0,0));
+  }
+
+  // EXPERIMENTAL: adjust matrix so that the [Frobenius] norm stays constant
+  // 
+  // This came from the observation that all of the weights in a given matrix
+  // may approach zero, essentially severing the connection between two layers
+  // in the network.
+  //
+  // I am concerned that this might have negative consequences in the opposite
+  // situation, when the weights are large.
+  //
+  // MATH:
+  // when matrix is first created:
+  // norm = Sqrt(Sum(i, Sum(j, a_ij^2)))
+  //      = Sqrt(Sum(i, Sum(j, 1/I))) where I = inputs, i.e. fan-in
+  //      = Sqrt(I * J * 1/I) = Sqrt(J) where J = outputs
+  // scale matrix by k:
+  // norm = Sqrt(Sum(i, Sum(j, (k * a_ij)^2)))
+  //      = Sqrt(Sum(i, Sum(j, k^2 * a_ij^2)))
+  //      = Sqrt(k^2 * Sum(i, Sum(j, a_ij^2)))
+  //      = k * Sqrt(Sum(i, Sum(j, a_ij^2))) = k * norm
+  // so, to get desired norm X, scale by X/norm
+  private void normalize() {
+    for (int k = 0; k < _weights.length; k++) {
+      double desired_norm = Math.sqrt(_weights[k].getColumnDimension());
+      double current_norm = _weights[k].getFrobeniusNorm();
+      _weights[k] = _weights[k].scalarMultiply(desired_norm / current_norm);
+      setupMatrix(_weights[k]);
+    }
   }
 
   // translate into a 3D array for easy serialization

@@ -41,7 +41,7 @@ class PopLab extends JPanel implements KeyListener {
 
   boolean evolving = false;
   public void run() {
-    Throttle t = new Throttle(4); // 4 epochs/second max
+    Throttle t = new Throttle(1); // 1 epoch/second max
     while (true) {
       if (evolving) {
         pop = pop.epoch();

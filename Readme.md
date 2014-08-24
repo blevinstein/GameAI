@@ -4,12 +4,10 @@ Some experiments with machine learning to play games. Currently just
 To play with this code, you just need Java and Ant, then run one of:
 
 ant t3 (tic-tac-toe program)
-ant diag (neural network diagnostic program)
+ant house (neural network diagnostic program)
 
 TODO
 ====
-- rename NetDiag => House
-- give NetDiag separate tabs ("labs"), add a tab for population inspection
 - play with pruning and other means of intervention in network
 - abstract out input (double[]) and output from neural networks
 - fix uglines of double[] <=> boolean[], dtob, btod, etc
@@ -22,13 +20,13 @@ OBSERVATIONS
 These are some of the observations I've made while watching the neural network,
   and may lead to improvements in the algorithm.
 - Backpropagation sometimes leads to "dead neurons", with incoming and/or
-  outgoing weights close to zero.
+  outgoing weights close to zero. Maybe solved by normalization.
 - Learning rates need careful tuning. Perhaps I should implement local learning
   rates, or allow learning rates to mutate.
 - Weights near zero are like a trap: they decrease their effect, and thus their
-  exposure to modification during backpropagation. Better results when removing
-  initial weights farther from zero. Still see problems when a whole layer of
-  synapses (i.e. one matrix) contains small values.
+  exposure to modification during backpropagation.  Solved by normalizing each
+  matrix, so that a matrix cannot become all zeroes, thus disconnecting two
+  layers from each other.
 
 ASPIRATIONAL
 ------------
