@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 // Controls:
 // - S to save net, L to load net
 // - T to start/stop training
-// - R to recent correct/incorrect count
+// - R to reset correct/incorrect count
 
 class NetLab extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});

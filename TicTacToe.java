@@ -39,7 +39,6 @@ class TicTacToe extends JPanel implements KeyListener {
       for (int i = 0; i < 100; i++) {
         Game g = new Game(student, memLearner); // NOTE: student is player 0
         // TODO: possible bug, memlearner doesn't learn?
-        //System.out.println("memlearner " + memLearner.map().size());
         g.play();
         switch (g.winner()) {
           case -1: score += 1.0; break; // tie
