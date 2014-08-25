@@ -295,7 +295,8 @@ public class NeuralNet implements Genome<NeuralNet> {
   // Neurons and synapses colored according to activation.
   // Synapse width corresponds to weight.
   // Arrowed "1.0 => 0.76" on neuron gives the input and output of the sigmoid.
-  public void drawState(Graphics g, double inputs[], int x, int y, int sx, int sy) {
+  public void drawState(Graphics g, double inputs[],
+                        int x, int y, int sx, int sy) {
     // needed for drawing with Stroke's
     Graphics2D g2 = (Graphics2D)g;
 

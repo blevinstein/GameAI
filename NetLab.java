@@ -22,7 +22,8 @@ import javax.swing.JPanel;
 // - R to reset correct/incorrect count
 
 class NetLab extends JPanel implements KeyListener {
-  private NeuralNet net = new NeuralNet(new int[]{2,2,1});
+  private NetAdapter<boolean[]> adapter =
+    new NetAdapter<boolean[]>(Util::btod, Util::dtob, new NeuralNet(new int[]{2, 2, 1}));
   private boolean[] state = Util.randomBits(2);
   private Map<String,Function<boolean[],boolean[]>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
@@ -78,7 +79,7 @@ class NetLab extends JPanel implements KeyListener {
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
 
-    net.drawState(g, Util.btod(state), 10, 10, getWidth()-20, getHeight()-20);
+    adapter.drawState(g, state, 10, 10, getWidth()-20, getHeight()-20);
   }
 
   public void trainRandom() {
@@ -87,9 +88,9 @@ class NetLab extends JPanel implements KeyListener {
     boolean target[] = f.apply(state);
     boolean targetBit = target[0];
     // train the neural network
-    net.backpropagate(Util.btod(state), Util.btod(target));
+    adapter.backpropagate(state, target);
     // check the network's answer
-    boolean answer = net.process(Util.btod(state))[0] > 0;
+    boolean answer = adapter.process(state)[0];
     // DEBUG
     if (answer == targetBit) {
       correct++;
@@ -110,14 +111,15 @@ class NetLab extends JPanel implements KeyListener {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_L:
         NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
-        if (newNet != null) net = newNet;
+        if (newNet != null) adapter =
+          new NetAdapter<boolean[]>(Util::btod, Util::dtob, newNet);
         repaint();
         break;
       case KeyEvent.VK_R:
         correct = incorrect = 0;
         break;
       case KeyEvent.VK_S:
-        Json.save(net, "patient.json");
+        Json.save(adapter.net(), "patient.json");
         break;
       case KeyEvent.VK_T:
         training = !training;
