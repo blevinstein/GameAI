@@ -49,6 +49,8 @@ class NetLab extends JPanel implements KeyListener {
         new boolean[]{inputs[1]});
     addFunction("AND", inputs ->
         new boolean[]{inputs[0] && inputs[1]});
+    addFunction("OR", inputs ->
+        new boolean[]{inputs[0] || inputs[1]});
 
     f = functions.get(selectFunction.getItemAt(0));
     selectFunction.addActionListener(e ->

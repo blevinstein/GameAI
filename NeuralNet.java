@@ -31,6 +31,10 @@ public class NeuralNet implements Genome<NeuralNet> {
   public RealMatrix[] weights() { return _weights; }
   
   private final int N; // numbers of layers, for convenience
+
+  public NeuralNet(int inputs, int outputs) {
+    this(new int[]{inputs, (inputs + outputs) / 2, outputs});
+  }
   
   public NeuralNet(int neurons[]) {
     N = neurons.length-1;
@@ -314,6 +318,9 @@ public class NeuralNet implements Genome<NeuralNet> {
     double dx = sx / outputs.length;
     // NOTE: 0.5 = arbitrary constant less than 1.0, for spacing
     int diameter = (int)(Math.min(dx, dy) * 0.5);
+
+    // set font
+    g.setFont(new Font("Arial", Font.PLAIN, diameter / 8));
 
     // draw neurons
     for (int i = 0; i < outputs.length; i++) { // each layer
