@@ -24,7 +24,7 @@ import java.util.PriorityQueue;
 
 class Population<T extends Genome<T>> {
   private final double CROSSOVER_RATE = 0.7;
-  private final double ELITE = 0.05;
+  private final double ELITE = 0.00;
 
   // TODO: could be confused for pop()/push()... should make clearer
   private ArrayList<T> _pop;

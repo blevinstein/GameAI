@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 
 class NetLab extends JPanel implements KeyListener {
   private NeuralNet net = new NeuralNet(new int[]{2,2,1});
-  private boolean[] state = randomBits(2);
+  private boolean[] state = Util.randomBits(2);
   private Map<String,Function<boolean[],boolean[]>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
   private Function<boolean[],boolean[]> f;
@@ -42,7 +42,7 @@ class NetLab extends JPanel implements KeyListener {
     this.add(selectFunction);
 
     addFunction("XOR", inputs ->
-        new boolean[]{(inputs[0]) ^ (inputs[1])});
+        new boolean[]{inputs[0] ^ inputs[1]});
     addFunction("A", inputs ->
         new boolean[]{inputs[0]});
     addFunction("B", inputs ->
@@ -78,21 +78,12 @@ class NetLab extends JPanel implements KeyListener {
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
 
-    // TODO: add tab panel, each tab is a different tool
     net.drawState(g, Util.btod(state), 10, 10, getWidth()-20, getHeight()-20);
-  }
-
-  private boolean[] randomBits(int n) {
-    boolean b[] = new boolean[n];
-    for (int i = 0; i < n; i++) {
-      b[i] = Math.random() < 0.5;
-    }
-    return b;
   }
 
   public void trainRandom() {
     // choose an input and calculate correct output
-    state = randomBits(2);
+    state = Util.randomBits(2);
     boolean target[] = f.apply(state);
     boolean targetBit = target[0];
     // train the neural network

@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -76,14 +77,23 @@ public class Util {
     // draw the buckets
     for (int i = 0; i < count.length; i++) {
       int height = sy * count[i]/count[most];
+      g.setColor(Color.LIGHT_GRAY);
       g.fillRect(x + width * i, y + sy - height,
                  width,         height);
+
       // add label
-      /*
+      g.setColor(Color.BLACK);
       Util.placeText(g, Util.S,
-                     String.format("%.1f - %.1f", min + width * i, min + width * (i+1)),
-                     (int)(x + width * (i + 0.5)), y + sy);
-      */
+                     String.format("[%.1f, %.1f)", min + bucketSize * i, min + bucketSize * (i+1)),
+                     (int)(x + width * (i + 0.5)), y + sy - 10);
     }
+  }
+
+  public static boolean[] randomBits(int n) {
+    boolean b[] = new boolean[n];
+    for (int i = 0; i < n; i++) {
+      b[i] = Math.random() < 0.5;
+    }
+    return b;
   }
 }
