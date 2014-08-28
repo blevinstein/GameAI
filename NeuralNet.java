@@ -253,6 +253,7 @@ public class NeuralNet implements Genome<NeuralNet> {
   private final double RESIZE_RATE = 0.01;
   public NeuralNet mutate() {
     // TODO: fix this code to allow architecture to mutate w/o ugliness
+    // TODO: allow number of layers to change?
     RealMatrix w[] = new RealMatrix[N];
     for (int k = 0; k < N; k++) {
       // HACKy
