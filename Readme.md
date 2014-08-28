@@ -8,10 +8,7 @@ ant house (neural network diagnostic program)
 
 TODO
 ====
-- play with pruning and other means of intervention in network
-- abstract out input (double[]) and output from neural networks
-- fix uglines of double[] <=> boolean[], dtob, btod, etc
-- implement mutation in neural net architecture
+- play with pruning and other means of intervention in network?
 - write some goddamn tests before everything breaks.. JUnit or something?
 - at least make tests for neural net propagate etc
 

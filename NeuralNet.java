@@ -59,12 +59,12 @@ public class NeuralNet implements Genome<NeuralNet> {
     // scale matrices and set last column
     normalize();
   }
-  
   public NeuralNet(RealMatrix[] w) {
     _weights = w;
     N = _weights.length;
-  }
 
+    normalize();
+  }
   public NeuralNet(double[][][] arr) {
     N = arr.length;
     _weights = new RealMatrix[N];
@@ -76,6 +76,8 @@ public class NeuralNet implements Genome<NeuralNet> {
         }
       }
     }
+
+    normalize();
   }
 
   // sets last column of matrix to [ 0 0 .. 0 1 ]
@@ -248,16 +250,31 @@ public class NeuralNet implements Genome<NeuralNet> {
   // methods to implement Genome<Self>, allow inclusion in a population
   private final double MAX_MUTATION = 1.0;
   private final double MUTATION_RATE = 0.1;
+  private final double RESIZE_RATE = 0.01;
   public NeuralNet mutate() {
-    // TODO: allow architecture (layers and sizes) to mutate
+    // TODO: fix this code to allow architecture to mutate w/o ugliness
     RealMatrix w[] = new RealMatrix[N];
     for (int k = 0; k < N; k++) {
-      int rows = _weights[k].getRowDimension();
-      int cols = _weights[k].getColumnDimension();
+      // HACKy
+      int rows = k == 0 ?                        // if first matrix
+                 _weights[0].getRowDimension() : // number of inputs
+                 w[k-1].getColumnDimension();    // else copy from last layer
+      int cols =_weights[k].getColumnDimension();
+      // with some probability, change the output size of the matrix
+      if (k < N-1 && Math.random() < RESIZE_RATE) {
+        cols += Math.random() < 0.5 ? 1 : -1;
+        if (cols < 2) cols = 2; // must have 2 neurons, 1 + bias, in each layer
+        System.out.println("cols mutates to " + cols);
+      }
+
       w[k] = MatrixUtils.createRealMatrix(rows, cols);
       for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-          double value = _weights[k].getEntry(i, j);
+          // HACK: looks ugly
+          double value = i < _weights[k].getRowDimension() &&
+                         j < _weights[k].getColumnDimension() ?
+                         _weights[k].getEntry(i, j) :
+                         Math.random() < 0.5 ? 1 : -1;
           // with probability MUTATION_RATE..
           if (Math.random() < MUTATION_RATE) {
             // ..alter the weight by less than MAX_MUTATION

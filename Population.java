@@ -78,6 +78,9 @@ class Population<T extends Genome<T>> {
   }
 
   // returns an array of fitness values corresponding to pop members
+  // HACK: called once, assumes networks do not change
+  // TODO: change to do proper memoization, perhaps store timeMemoized and
+  //   timeChanged somehow?
   private double[] calcFitness() {
     // create a thread pool
     ExecutorService threadPool = Executors.newCachedThreadPool();
