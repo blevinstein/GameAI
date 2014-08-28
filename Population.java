@@ -36,22 +36,22 @@ class Population<T extends Genome<T>> {
   private Grader<T> _grader;
   public void setGrader(Grader<T> grader) { _grader = grader; }
 
-  // NOTE: all constructors use DefaultGrader.getDefaultGrader() to avoid
+  // NOTE: all constructors use DefaultGrader.get() to avoid
   //       problems with serialization
   public Population(int size, Supplier<T> generator) {
     // HACK: create a dummy object to get it's class
-    _grader = DefaultGrader.getDefaultGrader(generator.get().getClass().getName());
+    _grader = DefaultGrader.get(generator.get().getClass().getName());
     _pop = new ArrayList<T>();
     while (_pop.size() < size) _pop.add(generator.get());
     _fitness = calcFitness();
   }
   public Population(List<T> pop) {
-    _grader = DefaultGrader.getDefaultGrader(pop.get(0).getClass().getName());
+    _grader = DefaultGrader.get(pop.get(0).getClass().getName());
     _pop = new ArrayList<T>(pop);
     _fitness = calcFitness();
   }
   public Population(T array[]) {
-    _grader = DefaultGrader.getDefaultGrader(array[0].getClass().getName());
+    _grader = DefaultGrader.get(array[0].getClass().getName());
     _pop = new ArrayList<T>();
     for (T genome : array) _pop.add(genome);
     _fitness = calcFitness();

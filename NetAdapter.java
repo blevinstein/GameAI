@@ -9,30 +9,32 @@ import java.awt.Graphics;
 // TODO: Revisit this implementation, decide whether it's worth trying to
 // move this kind of stuff into the NeuralNet class itself.
 
-public class NetAdapter<X> {
-  private Function<X, double[]> _tod;
-  private Function<double[], X> _fromd;
+public class NetAdapter<X,Y> {
+  private Converter<X> _cin;
+  private Converter<Y> _cout;
 
   private NeuralNet _net;
   public NeuralNet net() { return _net; }
 
-  public NetAdapter(Function<X, double[]> tod,
-                    Function<double[], X> fromd,
-                    NeuralNet net) {
-    _tod = tod;
+  public NetAdapter(Converter<X> cin, Converter<Y> cout, NeuralNet net) {
+    _cin = cin;
+    _cout = cout;
     _net = net;
-    _fromd = fromd;
   }
 
-  public X process(X input) {
-    return _fromd.apply(_net.process(_tod.apply(input)));
+  public Y process(X input) {
+    double[] rawInput = _cin.toDoubles(input);
+    double[] rawOutput = _net.process(rawInput);
+    return _cout.fromDoubles(rawOutput);
   }
 
-  public void backpropagate(X inputs, X targets) {
-    _net.backpropagate(_tod.apply(inputs), _tod.apply(targets));
+  public void backpropagate(X input, Y target) {
+    double[] rawInput = _cin.toDoubles(input);
+    double[] rawTarget = _cout.toDoubles(target);
+    _net.backpropagate(rawInput, rawTarget);
   }
 
-  public void drawState(Graphics g, X inputs, int x, int y, int sx, int sy) {
-    _net.drawState(g, _tod.apply(inputs), x, y, sx, sy);
+  public void drawState(Graphics g, X input, int x, int y, int sx, int sy) {
+    _net.drawState(g, _cin.toDoubles(input), x, y, sx, sy);
   }
 }

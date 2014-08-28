@@ -32,7 +32,7 @@ class TicTacToe extends JPanel implements KeyListener {
   @SuppressWarnings("unchecked")
   public TicTacToe() {
     // set grading policy, Learner -> double
-    DefaultGrader.registerDefaultGrader((network) -> {
+    DefaultGrader.register((network) -> {
       NetLearner student = new NetLearner(network);
       // simulate 100 games, 1 point for ties, 2 points for wins
       double score = 0;

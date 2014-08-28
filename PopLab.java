@@ -63,7 +63,7 @@ class PopLab extends JPanel implements KeyListener {
 
   private void setFunction(Function<boolean[],boolean[]> f) {
     // setup grading policy
-    DefaultGrader.registerDefaultGrader((net) -> {
+    DefaultGrader.register((net) -> {
       boolean cases[][] = {{false, false},
                            {false, true},
                            {true, false},

@@ -8,7 +8,6 @@ ant house (neural network diagnostic program)
 
 TODO
 ====
-- modify NetAdapter to use Sensor and Actuator objects
 - abstract out the learning policy of a neural network? i.e. train vs feedback?
 - fix neural net architecture mutation to look cleaner
 - play with pruning and other means of intervention in network?
