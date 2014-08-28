@@ -26,7 +26,8 @@ class NetLearner implements Learner<T3State, T3Move> {
     this(new NeuralNet(new int[]{18, 14, 9}));
   }
   public NetLearner(NeuralNet n) {
-    assert n != null;
+    if (n == null)
+      throw new NullPointerException();
     _net = n;
   }
   

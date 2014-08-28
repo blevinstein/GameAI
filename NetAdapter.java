@@ -15,6 +15,7 @@ public class NetAdapter<X,Y> {
 
   private NeuralNet _net;
   public NeuralNet net() { return _net; }
+  public void setNet(NeuralNet net) { _net = net; }
 
   public NetAdapter(Converter<X> cin, Converter<Y> cout, NeuralNet net) {
     _cin = cin;

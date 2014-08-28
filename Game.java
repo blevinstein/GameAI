@@ -58,7 +58,8 @@ class Game {
     for (int i = 0; i < players.size(); i++) {
       if (i == toMove()) continue; // don't tell players about their own moves
       if (players.get(i) == null) continue; // skip null players (users)
-      assert _state.normalize(i).validMove(m);
+      if (!_state.normalize(i).validMove(m))
+        throw new IllegalArgumentException("Invalid move.");
       players.get(i).moveMade(_state.normalize(i), m);
     }
     moveMade(m);

@@ -18,7 +18,7 @@ class PopLab extends JPanel implements KeyListener {
 
   private Population<NeuralNet> pop;
 
-  private Map<String,Function<boolean[],boolean[]>> functions = new HashMap<>();
+  private Map<String,Function<Boolean[],Boolean[]>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
 
   public PopLab() {
@@ -35,15 +35,15 @@ class PopLab extends JPanel implements KeyListener {
     this.add(selectFunction);
     
     addFunction("XOR", inputs ->
-        new boolean[]{inputs[0] ^ inputs[1]});
+        new Boolean[]{inputs[0] ^ inputs[1]});
     addFunction("A", inputs ->
-        new boolean[]{inputs[0]});
+        new Boolean[]{inputs[0]});
     addFunction("B", inputs ->
-        new boolean[]{inputs[1]});
+        new Boolean[]{inputs[1]});
     addFunction("AND", inputs ->
-        new boolean[]{inputs[0] && inputs[1]});
+        new Boolean[]{inputs[0] && inputs[1]});
     addFunction("OR", inputs ->
-        new boolean[]{inputs[0] || inputs[1]});
+        new Boolean[]{inputs[0] || inputs[1]});
 
     setFunction(functions.get(selectFunction.getItemAt(0)));
     selectFunction.addActionListener(e ->
@@ -56,22 +56,26 @@ class PopLab extends JPanel implements KeyListener {
         () -> new NeuralNet(new int[]{2,2,1}));
   }
 
-  private void addFunction(String name, Function<boolean[],boolean[]> function) {
+  private void addFunction(String name, Function<Boolean[],Boolean[]> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
 
-  private void setFunction(Function<boolean[],boolean[]> f) {
+  private void setFunction(Function<Boolean[],Boolean[]> f) {
     // setup grading policy
     DefaultGrader.register((net) -> {
-      boolean cases[][] = {{false, false},
+      NetAdapter<Boolean[],Boolean[]> adapter =
+        new NetAdapter<>(Converters.array(Boolean.class, 2),
+                         Converters.array(Boolean.class, 1),
+                         new NeuralNet(2,1));
+      Boolean cases[][] = {{false, false},
                            {false, true},
                            {true, false},
                            {false, false}};
       double score = 0.0;
-      for (boolean[] kase : cases) {
+      for (Boolean[] kase : cases) {
         boolean expected = f.apply(kase)[0];
-        boolean actual = Util.dtob(net.process(Util.btod(kase)))[0];
+        boolean actual = adapter.process(kase)[0];
         if (actual == expected) score += 1;
       }
       return score;
@@ -102,9 +106,12 @@ class PopLab extends JPanel implements KeyListener {
     // show a perfect example
     for (int i = 0; i < pop.fitness().length; i++) {
       if (pop.fitness()[i] == 4.0) {
-        NeuralNet net = pop.pop().get(i);
-        net.drawState(g, Util.btod(Util.randomBits(2)),
-                      10, 10 + 25, (getWidth()-20)/2, (getHeight()-20)/2);
+        NetAdapter<Boolean[],Boolean[]> adapter =
+          new NetAdapter<>(Converters.array(Boolean.class, 2),
+                           Converters.array(Boolean.class, 1),
+                           new NeuralNet(2, 1));
+        adapter.drawState(g, Util.randomBits(2),
+                          10, 10 + 25, (getWidth()-20)/2, (getHeight()-20)/2);
         break;
       }
     }

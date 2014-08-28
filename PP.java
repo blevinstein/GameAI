@@ -35,9 +35,6 @@ class PP {
   public static String dimOf(RealMatrix weights[]) {
     String output = "[" + weights[0].getRowDimension();
     for (int i = 0; i < weights.length; i++) {
-      if (i > 0) {
-        assert weights[i-1].getColumnDimension() == weights[i].getRowDimension();
-      }
       output += "x" + weights[i].getColumnDimension();
     }
     output += "]";

@@ -33,7 +33,7 @@ public class NeuralNet implements Genome<NeuralNet> {
   private final int N; // numbers of layers, for convenience
 
   public NeuralNet(int inputs, int outputs) {
-    this(new int[]{inputs, (inputs + outputs) / 2, outputs});
+    this(new int[]{inputs, (int)Math.round((inputs + outputs) / 2.0), outputs});
   }
   
   public NeuralNet(int neurons[]) {
@@ -162,8 +162,8 @@ public class NeuralNet implements Genome<NeuralNet> {
     double outputs[][] = propagate(inputs);
     
     // check length of targets
-    assert targets.length == outputs[N].length :
-        "targets should be length " + outputs[N].length + " but is " + targets.length;
+    if (targets.length != outputs[N].length)
+      throw new RuntimeException("Wrong target length!");
     
     // calculate dj, where dE/dwij = dj * xi
     // refer to http://en.wikipedia.org/wiki/Backpropagation
@@ -198,7 +198,8 @@ public class NeuralNet implements Genome<NeuralNet> {
     normalize();
     
     // HACK: just checks one element, forces crash when matrix diverges
-    assert !Double.isNaN(_weights[0].getEntry(0,0));
+    if (Double.isNaN(_weights[0].getEntry(0,0)))
+      throw new RuntimeException("Matrix has diverged!");
   }
 
   // EXPERIMENTAL: adjust matrix so that the [Frobenius] norm stays constant
@@ -292,7 +293,8 @@ public class NeuralNet implements Genome<NeuralNet> {
     // TODO: don't just cut between matrices
     RealMatrix otherWeights[] = other.weights();
 
-    assert _weights.length == otherWeights.length;
+    if (_weights.length != otherWeights.length)
+      throw new RuntimeException("Invalid crossover attempted.");
     
     RealMatrix newWeights[] = new RealMatrix[N];
     // choose a point to cut

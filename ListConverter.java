@@ -2,10 +2,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConverterArray implements Converter<List<?>> {
+public class ListConverter implements Converter<List<?>> {
   List<Converter<?>> _converters;
 
-  public ConverterArray(List<Converter<?>> converters) {
+  public ListConverter(List<Converter<?>> converters) {
     _converters = converters;
   }
 
@@ -21,7 +21,8 @@ public class ConverterArray implements Converter<List<?>> {
       double results[] = c.toDoubles(values.get(v));
 
       // check output length
-      assert results.length == c.bits();
+      if (results.length != c.bits())
+        throw new RuntimeException("Wrong output length!");
 
       // copy results into larger array
       System.arraycopy(results, 0, allResults, i, results.length);
@@ -33,7 +34,8 @@ public class ConverterArray implements Converter<List<?>> {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public List<?> fromDoubles(double[] doubles) {
     // check input length
-    assert doubles.length == bits();
+    if (doubles.length != bits())
+      throw new RuntimeException("Wrong input length!");
 
     List results = new ArrayList<>();
 

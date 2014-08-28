@@ -43,19 +43,6 @@ public class Util {
     }
   }
 
-  public static boolean[] dtob(double values[]) {
-    boolean b[] = new boolean[values.length];
-    for (int i = 0; i < values.length; i++)
-      b[i] = values[i] > 0;
-    return b;
-  }
-  public static double[] btod(boolean bits[]) {
-    double d[] = new double[bits.length];
-    for (int i = 0; i < bits.length; i++)
-      d[i] = bits[i] ? 1.0 : -1.0;
-    return d;
-  }
-
   public static void drawHistogram(Graphics g, double values[], double bucketSize,
                                    int x, int y, int sx, int sy) {
     // determine min and max values
@@ -89,8 +76,8 @@ public class Util {
     }
   }
 
-  public static boolean[] randomBits(int n) {
-    boolean b[] = new boolean[n];
+  public static Boolean[] randomBits(int n) {
+    Boolean b[] = new Boolean[n];
     for (int i = 0; i < n; i++) {
       b[i] = Math.random() < 0.5;
     }

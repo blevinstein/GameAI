@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.function.Function;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -22,12 +23,14 @@ import javax.swing.JPanel;
 // - R to reset correct/incorrect count
 
 class NetLab extends JPanel implements KeyListener {
-  private NetAdapter<boolean[]> adapter =
-    new NetAdapter<boolean[]>(Util::btod, Util::dtob, new NeuralNet(new int[]{2, 2, 1}));
-  private boolean[] state = Util.randomBits(2);
-  private Map<String,Function<boolean[],boolean[]>> functions = new HashMap<>();
+  private NetAdapter<Boolean[],Boolean[]> adapter =
+    new NetAdapter<>(Converters.array(Boolean.class, 2),
+                     Converters.array(Boolean.class, 1),
+                     new NeuralNet(2,1));
+  private Boolean[] state = Util.randomBits(2);
+  private Map<String,Function<Boolean[],Boolean[]>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
-  private Function<boolean[],boolean[]> f;
+  private Function<Boolean[],Boolean[]> f;
 
   public NetLab() {
     super(null); // no layout manager
@@ -43,15 +46,15 @@ class NetLab extends JPanel implements KeyListener {
     this.add(selectFunction);
 
     addFunction("XOR", inputs ->
-        new boolean[]{inputs[0] ^ inputs[1]});
+        new Boolean[]{inputs[0] ^ inputs[1]});
     addFunction("A", inputs ->
-        new boolean[]{inputs[0]});
+        new Boolean[]{inputs[0]});
     addFunction("B", inputs ->
-        new boolean[]{inputs[1]});
+        new Boolean[]{inputs[1]});
     addFunction("AND", inputs ->
-        new boolean[]{inputs[0] && inputs[1]});
+        new Boolean[]{inputs[0] && inputs[1]});
     addFunction("OR", inputs ->
-        new boolean[]{inputs[0] || inputs[1]});
+        new Boolean[]{inputs[0] || inputs[1]});
 
     f = functions.get(selectFunction.getItemAt(0));
     selectFunction.addActionListener(e ->
@@ -60,7 +63,7 @@ class NetLab extends JPanel implements KeyListener {
             selectFunction.getSelectedIndex())));
   }
 
-  private void addFunction(String name, Function<boolean[],boolean[]> function) {
+  private void addFunction(String name, Function<Boolean[],Boolean[]> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
@@ -85,7 +88,7 @@ class NetLab extends JPanel implements KeyListener {
   public void trainRandom() {
     // choose an input and calculate correct output
     state = Util.randomBits(2);
-    boolean target[] = f.apply(state);
+    Boolean target[] = f.apply(state);
     boolean targetBit = target[0];
     // train the neural network
     adapter.backpropagate(state, target);
@@ -111,8 +114,7 @@ class NetLab extends JPanel implements KeyListener {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_L:
         NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
-        if (newNet != null) adapter =
-          new NetAdapter<boolean[]>(Util::btod, Util::dtob, newNet);
+        if (newNet != null) adapter.setNet(newNet);
         repaint();
         break;
       case KeyEvent.VK_R:

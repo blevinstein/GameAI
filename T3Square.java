@@ -28,7 +28,7 @@ class T3Square {
   }
   
   public boolean isEmpty() { return _empty; }
-  public int player() { assert !_empty; return _player; }
+  public int player() { return _player; }
   
   public boolean equals(T3Square other) {
     return (_empty == other.isEmpty() && _player == other._player);
