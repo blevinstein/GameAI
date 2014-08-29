@@ -94,7 +94,6 @@ class Json {
     public JsonElement serialize(NeuralNet src,
                                  Type typeOfSrc,
                                  JsonSerializationContext context) {
-      System.out.println("NeuralNet Serializer");
       // serialize as double[][][]
       return gson.toJsonTree(src.toDoubles());
     }
@@ -106,7 +105,6 @@ class Json {
                                   Type type,
                                   JsonDeserializationContext context)
                                   throws JsonParseException {
-      System.out.println("NeuralNet Deserializer");
       // deserialize from double[][][]
       return new NeuralNet(gson.fromJson(json, double[][][].class));
     }

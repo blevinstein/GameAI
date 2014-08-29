@@ -16,13 +16,16 @@ import javax.swing.JPanel;
 // In theory, something like a visual inspection of the neural net in action,
 // to complement other types of testing, and to provide a more intuitive
 // view of the network when diagnosing behavioral issues.
-//
-// Controls:
-// - S to save net, L to load net
-// - T to start/stop training
-// - R to reset correct/incorrect count
 
 class NetLab extends JPanel implements KeyListener {
+
+  private String HELP =
+    "Choose a function for the network to learn. " +
+    "Press S to save, L to load a saved net. " +
+    "T to start/stop training of the net. " +
+    "R to reset correct % stats. ";
+
+
   private NetAdapter<Boolean[],Boolean> adapter = new NetAdapter<>(Converters.array(Boolean.class, 2),
                                                                    new BinaryConverter());
   private Boolean[] state = Util.randomBits(2);
@@ -71,6 +74,7 @@ class NetLab extends JPanel implements KeyListener {
     Throttle t = new Throttle(100); // 100fps max
     while (true) {
       if (training) trainRandom();
+      repaint();
       t.sleep();
     }
   }
@@ -81,6 +85,22 @@ class NetLab extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     adapter.drawState(g, state, 10, 10, getWidth()-20, getHeight()-20);
+
+    // draw overlay text last
+    g.setColor(Color.BLACK);
+    g.setFont(new Font("Arial", Font.PLAIN, 15));
+    
+    // draw success % since last reset
+    Util.placeText(g, Util.NE,
+                   String.format("Success: %2.2f%%", correctPercent),
+                   getWidth()-20, 20);
+
+    // draw help
+    if (displayHelp) {
+      Util.placeText(g, Util.SE, HELP, getWidth()-20, getHeight()-20);
+    } else {
+      Util.placeText(g, Util.SE, "H for help", getWidth()-20, getHeight()-20);
+    }
   }
 
   public void trainRandom() {
@@ -97,16 +117,13 @@ class NetLab extends JPanel implements KeyListener {
     } else {
       incorrect++;
     }
-    System.out.println(String.format("train(%d, %d) = %d (%d) Success %.2f%%",
-                                      state[0]  ? 1 : 0,
-                                      state[1]  ? 1 : 0,
-                                      target ? 1 : 0,
-                                      answer    ? 1 : 0,
-                                      correct * 100.0 / (correct + incorrect)));
+    correctPercent = correct * 100.0 / (correct + incorrect);
     repaint();
   }
 
+  private double correctPercent = 0.0;
   private int correct = 0, incorrect = 0;
+  private boolean displayHelp = false;
   public void keyPressed(KeyEvent e) {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_L:
@@ -123,12 +140,21 @@ class NetLab extends JPanel implements KeyListener {
       case KeyEvent.VK_T:
         training = !training;
         break;
+      case KeyEvent.VK_H:
+        displayHelp = true;
+        break;
       case KeyEvent.VK_ESCAPE:
         System.exit(0);
         break;
     }
   }
-  public void keyReleased(KeyEvent e) {}
+  public void keyReleased(KeyEvent e) {
+    switch(e.getKeyCode()) {
+      case KeyEvent.VK_H:
+        displayHelp = false;
+        break;
+    }
+  }
   public void keyTyped(KeyEvent e) {}
 
   private static final long serialVersionUID = 1;

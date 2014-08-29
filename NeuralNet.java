@@ -266,7 +266,6 @@ public class NeuralNet implements Genome<NeuralNet> {
       if (k < N-1 && Math.random() < RESIZE_RATE) {
         cols += Math.random() < 0.5 ? 1 : -1;
         if (cols < 2) cols = 2; // must have 2 neurons, 1 + bias, in each layer
-        System.out.println("cols mutates to " + cols);
       }
 
       w[k] = MatrixUtils.createRealMatrix(rows, cols);

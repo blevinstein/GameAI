@@ -26,7 +26,7 @@ public class Util {
     return Math.random() * 2 - 1;
   }
 
-  public static final int CENTER = 0, NE = 1, S = 2;
+  public static final int CENTER = 0, NE = 1, S = 2, SE = 3;
   public static void placeText(Graphics g, int align, String s, int x, int y) {
     FontMetrics fm = g.getFontMetrics();
     switch(align) {
@@ -39,7 +39,11 @@ public class Util {
       case S:
         g.drawString(s, x - fm.stringWidth(s)/2, y);
         break;
-      // TODO: add more cases
+      case SE:
+        g.drawString(s, x - fm.stringWidth(s), y);
+        break;
+      default:
+        throw new UnsupportedOperationException("Not implemented!");
     }
   }
 

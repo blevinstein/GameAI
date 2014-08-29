@@ -4,7 +4,7 @@ Some experiments with machine learning to play games. Currently just
 To play with this code, you just need Java and Ant, then run one of:
 
 ant t3 (tic-tac-toe program)
-ant house (neural network diagnostic program)
+ant house (neural network inspection program)
 
 TODO
 ====

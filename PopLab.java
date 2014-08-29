@@ -14,6 +14,12 @@ import javax.swing.JPanel;
 // This lab helps visualize the progress of an evolving population.
 
 class PopLab extends JPanel implements KeyListener {
+
+  private String HELP =
+    "Choose a function for the population to learn. " +
+    "Press S to save, L to load a saved population. " +
+    "Presse E to start/stop evolution. ";
+
   private final int POPULATION_SIZE = 100;
 
   private Population<NeuralNet> pop;
@@ -83,24 +89,26 @@ class PopLab extends JPanel implements KeyListener {
 
   boolean evolving = false;
   public void run() {
-    Throttle t = new Throttle(4); // limit epochs/second
+    Throttle t = new Throttle(60); // limit framerate
+    Throttle t2 = new Throttle(4); // limit epochs/second
     while (true) {
       if (evolving) {
         pop = pop.epoch();
-        System.out.println(pop.stats());
-        repaint();
+        t2.sleep();
       }
+      repaint();
       t.sleep();
     }
   }
 
+  private boolean displayHelp = false;
   public void paintComponent(Graphics g) {
     // clear the screen
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
 
     // show histogram
-    Util.drawHistogram(g, pop.fitness(), 1.0, 10, 10, getWidth()-20, getHeight()-20);
+    Util.drawHistogram(g, pop.fitness(), 1.0, 10, 10, getWidth()-20, getHeight()-100);
 
     // show a perfect example
     for (int i = 0; i < pop.fitness().length; i++) {
@@ -112,6 +120,20 @@ class PopLab extends JPanel implements KeyListener {
                           10, 10 + 25, (getWidth()-20)/2, (getHeight()-20)/2);
         break;
       }
+    }
+
+    // draw overlay text last
+    g.setColor(Color.BLACK);
+    g.setFont(new Font("Arial", Font.PLAIN, 15));
+    
+    // draw stats
+    Util.placeText(g, Util.NE, pop.stats(), getWidth()-20, 20);;
+
+    // draw help
+    if (displayHelp) {
+      Util.placeText(g, Util.SE, HELP, getWidth()-20, getHeight()-20);
+    } else {
+      Util.placeText(g, Util.SE, "H for help", getWidth()-20, getHeight()-20);
     }
   }
 
@@ -129,12 +151,21 @@ class PopLab extends JPanel implements KeyListener {
       case KeyEvent.VK_S:
         Json.save(pop, "patients.json");
         break;
+      case KeyEvent.VK_H:
+        displayHelp = true;
+        break;
       case KeyEvent.VK_ESCAPE:
         System.exit(0);
         break;
     }
   }
-  public void keyReleased(KeyEvent e) {}
+  public void keyReleased(KeyEvent e) {
+    switch(e.getKeyCode()) {
+      case KeyEvent.VK_H:
+        displayHelp = false;
+        break;
+    }
+  }
   public void keyTyped(KeyEvent e) {}
 
   public static final long serialVersionUID = 1;
