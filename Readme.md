@@ -30,8 +30,9 @@ These are some of the observations I've made while watching the neural network,
 ASPIRATIONAL
 ------------
 - experiment with neural net sizes & architectures, or allow mutation
+- implement simple image recognition
 - implement other TBS games
-- implement realtime game
+- implement realtime games
 
 IDEAS
 -----

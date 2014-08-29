@@ -23,14 +23,12 @@ import javax.swing.JPanel;
 // - R to reset correct/incorrect count
 
 class NetLab extends JPanel implements KeyListener {
-  private NetAdapter<Boolean[],Boolean[]> adapter =
-    new NetAdapter<>(Converters.array(Boolean.class, 2),
-                     Converters.array(Boolean.class, 1),
-                     new NeuralNet(2,1));
+  private NetAdapter<Boolean[],Boolean> adapter = new NetAdapter<>(Converters.array(Boolean.class, 2),
+                                                                   new BinaryConverter());
   private Boolean[] state = Util.randomBits(2);
-  private Map<String,Function<Boolean[],Boolean[]>> functions = new HashMap<>();
+  private Map<String,Function<Boolean[],Boolean>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
-  private Function<Boolean[],Boolean[]> f;
+  private Function<Boolean[],Boolean> f;
 
   public NetLab() {
     super(null); // no layout manager
@@ -46,15 +44,15 @@ class NetLab extends JPanel implements KeyListener {
     this.add(selectFunction);
 
     addFunction("XOR", inputs ->
-        new Boolean[]{inputs[0] ^ inputs[1]});
+        inputs[0] ^ inputs[1]);
     addFunction("A", inputs ->
-        new Boolean[]{inputs[0]});
+        inputs[0]);
     addFunction("B", inputs ->
-        new Boolean[]{inputs[1]});
+        inputs[1]);
     addFunction("AND", inputs ->
-        new Boolean[]{inputs[0] && inputs[1]});
+        inputs[0] && inputs[1]);
     addFunction("OR", inputs ->
-        new Boolean[]{inputs[0] || inputs[1]});
+        inputs[0] || inputs[1]);
 
     f = functions.get(selectFunction.getItemAt(0));
     selectFunction.addActionListener(e ->
@@ -63,7 +61,7 @@ class NetLab extends JPanel implements KeyListener {
             selectFunction.getSelectedIndex())));
   }
 
-  private void addFunction(String name, Function<Boolean[],Boolean[]> function) {
+  private void addFunction(String name, Function<Boolean[],Boolean> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
@@ -88,14 +86,13 @@ class NetLab extends JPanel implements KeyListener {
   public void trainRandom() {
     // choose an input and calculate correct output
     state = Util.randomBits(2);
-    Boolean target[] = f.apply(state);
-    boolean targetBit = target[0];
+    Boolean target = f.apply(state);
     // train the neural network
     adapter.backpropagate(state, target);
     // check the network's answer
-    boolean answer = adapter.process(state)[0];
+    Boolean answer = adapter.process(state);
     // DEBUG
-    if (answer == targetBit) {
+    if (answer == target) {
       correct++;
     } else {
       incorrect++;
@@ -103,7 +100,7 @@ class NetLab extends JPanel implements KeyListener {
     System.out.println(String.format("train(%d, %d) = %d (%d) Success %.2f%%",
                                       state[0]  ? 1 : 0,
                                       state[1]  ? 1 : 0,
-                                      targetBit ? 1 : 0,
+                                      target ? 1 : 0,
                                       answer    ? 1 : 0,
                                       correct * 100.0 / (correct + incorrect)));
     repaint();

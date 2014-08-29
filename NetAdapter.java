@@ -17,10 +17,10 @@ public class NetAdapter<X,Y> {
   public NeuralNet net() { return _net; }
   public void setNet(NeuralNet net) { _net = net; }
 
-  public NetAdapter(Converter<X> cin, Converter<Y> cout, NeuralNet net) {
+  public NetAdapter(Converter<X> cin, Converter<Y> cout) {
     _cin = cin;
     _cout = cout;
-    _net = net;
+    _net = new NeuralNet(cin.bits(), cout.bits());
   }
 
   public Y process(X input) {

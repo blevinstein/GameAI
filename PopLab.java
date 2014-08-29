@@ -66,8 +66,7 @@ class PopLab extends JPanel implements KeyListener {
     DefaultGrader.register((net) -> {
       NetAdapter<Boolean[],Boolean[]> adapter =
         new NetAdapter<>(Converters.array(Boolean.class, 2),
-                         Converters.array(Boolean.class, 1),
-                         new NeuralNet(2,1));
+                         Converters.array(Boolean.class, 1));
       Boolean cases[][] = {{false, false},
                            {false, true},
                            {true, false},
@@ -108,8 +107,7 @@ class PopLab extends JPanel implements KeyListener {
       if (pop.fitness()[i] == 4.0) {
         NetAdapter<Boolean[],Boolean[]> adapter =
           new NetAdapter<>(Converters.array(Boolean.class, 2),
-                           Converters.array(Boolean.class, 1),
-                           new NeuralNet(2, 1));
+                           Converters.array(Boolean.class, 1));
         adapter.drawState(g, Util.randomBits(2),
                           10, 10 + 25, (getWidth()-20)/2, (getHeight()-20)/2);
         break;
