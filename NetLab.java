@@ -107,10 +107,10 @@ class NetLab extends JPanel implements KeyListener {
     // choose an input and calculate correct output
     state = Util.randomBits(2);
     Boolean target = f.apply(state);
-    // train the neural network
-    adapter.backpropagate(state, target);
     // check the network's answer
     Boolean answer = adapter.process(state);
+    // train the neural network
+    adapter.backpropagate(state, target);
     // DEBUG
     if (answer == target) {
       correct++;

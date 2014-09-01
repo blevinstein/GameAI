@@ -18,13 +18,17 @@ public class House {
 
     // give each lab a tab and a thread
     
-    NetLab netlab = new NetLab();
-    tabs.add("Net Lab", netlab);
-    new Thread(() -> netlab.run()).start();
+    NetLab netLab = new NetLab();
+    tabs.add("Net Lab", netLab);
+    new Thread(() -> netLab.run()).start();
 
-    PopLab poplab = new PopLab();
-    tabs.add("Pop Lab", poplab);
-    new Thread(() -> poplab.run()).start();
+    PopLab popLab = new PopLab();
+    tabs.add("Pop Lab", popLab);
+    new Thread(() -> popLab.run()).start();
+
+    OpticsLab opticsLab = new OpticsLab();
+    tabs.add("Optics Lab", opticsLab);
+    new Thread(() -> opticsLab.run()).start();
 
     frame.setVisible(true);
   }
