@@ -24,6 +24,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 class OpticsLab extends JPanel implements KeyListener {
 
   private String HELP =
+    "Press S to save, L to load a saved net. " +
     "T to start/stop training of the net. " +
     "R to reset correct % stats. ";
 
@@ -41,11 +42,11 @@ class OpticsLab extends JPanel implements KeyListener {
     image = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
     Graphics g = image.getGraphics();
     // clear the image
-    g.setColor(Color.WHITE);
+    g.setColor(Color.BLACK);
     g.fillRect(0, 0, image.getWidth(), image.getHeight());
     // draw the letter
-    g.setColor(Color.BLACK);
-    g.setFont(new Font("Arial", Font.PLAIN, 24));
+    g.setColor(Color.WHITE);
+    g.setFont(new Font("Arial", Font.PLAIN, 32));
     Util.placeText(g, Util.CENTER, letter,
         image.getWidth()/2, image.getHeight()/2);
 
@@ -74,7 +75,7 @@ class OpticsLab extends JPanel implements KeyListener {
     _classifier.backpropagate(image, target);
 
     // tabulate correct/incorrect answers
-    if (guess == target) {
+    if (guess.equals(target)) {
       correct++;
     } else {
       incorrect++;
@@ -101,7 +102,6 @@ class OpticsLab extends JPanel implements KeyListener {
     // clear the screen
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
-    g.setColor(Color.BLACK);
     
     // image in the top left
     if (image != null) {
@@ -110,22 +110,25 @@ class OpticsLab extends JPanel implements KeyListener {
       int w = (int)(scale * image.getWidth());
       int h = (int)(scale * image.getHeight());
       // draw image with border
+      g.setColor(Color.BLACK);
       g.drawRect(getWidth() / 4 - w / 2 - 1, getHeight() / 4 - h / 2 - 1,
                  w + 2, h + 2);
       g.drawImage(image,
                   getWidth() / 4 - w / 2,
                   getHeight() / 4 - h / 2,
                   w, h, null);
+
+      // network on the right
+      _classifier.drawState(g, image,
+                            getWidth() / 2 + 10, 10,
+                            getWidth() / 2 - 20, getHeight() - 20);
     }
 
-    // network on the bottom left
-    _classifier.drawState(g, image,
-                          10, getHeight() / 2 + 10,
-                          getWidth() / 2 - 20, getHeight() / 2 - 20);
+    g.setColor(Color.BLACK);
 
-    // letter on the right
+    // letter in the bottom left
     g.setFont(new Font("Arial", Font.PLAIN, 100));
-    Util.placeText(g, Util.CENTER, guess, getWidth()*3/4, getHeight()/2);
+    Util.placeText(g, Util.CENTER, guess, getWidth()/4, getHeight()*3/4);
     
     g.setFont(new Font("Arial", Font.PLAIN, 15));
     
@@ -146,6 +149,13 @@ class OpticsLab extends JPanel implements KeyListener {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_R:
         correct = incorrect = 0;
+        break;
+      case KeyEvent.VK_S:
+        Json.save(_classifier.net(), "classifier.json");
+        break;
+      case KeyEvent.VK_L:
+        NeuralNet newNet = Json.load("classifier.json", NeuralNet.class);
+        if (newNet != null) _classifier.setNet(newNet);
         break;
       case KeyEvent.VK_T:
         training = !training;
