@@ -334,13 +334,13 @@ public class NeuralNet implements Genome<NeuralNet> {
       int neurons = _weights[i].getColumnDimension();
       if (neurons > maxNeurons) maxNeurons = neurons;
     }
-    double dy = sy / maxNeurons;
-    double dx = sx / outputs.length;
+    double dy = 1.0 * sy / maxNeurons;
+    double dx = 1.0 * sx / outputs.length;
     // NOTE: 0.5 = arbitrary constant less than 1.0, for spacing
-    int diameter = (int)(Math.min(dx, dy) * 0.5);
+    double diameter = Math.min(dx, dy) * 0.5;
 
     // set font
-    g.setFont(new Font("Arial", Font.PLAIN, diameter / 8));
+    g.setFont(new Font("Arial", Font.PLAIN, (int)(diameter / 8)));
 
     // draw neurons
     for (int i = 0; i < outputs.length; i++) { // each layer
@@ -365,7 +365,7 @@ public class NeuralNet implements Genome<NeuralNet> {
           for (int m = 0; m < outputs[i+1].length-1; m++) { // each synapse
             double weight = _weights[i].getEntry(j, m);
 
-            if (weight == 0) continue; // skip synapses which aren't connected
+            if (Math.abs(weight) < 0.1) continue; // skip synapses which aren't connected
 
             double mag = Math.abs(weight);
             // NOTE: 0.5 = arbitrary constant less than 1
@@ -392,19 +392,19 @@ public class NeuralNet implements Genome<NeuralNet> {
         }
 
         // diameter is halved for bias nodes
-        int d = j == outputs[i].length-1 ?
-                diameter / 2 :
-                diameter;
+        double d = j == outputs[i].length-1 ?
+                   diameter / 2 :
+                   diameter;
         // circle is centered on square [i,j] with given side length, diameter d
         g.setColor(gray);
         g.fillOval((int)(x + dx*(0.5 + i) - d/2),
                    (int)(y + dy*(0.5 + j) - d/2),
-                   d, d);
+                   (int)d, (int)d);
         // draw border
         g.setColor(Color.BLACK);
         g.drawOval((int)(x + dx*(0.5 + i) - d/2),
                    (int)(y + dy*(0.5 + j) - d/2),
-                   d, d);
+                   (int)d, (int)d);
 
         // display the neuron's pre- and post-sigmoid values
         // NOTE: inputs (outputs[0]) and biases (outputs[i].last) don't get sigmoided
