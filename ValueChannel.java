@@ -5,7 +5,6 @@ import java.awt.image.ColorModel;
 // and taking the average value (as in HSV) of each section of the image.
 //
 // TODO: MultiChannel, construct w/ Channel[], e.g. RGBChannel
-// TODO: GridChannel, abstract out grid logic
 
 public class ValueChannel extends Channel {
   private int _n, _m;

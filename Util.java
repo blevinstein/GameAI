@@ -31,16 +31,20 @@ public class Util {
     FontMetrics fm = g.getFontMetrics();
     switch(align) {
       case CENTER:
-        g.drawString(s, x - fm.stringWidth(s)/2, y + fm.getAscent()/2);
+        g.drawString(s,
+            x - fm.stringWidth(s)/2,
+            y + fm.getAscent()/2 - fm.getDescent()/2);
         break;
       case NE:
-        g.drawString(s, x - fm.stringWidth(s), y + fm.getAscent());
+        g.drawString(s,
+            x - fm.stringWidth(s),
+            y + fm.getAscent());
         break;
       case S:
-        g.drawString(s, x - fm.stringWidth(s)/2, y);
+        g.drawString(s, x - fm.stringWidth(s)/2, y - fm.getDescent());
         break;
       case SE:
-        g.drawString(s, x - fm.stringWidth(s), y);
+        g.drawString(s, x - fm.stringWidth(s), y - fm.getDescent());
         break;
       default:
         throw new UnsupportedOperationException("Not implemented!");

@@ -8,11 +8,9 @@ ant house (neural network inspection program)
 
 TODO
 ====
-- abstract out the learning policy of a neural network? i.e. train vs feedback?
+- use multiple fonts for the image classifier
 - fix neural net architecture mutation to look cleaner
-- play with pruning and other means of intervention in network?
 - write some goddamn tests before everything breaks.. JUnit or something?
-- at least make tests for neural net propagate etc
 
 OBSERVATIONS
 ------------

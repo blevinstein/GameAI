@@ -3,6 +3,7 @@ import java.awt.event.KeyListener;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.awt.Toolkit;
 import java.util.function.Function;
@@ -28,15 +29,21 @@ class OpticsLab extends JPanel implements KeyListener {
     "T to start/stop training of the net. " +
     "R to reset correct % stats. ";
 
-  private ImageClassifier<String> _classifier = new ImageClassifier<>(new ValueChannel(4, 4), new LetterConverter());
+  private ImageClassifier<String> _classifier =
+    new ImageClassifier<>(new ValueChannel(4, 4), new LetterConverter());
 
   private BufferedImage image = null;
   private String guess = "?";
+  private Font[] allFonts =
+    GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
   private Supplier<Pair<BufferedImage,String>> testCaseGenerator = () -> {
     // pick a number 0-25
     int num = (int)(Math.random() * 26);
     // get the corresponding letter
     String letter = LetterConverter.LETTERS.charAt(num) + "";
+
+    // TODO: choose a random font FROM A SCREENED LIST
+    String font = allFonts[(int)(allFonts.length * Math.random())].getFontName();
 
     // create an image
     image = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
@@ -46,7 +53,8 @@ class OpticsLab extends JPanel implements KeyListener {
     g.fillRect(0, 0, image.getWidth(), image.getHeight());
     // draw the letter
     g.setColor(Color.WHITE);
-    g.setFont(new Font("Arial", Font.PLAIN, 32));
+    //g.setFont(new Font(font, Font.PLAIN, 24));
+    g.setFont(new Font("Arial", Font.PLAIN, 34));
     Util.placeText(g, Util.CENTER, letter,
         image.getWidth()/2, image.getHeight()/2);
 
