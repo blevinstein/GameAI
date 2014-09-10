@@ -1,9 +1,13 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.geom.Area;
 import java.awt.Graphics;
+import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 // Various static utility functions.
 
@@ -90,5 +94,17 @@ public class Util {
       b[i] = Math.random() < 0.5;
     }
     return b;
+  }
+
+  // gives whether two circles, centered at point p with radius r, intersect
+  public boolean intersects(Vector2D p1, double r1, Vector2D p2, double r2) {
+    return p1.distance(p2) < (r1 + r2);
+  }
+
+  // gives whether two Shapes intersect
+  public boolean intersects(Shape s1, Shape s2) {
+    Area area = new Area(s1);
+    area.intersect(new Area(s2));
+    return !area.isEmpty();
   }
 }

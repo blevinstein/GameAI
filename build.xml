@@ -27,6 +27,16 @@
     <java jar="jar/House.jar" fork="true" />
   </target>
 
+  <target name="boids" depends="build">
+    <mkdir dir="jar" />
+    <jar destfile="jar/Boids.jar" basedir="build">
+      <manifest>
+        <attribute name="Main-Class" value="Boids" />
+      </manifest>
+    </jar>
+    <java jar="jar/Boids.jar" fork="true" />
+  </target>
+
   <target name="clean">
     <delete dir="build" />
   </target>

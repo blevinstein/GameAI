@@ -8,7 +8,12 @@ ant house (neural network inspection program)
 
 TODO
 ====
-- use multiple fonts for the image classifier
+- implement boids
+- abstract out double[] for neural net input/output -> Signal?
+- neural net improvement via event listeners?
+  e.g. FeedbackListener
+- move code into separate folders, setup packages
+- use multiple fonts, offsets, rotations for the image classifier
 - fix neural net architecture mutation to look cleaner
 - write some goddamn tests before everything breaks.. JUnit or something?
 
