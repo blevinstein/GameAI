@@ -9,9 +9,8 @@ ant house (neural network inspection program)
 TODO
 ====
 - implement boids
-- abstract out double[] for neural net input/output -> Signal?
 - neural net improvement via event listeners?
-  e.g. FeedbackListener
+  e.g. FeedbackListener, TrainingListener
 - move code into separate folders, setup packages
 - use multiple fonts, offsets, rotations for the image classifier
 - fix neural net architecture mutation to look cleaner
