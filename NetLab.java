@@ -70,6 +70,7 @@ class NetLab extends JPanel implements KeyListener {
   }
   
   boolean training = false;
+  boolean svd = false;
   public void run() {
     Throttle t = new Throttle(100); // 100fps max
     while (true) {
@@ -84,7 +85,8 @@ class NetLab extends JPanel implements KeyListener {
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
 
-    adapter.drawState(g, state, 10, 10, getWidth()-20, getHeight()-20);
+    adapter.drawState(g, state, 10, 10, getWidth()-20, getHeight()-20,
+        svd? NeuralNet.SVD : NeuralNet.MAG);
 
     // draw overlay text last
     g.setColor(Color.BLACK);
@@ -143,6 +145,9 @@ class NetLab extends JPanel implements KeyListener {
       case KeyEvent.VK_H:
         displayHelp = true;
         break;
+      case KeyEvent.VK_M:
+        svd = true;
+        break;
       case KeyEvent.VK_ESCAPE:
         System.exit(0);
         break;
@@ -152,6 +157,9 @@ class NetLab extends JPanel implements KeyListener {
     switch(e.getKeyCode()) {
       case KeyEvent.VK_H:
         displayHelp = false;
+        break;
+      case KeyEvent .VK_M:
+        svd = false;
         break;
     }
   }

@@ -12,6 +12,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Represents a neural net using matrices.
 //
@@ -314,8 +315,14 @@ public class NeuralNet implements Genome<NeuralNet> {
   // Neurons and synapses colored according to activation.
   // Synapse width corresponds to weight.
   // Arrowed "1.0 => 0.76" on neuron gives the input and output of the sigmoid.
+  // mode determines method of drawing connections, MAG or SVD.
   public void drawState(Graphics g, double inputs[],
                         int x, int y, int sx, int sy) {
+    drawState(g, inputs, x, y, sx, sy, MAG);
+  }
+  static final int MAG = 0, SVD = 1;
+  public void drawState(Graphics g, double inputs[],
+                        int x, int y, int sx, int sy, int mode) {
     // needed for drawing with Stroke's
     Graphics2D g2 = (Graphics2D)g;
 
@@ -349,12 +356,6 @@ public class NeuralNet implements Genome<NeuralNet> {
         if (i == outputs.length-1 && j == outputs[i].length-1) continue;
 
         // calculate grayscale color to use
-        /*
-        // HACK: outputs[][] holds pre-sigmoid values, except output[0] = inputs
-        float value = (i == 0) ?              // if inputs
-                      outputs[i][j] :         // no sigmoid
-                      sigmoid(outputs[i][j]); // else sigmoid
-        */
         float value = (float)(sigmoid(outputs[i][j]) * 0.5 + 0.5);
         Color gray = new Color(value, value, value);
         Color tgray = new Color(value, value, value, 0.5f); // translucent gray
@@ -363,31 +364,70 @@ public class NeuralNet implements Genome<NeuralNet> {
         // draw outgoing synapses
         if (i+1 < outputs.length) { // except for last row
           for (int m = 0; m < outputs[i+1].length-1; m++) { // each synapse
+
+            int widths[];
+            Color colors[];
+
             double weight = _weights[i].getEntry(j, m);
 
-            if (Math.abs(weight) < 0.1) continue; // skip synapses which aren't connected
+            switch(mode) {
+              case MAG:
+                if (Math.abs(weight) < 0.1) continue; // skip synapses which aren't connected
 
-            double mag = Math.abs(weight);
-            // NOTE: 0.5 = arbitrary constant less than 1
-            int width = (int)(mag / (1 + mag) * diameter * 0.5);
-            
-            // draw synapse
-            g2.setColor(tgray);
-            g2.setStroke(new BasicStroke(width));
-            g2.drawLine((int)(x + dx*(0.5 + i)),
-                        (int)(y + dy*(0.5 + j)),
-                        (int)(x + dx*(1.5 + i)),
-                        (int)(y + dy*(0.5 + m)));
-            g2.setStroke(new BasicStroke(1.0f));
+                double mag = Math.abs(weight);
 
-            // display the synapse weight
-            g2.setColor(contrast);
-            // t is used to determine placement along the synapse, to avoid
-            //   labels overlapping. For simple midpoint text, set t=0.5.
-            double t = (j + 1.0) / (outputs[i].length + 1.0);
-            Util.placeText(g, Util.CENTER, String.format("%.2f", weight),
-                           (int)(x + dx*(i + 0.5 + t)),
-                           (int)(y + dy*(0.5 + j + (m-j)*t)));
+                widths = new int[1];
+                // NOTE: 0.5 = arbitrary constant less than 1
+                widths[0] = (int)(mag / (1 + mag) * diameter * 0.5);
+                
+                colors = new Color[]{ tgray };
+
+                break;
+              case SVD:
+                SingularValueDecomposition svd = new SingularValueDecomposition(
+                    _weights[i]);
+
+                // TODO: utilize local value of SVD matrix inverted
+
+                double[] rgb = Arrays.copyOfRange(svd.getSingularValues(), 0, 2);
+
+                widths = new int[rgb.length];
+                // NOTE: 0.5 = arbitrary constant less than 1
+                for (int w = 0; w < widths.length; w++) {
+                  widths[w] = (int)(rgb[w] / (1 + rgb[w]) * diameter * 0.5);
+                }
+                
+                colors = new Color[]{ new Color(1f, 0, 0, 0.5f),
+                                      new Color(0, 1f, 0, 0.5f),
+                                      new Color(0, 0, 1f, 0.5f) };
+
+                break;
+              default:
+                throw new UnsupportedOperationException("Invalid mode.");
+            }
+
+            // for each connection
+            for (int w = 0; w < widths.length; w++) {
+              // TODO: curve through control point
+              g2.setColor(colors[w]);
+              g2.setStroke(new BasicStroke(widths[w]));
+              g2.drawLine((int)(x + dx*(0.5 + i)),
+                          (int)(y + dy*(0.5 + j)),
+                          (int)(x + dx*(1.5 + i)),
+                          (int)(y + dy*(0.5 + m)));
+              g2.setStroke(new BasicStroke(1.0f));
+
+              // TODO: shift to reflect curve
+              // display the synapse weight
+              g2.setColor(contrast);
+              // t is used to determine placement along the synapse, to avoid
+              //   labels overlapping. For simple midpoint text, set t=0.5.
+              double t = (j + 1.0) / (outputs[i].length + 1.0);
+              Util.placeText(g, Util.CENTER, String.format("%.2f", weight),
+                            (int)(x + dx*(i + 0.5 + t)),
+                            (int)(y + dy*(0.5 + j + (m-j)*t)));
+            }
+
           }
         }
 

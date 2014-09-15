@@ -38,4 +38,7 @@ public class NetAdapter<X,Y> {
   public void drawState(Graphics g, X input, int x, int y, int sx, int sy) {
     _net.drawState(g, _cin.toDoubles(input), x, y, sx, sy);
   }
+  public void drawState(Graphics g, X input, int x, int y, int sx, int sy, int mode) {
+    _net.drawState(g, _cin.toDoubles(input), x, y, sx, sy, mode);
+  }
 }
