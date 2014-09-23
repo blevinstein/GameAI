@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.geom.Area;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 // Various static utility functions.
 
-public class Util {
+public abstract class Util {
   // choose from an array, where the probability of choosing any index
   // is proportional to prob[index]
   // NOTE: expects positive values in the array
@@ -97,14 +98,28 @@ public class Util {
   }
 
   // gives whether two circles, centered at point p with radius r, intersect
-  public boolean intersects(Vector2D p1, double r1, Vector2D p2, double r2) {
+  public static boolean intersects(Vector2D p1, double r1, Vector2D p2, double r2) {
     return p1.distance(p2) < (r1 + r2);
   }
 
   // gives whether two Shapes intersect
-  public boolean intersects(Shape s1, Shape s2) {
+  public static boolean intersects(Shape s1, Shape s2) {
     Area area = new Area(s1);
     area.intersect(new Area(s2));
     return !area.isEmpty();
+  }
+
+  // elementwise multiplication of Vector2D's
+  public static Vector2D multiply(Vector2D a, Vector2D b) {
+    return new Vector2D(a.getX() * b.getX(), a.getY() * b.getY());
+  }
+
+  // outline and fill a shape
+  public static void drawAndFill(Graphics g, Shape s, Color draw, Color fill) {
+    Graphics2D g2 = (Graphics2D)g;
+    g2.setColor(fill);
+    g2.fill(s);
+    g2.setColor(draw);
+    g2.draw(s);
   }
 }
