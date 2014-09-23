@@ -2,16 +2,19 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.geom.QuadCurve2D;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Function;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.DiagonalMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Represents a neural net using matrices.
@@ -334,17 +337,16 @@ public class NeuralNet implements Genome<NeuralNet> {
     g.setColor(new Color(0.5f, 0.5f, 0.5f));
     g.fillRect(x, y, sx, sy);
 
-    // calculate spacing [dx, dy]
+    // calculate spacing (grid)
     // calculate neuron size (diameter)
     int maxNeurons = _weights[0].getRowDimension();
     for (int i = 0; i < N; i++) {
       int neurons = _weights[i].getColumnDimension();
       if (neurons > maxNeurons) maxNeurons = neurons;
     }
-    double dy = 1.0 * sy / maxNeurons;
-    double dx = 1.0 * sx / outputs.length;
+    Vector2D grid = new Vector2D(sx / outputs.length, sy / maxNeurons);
     // NOTE: 0.5 = arbitrary constant less than 1.0, for spacing
-    double diameter = Math.min(dx, dy) * 0.5;
+    double diameter = Math.min(grid.getX(), grid.getY()) * 0.5;
 
     // set font
     g.setFont(new Font("Arial", Font.PLAIN, (int)(diameter / 8)));
@@ -361,15 +363,35 @@ public class NeuralNet implements Genome<NeuralNet> {
         Color tgray = new Color(value, value, value, 0.5f); // translucent gray
         Color contrast = value > 0.5 ? Color.BLACK : Color.WHITE;
 
-        // draw outgoing synapses
+        // draw synapses, layer i, outgoing from neuron j...
         if (i+1 < outputs.length) { // except for last row
-          for (int m = 0; m < outputs[i+1].length-1; m++) { // each synapse
+
+          // SVD-related preprocessing
+          SingularValueDecomposition svd = new SingularValueDecomposition(
+              _weights[i]);
+          int p = svd.getRank();
+          RealMatrix a[] = new RealMatrix[p];
+          if (mode == SVD) { 
+            RealMatrix u = svd.getU();
+            RealMatrix v = svd.getVT();
+            for (int k = 0; k < p; k++) {
+              RealMatrix s = new DiagonalMatrix(p);
+              s.setEntry(k, k, svd.getSingularValues()[k]);
+              // IDEA: set to 1.0?
+              //s.setEntry(k, k, 1.0);
+              a[k] = u.multiply(s).multiply(v);
+            }
+          }
+
+          // ...to neuron m
+          for (int m = 0; m < outputs[i+1].length-1; m++) {
 
             int widths[];
             Color colors[];
 
             double weight = _weights[i].getEntry(j, m);
 
+            // perform mode-specific processing
             switch(mode) {
               case MAG:
                 if (Math.abs(weight) < 0.1) continue; // skip synapses which aren't connected
@@ -384,12 +406,10 @@ public class NeuralNet implements Genome<NeuralNet> {
 
                 break;
               case SVD:
-                SingularValueDecomposition svd = new SingularValueDecomposition(
-                    _weights[i]);
-
-                // TODO: utilize local value of SVD matrix inverted
-
-                double[] rgb = Arrays.copyOfRange(svd.getSingularValues(), 0, 2);
+                double[] rgb = new double[p < 3 ? p : 3];
+                for (int k = 0; k < rgb.length; k++) {
+                  rgb[k] = Math.abs(a[k].getEntry(j, m));
+                }
 
                 widths = new int[rgb.length];
                 // NOTE: 0.5 = arbitrary constant less than 1
@@ -408,24 +428,40 @@ public class NeuralNet implements Genome<NeuralNet> {
 
             // for each connection
             for (int w = 0; w < widths.length; w++) {
-              // TODO: curve through control point
+              Vector2D origin = new Vector2D(x, y);
+              Vector2D from = Util.multiply(grid, new Vector2D(0.5 + i, 0.5 + j))
+                .add(origin);
+              Vector2D to = Util.multiply(grid, new Vector2D(1.5 + i, 0.5 + m))
+                .add(origin);
+              // (x, y) perpendicular to (x, -y) or (-x, y)
+              // both should be normalized
+              Vector2D neuronVector = to.subtract(from);
+              Vector2D perpVector =
+                new Vector2D(neuronVector.getY(), -neuronVector.getX());
+              Vector2D mid = from.add(to).scalarMultiply(0.5);
+              // NOTE: 0.2 is a constant close to 0.0
+              Vector2D offset = perpVector
+                .scalarMultiply(0.2 * (w * 2.0 / (widths.length-1) - 1.0))
+                .add(mid);
               g2.setColor(colors[w]);
               g2.setStroke(new BasicStroke(widths[w]));
-              g2.drawLine((int)(x + dx*(0.5 + i)),
-                          (int)(y + dy*(0.5 + j)),
-                          (int)(x + dx*(1.5 + i)),
-                          (int)(y + dy*(0.5 + m)));
+              // g2.drawLine((int)from.getX(), (int)from.getY(),
+              //             (int)to.getX(),   (int)to.getY());
+              QuadCurve2D curve = new QuadCurve2D.Double();
+              curve.setCurve(from.getX(), from.getY(),
+                             offset.getX(), offset.getY(),
+                             to.getX(), to.getY());
+              g2.draw(curve);
               g2.setStroke(new BasicStroke(1.0f));
 
-              // TODO: shift to reflect curve
               // display the synapse weight
               g2.setColor(contrast);
               // t is used to determine placement along the synapse, to avoid
               //   labels overlapping. For simple midpoint text, set t=0.5.
               double t = (j + 1.0) / (outputs[i].length + 1.0);
               Util.placeText(g, Util.CENTER, String.format("%.2f", weight),
-                            (int)(x + dx*(i + 0.5 + t)),
-                            (int)(y + dy*(0.5 + j + (m-j)*t)));
+                            (int)(x + grid.getX()*(i + 0.5 + t)),
+                            (int)(y + grid.getY()*(0.5 + j + (m-j)*t)));
             }
 
           }
@@ -437,13 +473,13 @@ public class NeuralNet implements Genome<NeuralNet> {
                    diameter;
         // circle is centered on square [i,j] with given side length, diameter d
         g.setColor(gray);
-        g.fillOval((int)(x + dx*(0.5 + i) - d/2),
-                   (int)(y + dy*(0.5 + j) - d/2),
+        g.fillOval((int)(x + grid.getX()*(0.5 + i) - d/2),
+                   (int)(y + grid.getY()*(0.5 + j) - d/2),
                    (int)d, (int)d);
         // draw border
         g.setColor(Color.BLACK);
-        g.drawOval((int)(x + dx*(0.5 + i) - d/2),
-                   (int)(y + dy*(0.5 + j) - d/2),
+        g.drawOval((int)(x + grid.getX()*(0.5 + i) - d/2),
+                   (int)(y + grid.getY()*(0.5 + j) - d/2),
                    (int)d, (int)d);
 
         // display the neuron's pre- and post-sigmoid values
@@ -453,8 +489,8 @@ public class NeuralNet implements Genome<NeuralNet> {
                      String.format("%.2f", outputs[i][j]) :
                      String.format("%.2f => %.2f", outputs[i][j], sigmoid(outputs[i][j]));
         Util.placeText(g, Util.CENTER, str,
-                       (int)(x + dx*(0.5 + i)),
-                       (int)(y + dy*(0.5 + j)));
+                       (int)(x + grid.getX()*(0.5 + i)),
+                       (int)(y + grid.getY()*(0.5 + j)));
       }
     }
   }
