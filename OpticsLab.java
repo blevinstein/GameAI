@@ -34,8 +34,11 @@ class OpticsLab extends JPanel implements KeyListener {
 
   private BufferedImage image = null;
   private String guess = "?";
+  /*
   private Font[] allFonts =
     GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+  */
+  private String[] allFonts = {"Arial", "Times New Roman"};
   private Supplier<Pair<BufferedImage,String>> testCaseGenerator = () -> {
     // pick a number 0-25
     int num = (int)(Math.random() * 26);
@@ -43,7 +46,8 @@ class OpticsLab extends JPanel implements KeyListener {
     String letter = LetterConverter.LETTERS.charAt(num) + "";
 
     // TODO: choose a random font FROM A SCREENED LIST
-    String font = allFonts[(int)(allFonts.length * Math.random())].getFontName();
+    //String font = allFonts[(int)(allFonts.length * Math.random())].getFontName();
+    String font = allFonts[(int)(allFonts.length * Math.random())];
 
     // create an image
     image = new BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB);
@@ -53,10 +57,14 @@ class OpticsLab extends JPanel implements KeyListener {
     g.fillRect(0, 0, image.getWidth(), image.getHeight());
     // draw the letter
     g.setColor(Color.WHITE);
-    //g.setFont(new Font(font, Font.PLAIN, 24));
-    g.setFont(new Font("Arial", Font.PLAIN, 34));
+    g.setFont(new Font(font, Font.PLAIN, 30));
+    //g.setFont(new Font("Arial", Font.PLAIN, 34));
     Util.placeText(g, Util.CENTER, letter,
         image.getWidth()/2, image.getHeight()/2);
+        /*
+        image.getWidth()/2 + (int)(image.getWidth()/4*Util.random()),
+        image.getHeight()/2 + (int)(image.getHeight()/4*Util.random()));
+        */
 
     // return the image and letter
     return new ImmutablePair<>(image, letter);
