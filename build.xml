@@ -2,43 +2,48 @@
   
   <target name="build">
     <mkdir dir="build" />
+    <mkdir dir="jar" />
     <javac srcdir="." destdir="build" includeantruntime="false" debug="on">
       <compilerarg value="-Xlint" />
     </javac>
   </target>
 
-  <target name="t3" depends="build">
-    <mkdir dir="jar" />
+  <target name="t3_build" depends="build">
     <jar destfile="jar/TicTacToe.jar" basedir="build">
       <manifest>
         <attribute name="Main-Class" value="TicTacToe" />
       </manifest>
     </jar>
+  </target>
+  <target name="t3" depends="t3_build">
     <java jar="jar/TicTacToe.jar" fork="true" />
   </target>
 
-  <target name="house" depends="build">
-    <mkdir dir="jar" />
+  <target name="house_build" depends="build">
     <jar destfile="jar/House.jar" basedir="build">
       <manifest>
         <attribute name="Main-Class" value="House" />
       </manifest>
     </jar>
+  </target>
+  <target name="house" depends="house_build">
     <java jar="jar/House.jar" fork="true" />
   </target>
 
-  <target name="boids" depends="build">
-    <mkdir dir="jar" />
+  <target name="boids_build" depends="build">
     <jar destfile="jar/Boids.jar" basedir="build">
       <manifest>
         <attribute name="Main-Class" value="Boids" />
       </manifest>
     </jar>
+  </target>
+  <target name="boids" depends="boids_build">
     <java jar="jar/Boids.jar" fork="true" />
   </target>
 
   <target name="clean">
     <delete dir="build" />
+    <delete dir="jar" />
   </target>
   
 </project>
