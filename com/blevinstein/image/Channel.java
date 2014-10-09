@@ -5,7 +5,7 @@ import com.blevinstein.net.Converter;
 import java.awt.image.BufferedImage;
 
 // Represents a mapping between a BufferedImage and neuron voltages.
-// 
+//
 // Used as the input to an ImageClassifier. Only converts one way, so it's
 // invalid to use it as an output converter.
 

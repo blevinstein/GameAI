@@ -7,7 +7,7 @@ class T3Square {
   public static final int O = 0;
   private boolean _empty;
   private int _player;
-  
+
   // creates an empty square
   public T3Square() {
     _empty = true;
@@ -21,21 +21,22 @@ class T3Square {
       throw new IllegalArgumentException("Cannot create a square of value " + p + ".");
     }
   }
-  
+
   // flips Xs and Os
   public T3Square flip() {
-    if (_empty)
+    if (_empty) {
       return this;
+    }
     return new T3Square(1 - _player);
   }
-  
+
   public boolean isEmpty() { return _empty; }
   public int player() { return _player; }
-  
+
   public boolean equals(T3Square other) {
     return (_empty == other.isEmpty() && _player == other._player);
   }
-  
+
   public String toString() {
     if (!_empty) {
       if (_player == T3Square.X) {
@@ -46,9 +47,9 @@ class T3Square {
     }
     return " ";
   }
-  
+
   public static T3Square fromChar(char c) {
-    switch(c) {
+    switch (c) {
       case 'X': return new T3Square(X);
       case 'O': return new T3Square(O);
       case ' ': return new T3Square();

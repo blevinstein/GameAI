@@ -17,22 +17,23 @@ public class ValueChannel extends Channel {
   }
 
   public double[] toDoubles(BufferedImage image) {
-    if (image == null)
+    if (image == null) {
       throw new IllegalArgumentException();
+    }
     int w = image.getWidth(), h = image.getHeight();
 
-    double values[] = new double[_n*_m];
+    double values[] = new double[_n * _m];
     double max = 0.0;
     double min = 1.0;
     for (int i = 0; i < _n; i++) {
       for (int j = 0; j < _m; j++) {
         int neuron = i * _m + j;
         // for each rectangle in an N x M grid over W x H pixels
-        BufferedImage slice = image.getSubimage(w*i/_n, h*j/_m, w/_n, h/_m);
+        BufferedImage slice = image.getSubimage(w * i / _n, h * j / _m, w / _n, h / _m);
 
         double value = avgValue(slice);
-        if (value > max) max = value;
-        if (value < min) min = value;
+        if (value > max) { max = value; }
+        if (value < min) { min = value; }
 
         // set the input to each neuron
         values[neuron] = value;
@@ -50,7 +51,7 @@ public class ValueChannel extends Channel {
   private double avgValue(BufferedImage image) {
     ColorModel cm = image.getColorModel();
     int w = image.getWidth(), h = image.getHeight();
-  
+
     double total = 0.0;
     for (int x = 0; x < w; x++) {
       for (int y = 0; y < h; y++) {
@@ -59,7 +60,7 @@ public class ValueChannel extends Channel {
         int color = image.getRGB(x, y);
         double value = Math.max(Math.max(cm.getRed(color),
                                          cm.getGreen(color)),
-                                         cm.getBlue(color)) / 255.0;
+                                cm.getBlue(color)) / 255.0;
         total += value;
       }
     }

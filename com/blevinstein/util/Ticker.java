@@ -31,7 +31,7 @@ public class Ticker {
 
     // calculate framerate from duration of this loop around the array
     long duration = newTime - ticks[newIndex];
-    if (duration == 0) duration = 1; // HACK: prevent divide-by-zero exceptions
+    if (duration == 0) { duration = 1; } // HACK: prevent divide-by-zero exceptions
     long frameRate = N * 1000000000L / duration;
     ticks[newIndex] = newTime;
 

@@ -11,7 +11,7 @@ class T3Move implements Move {
   public int x() { return _x; }
   private int _y;
   public int y() { return _y; }
-  
+
   public T3Move() {
     _x = 0;
     _y = 0;
@@ -24,19 +24,19 @@ class T3Move implements Move {
     _x = m._x;
     _y = m._y;
   }
-  
+
   public boolean equals(T3Move other) {
     return _x == other._x && _y == other._y;
   }
-  
+
   public String toString() {
     return "[" + _x + "," + _y + "]";
   }
-  
+
   public double[] toDoubles() {
     double vector[] = new double[9];
     Arrays.fill(vector, 0.0);
-    vector[_x*3+_y] = 1.0;
+    vector[_x * 3 + _y] = 1.0;
     return vector;
   }
 

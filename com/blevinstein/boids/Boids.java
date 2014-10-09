@@ -47,7 +47,7 @@ class Boids extends JPanel implements KeyListener, MouseListener {
     // clear the screen
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
-    
+
     // draw the boids
     // for each boid
     //   boid.draw(g, 0, 0, sx, sy);
@@ -65,7 +65,7 @@ class Boids extends JPanel implements KeyListener, MouseListener {
 
   public static void main(String[] args) {
     JFrame frame = new JFrame();
-    frame.setSize(1024, 768+25);
+    frame.setSize(1024, 768 + 25);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     Boids boids = new Boids();

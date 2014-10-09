@@ -36,16 +36,16 @@ class NetLab extends JPanel implements KeyListener {
     "R to reset correct % stats. ";
 
 
-  private NetAdapter<Boolean[],Boolean> adapter = new NetAdapter<>(Converters.array(Boolean.class, 2),
-                                                                   new BinaryConverter());
+  private NetAdapter<Boolean[], Boolean> adapter = new NetAdapter<>(Converters.array(Boolean.class, 2),
+      new BinaryConverter());
   private Boolean[] state = Util.randomBits(2);
-  private Map<String,Function<Boolean[],Boolean>> functions = new HashMap<>();
+  private Map<String, Function<Boolean[], Boolean>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
-  private Function<Boolean[],Boolean> f;
+  private Function<Boolean[], Boolean> f;
 
   public NetLab() {
     super(null); // no layout manager
-    
+
     // receive key events
     this.setFocusable(true);
     this.addKeyListener(this);
@@ -57,34 +57,34 @@ class NetLab extends JPanel implements KeyListener {
     this.add(selectFunction);
 
     addFunction("XOR", inputs ->
-        inputs[0] ^ inputs[1]);
+                inputs[0] ^ inputs[1]);
     addFunction("A", inputs ->
-        inputs[0]);
+                inputs[0]);
     addFunction("B", inputs ->
-        inputs[1]);
+                inputs[1]);
     addFunction("AND", inputs ->
-        inputs[0] && inputs[1]);
+                inputs[0] && inputs[1]);
     addFunction("OR", inputs ->
-        inputs[0] || inputs[1]);
+                inputs[0] || inputs[1]);
 
     f = functions.get(selectFunction.getItemAt(0));
     selectFunction.addActionListener(e ->
-        f = functions.get(
-          selectFunction.getItemAt(
-            selectFunction.getSelectedIndex())));
+                                     f = functions.get(
+                                           selectFunction.getItemAt(
+                                               selectFunction.getSelectedIndex())));
   }
 
-  private void addFunction(String name, Function<Boolean[],Boolean> function) {
+  private void addFunction(String name, Function<Boolean[], Boolean> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
-  
+
   boolean training = false;
   boolean svd = false;
   public void run() {
     Throttle t = new Throttle(100); // 100fps max
     while (true) {
-      if (training) trainRandom();
+      if (training) { trainRandom(); }
       repaint();
       t.sleep();
     }
@@ -95,23 +95,23 @@ class NetLab extends JPanel implements KeyListener {
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
 
-    adapter.drawState(g, state, 10, 10, getWidth()-20, getHeight()-20,
-        svd? NeuralNet.SVD : NeuralNet.MAG);
+    adapter.drawState(g, state, 10, 10, getWidth() - 20, getHeight() - 20,
+                      svd ? NeuralNet.SVD : NeuralNet.MAG);
 
     // draw overlay text last
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, 15));
-    
+
     // draw success % since last reset
     Util.placeText(g, Util.NE,
                    String.format("Success: %2.2f%%", correctPercent),
-                   getWidth()-20, 20);
+                   getWidth() - 20, 20);
 
     // draw help
     if (displayHelp) {
-      Util.placeText(g, Util.SE, HELP, getWidth()-20, getHeight()-20);
+      Util.placeText(g, Util.SE, HELP, getWidth() - 20, getHeight() - 20);
     } else {
-      Util.placeText(g, Util.SE, "H for help", getWidth()-20, getHeight()-20);
+      Util.placeText(g, Util.SE, "H for help", getWidth() - 20, getHeight() - 20);
     }
   }
 
@@ -137,10 +137,10 @@ class NetLab extends JPanel implements KeyListener {
   private int correct = 0, incorrect = 0;
   private boolean displayHelp = false;
   public void keyPressed(KeyEvent e) {
-    switch(e.getKeyCode()) {
+    switch (e.getKeyCode()) {
       case KeyEvent.VK_L:
         NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
-        if (newNet != null) adapter.setNet(newNet);
+        if (newNet != null) { adapter.setNet(newNet); }
         repaint();
         break;
       case KeyEvent.VK_R:
@@ -164,7 +164,7 @@ class NetLab extends JPanel implements KeyListener {
     }
   }
   public void keyReleased(KeyEvent e) {
-    switch(e.getKeyCode()) {
+    switch (e.getKeyCode()) {
       case KeyEvent.VK_H:
         displayHelp = false;
         break;

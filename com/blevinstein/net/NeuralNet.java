@@ -35,25 +35,25 @@ public class NeuralNet implements Genome<NeuralNet> {
   //                           [ -1 ]
   // yi = Sum(wij * xj - ti)
   // t = threshold
-  
+
   private double LEARNING_RATE = 0.01;
-  
+
   private RealMatrix _weights[];
   public RealMatrix[] weights() { return _weights; }
-  
+
   private final int N; // numbers of layers, for convenience
 
   public NeuralNet(int inputs, int outputs) {
-    this(new int[]{inputs, (int)Math.round((inputs + outputs) / 2.0), outputs});
+    this(new int[] {inputs, (int)Math.round((inputs + outputs) / 2.0), outputs});
   }
-  
+
   public NeuralNet(int neurons[]) {
-    N = neurons.length-1;
+    N = neurons.length - 1;
     _weights = new RealMatrix[N];
     for (int k = 0; k < N; k++) {
       // rows and cols have +1 to include bias term
       int rows = neurons[k] + 1;
-      int cols = neurons[k+1] + 1;
+      int cols = neurons[k + 1] + 1;
       _weights[k] = MatrixUtils.createRealMatrix(rows, cols);
 
       // initialize weights
@@ -95,8 +95,8 @@ public class NeuralNet implements Genome<NeuralNet> {
   private static void setupMatrix(RealMatrix m) {
     int rows = m.getRowDimension();
     int cols = m.getColumnDimension();
-    for (int i = 0; i < rows; i++) m.setEntry(i, cols-1, 0.0);
-    m.setEntry(rows-1, cols-1, 1.0);
+    for (int i = 0; i < rows; i++) { m.setEntry(i, cols - 1, 0.0); }
+    m.setEntry(rows - 1, cols - 1, 1.0);
   }
 
   // NOTE: use tanh instead of 1/(1+e^(-u)) as suggested by
@@ -110,58 +110,58 @@ public class NeuralNet implements Genome<NeuralNet> {
   }
   */
   private double sigmoid(double x) { return Math.tanh(x); }                        // S = tanh(x)
-  private double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t*t; }  // dS/dx = 1 - tanh(x)^2
-  
+  private double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t * t; } // dS/dx = 1 - tanh(x)^2
+
   // TODO: allow normalizing input, xi' = (xi - offset) * scalar
   // TODO: allow normalizing output/feedback
-  
+
   // convenience methods to append (wrap) and remove (unwrap)
   // a trailing -1
   public static double[] wrap(double vector[]) {
     double ret[] = Arrays.copyOf(vector, vector.length + 1);
-    ret[ret.length-1] = -1;
+    ret[ret.length - 1] = -1;
     return ret;
   }
   public static double[] unwrap(double vector[]) {
     return Arrays.copyOf(vector, vector.length - 1);
   }
- 
+
   // give outputs for a set of inputs
   public double[] process(double[] inputs) {
     // append -1, e.g. [ x0 x1 x2 -1 ]
     inputs = wrap(inputs);
-    
+
     double layers[][] = propagate(inputs);
     double output[] = layers[layers.length - 1];
-    
+
     // remove extra -1, [ y0 y1 -1 ]
     // NOTE: output is sigmoided, only allows binary (not scalar) outputs
     return Arrays.stream(unwrap(output)).map(x -> sigmoid(x)).toArray();
   }
-  
+
   // propagate a series of values through the network
   // RETURN intermediate layers, pre-sigmoid
   // assumes that inputs have been wrapped (-1 appended)
   public double[][] propagate(double[] inputs) {
     // propagate across each layer, saving pre-sigmoid output
     // length+1 to include input layer
-    double outputs[][] = new double[N+1][];
+    double outputs[][] = new double[N + 1][];
     // NOTE: no sigmoid function applied to initial inputs
     outputs[0] = inputs;
-    
+
     // for each layer
-    for(int k = 0; k < N; k++) {
+    for (int k = 0; k < N; k++) {
       // store pre-sigmoid values in outputs[][]
       // X * W = Y
-      outputs[k+1] = _weights[k].preMultiply(inputs);
-      
+      outputs[k + 1] = _weights[k].preMultiply(inputs);
+
       // new X = sigmoid(Y) except last term
-      inputs = Arrays.stream(outputs[k+1]).map(x -> sigmoid(x)).toArray();
-      inputs[inputs.length-1] = -1;
+      inputs = Arrays.stream(outputs[k + 1]).map(x -> sigmoid(x)).toArray();
+      inputs[inputs.length - 1] = -1;
     }
     return outputs;
   }
-  
+
   // backpropagate a correct value back through the network
   // returns the error E, calculated as Sum[(xi-ti)^2] where ti are targets
   // assumes that inputs and targets are NOT pre-wrapped (-1 appended)
@@ -169,52 +169,54 @@ public class NeuralNet implements Genome<NeuralNet> {
     // append extra -1
     inputs = wrap(inputs);
     targets = wrap(targets);
-    
+
     double outputs[][] = propagate(inputs);
-    
+
     // check length of targets
-    if (targets.length != outputs[N].length)
+    if (targets.length != outputs[N].length) {
       throw new RuntimeException("Wrong target length!");
-    
+    }
+
     // calculate dj, where dE/dwij = dj * xi
     // refer to http://en.wikipedia.org/wiki/Backpropagation
     double delta[][] = new double[N][];
-    delta[N-1] = new double[outputs[N].length];
-    for (int j = 0; j < delta[N-1].length; j++) {
-      delta[N-1][j] = (sigmoid(outputs[N][j]) - targets[j]) * d_sigmoid(outputs[N][j]);
+    delta[N - 1] = new double[outputs[N].length];
+    for (int j = 0; j < delta[N - 1].length; j++) {
+      delta[N - 1][j] = (sigmoid(outputs[N][j]) - targets[j]) * d_sigmoid(outputs[N][j]);
     }
-    for (int k = N-2; k >= 0; k--) {
-      delta[k] = _weights[k+1].transpose().preMultiply(delta[k+1]);
+    for (int k = N - 2; k >= 0; k--) {
+      delta[k] = _weights[k + 1].transpose().preMultiply(delta[k + 1]);
       // multiply each element by d_sigmoid
       for (int j = 0; j < delta[k].length; j++) {
-        delta[k][j] = delta[k][j] * d_sigmoid(outputs[k+1][j]);
+        delta[k][j] = delta[k][j] * d_sigmoid(outputs[k + 1][j]);
       } // last element set to 0 to backprop bias correctly
-      delta[k][delta[k].length-1] = 0;
+      delta[k][delta[k].length - 1] = 0;
     }
-    
+
     // update weights
     for (int k = 0; k < N; k++) { // for each layer
       // TODO: set local learning rates
       // http://www.willamette.edu/~gorr/classes/cs449/precond.html
-      
+
       // layerSlope = delta ** outputs, represents dE/dwij(** = outer product)
       // W -= learning_rate * layerSlope
       RealMatrix layerSlope =
-          new ArrayRealVector(outputs[k]).outerProduct(
-          new ArrayRealVector(delta[k]));
+        new ArrayRealVector(outputs[k]).outerProduct(
+        new ArrayRealVector(delta[k]));
       _weights[k] = _weights[k].subtract(layerSlope.scalarMultiply(LEARNING_RATE));
     }
 
     // scale matrices and set last column
     normalize();
-    
+
     // HACK: just checks one element, forces crash when matrix diverges
-    if (Double.isNaN(_weights[0].getEntry(0,0)))
+    if (Double.isNaN(_weights[0].getEntry(0, 0))) {
       throw new RuntimeException("Matrix has diverged!");
+    }
   }
 
   // EXPERIMENTAL: adjust matrix so that the [Frobenius] norm stays constant
-  // 
+  //
   // This came from the observation that all of the weights in a given matrix
   // may approach zero, essentially severing the connection between two layers
   // in the network.
@@ -271,12 +273,12 @@ public class NeuralNet implements Genome<NeuralNet> {
       // HACKy
       int rows = k == 0 ?                        // if first matrix
                  _weights[0].getRowDimension() : // number of inputs
-                 w[k-1].getColumnDimension();    // else copy from last layer
-      int cols =_weights[k].getColumnDimension();
+                 w[k - 1].getColumnDimension();  // else copy from last layer
+      int cols = _weights[k].getColumnDimension();
       // with some probability, change the output size of the matrix
-      if (k < N-1 && Math.random() < RESIZE_RATE) {
+      if (k < N - 1 && Math.random() < RESIZE_RATE) {
         cols += Math.random() < 0.5 ? 1 : -1;
-        if (cols < 2) cols = 2; // must have 2 neurons, 1 + bias, in each layer
+        if (cols < 2) { cols = 2; } // must have 2 neurons, 1 + bias, in each layer
       }
 
       w[k] = MatrixUtils.createRealMatrix(rows, cols);
@@ -303,12 +305,13 @@ public class NeuralNet implements Genome<NeuralNet> {
     // TODO: don't just cut between matrices
     RealMatrix otherWeights[] = other.weights();
 
-    if (_weights.length != otherWeights.length)
+    if (_weights.length != otherWeights.length) {
       throw new RuntimeException("Invalid crossover attempted.");
-    
+    }
+
     RealMatrix newWeights[] = new RealMatrix[N];
     // choose a point to cut
-    int cross = (int)(Math.random() * (N+1));
+    int cross = (int)(Math.random() * (N + 1));
     // return this[0..x] :: other[x..N]
     for (int i = 0; i < N; i++) {
       if (i < cross) {
@@ -349,7 +352,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     int maxNeurons = _weights[0].getRowDimension();
     for (int i = 0; i < N; i++) {
       int neurons = _weights[i].getColumnDimension();
-      if (neurons > maxNeurons) maxNeurons = neurons;
+      if (neurons > maxNeurons) { maxNeurons = neurons; }
     }
     Vector2D grid = new Vector2D(sx / outputs.length, sy / maxNeurons);
     // NOTE: 0.5 = arbitrary constant less than 1.0, for spacing
@@ -362,7 +365,7 @@ public class NeuralNet implements Genome<NeuralNet> {
     for (int i = 0; i < outputs.length; i++) { // each layer
       for (int j = 0; j < outputs[i].length; j++) { // each neuron
         // skip the last bias element
-        if (i == outputs.length-1 && j == outputs[i].length-1) continue;
+        if (i == outputs.length - 1 && j == outputs[i].length - 1) { continue; }
 
         // calculate grayscale color to use
         float value = (float)(sigmoid(outputs[i][j]) * 0.5 + 0.5);
@@ -371,14 +374,14 @@ public class NeuralNet implements Genome<NeuralNet> {
         Color contrast = value > 0.5 ? Color.BLACK : Color.WHITE;
 
         // draw synapses, layer i, outgoing from neuron j...
-        if (i+1 < outputs.length) { // except for last row
+        if (i + 1 < outputs.length) { // except for last row
 
           // SVD-related preprocessing
           SingularValueDecomposition svd = new SingularValueDecomposition(
-              _weights[i]);
+            _weights[i]);
           int p = svd.getRank();
           RealMatrix a[] = new RealMatrix[p];
-          if (mode == SVD) { 
+          if (mode == SVD) {
             RealMatrix u = svd.getU();
             RealMatrix v = svd.getVT();
             for (int k = 0; k < p; k++) {
@@ -391,7 +394,7 @@ public class NeuralNet implements Genome<NeuralNet> {
           }
 
           // ...to neuron m
-          for (int m = 0; m < outputs[i+1].length-1; m++) {
+          for (int m = 0; m < outputs[i + 1].length - 1; m++) {
 
             int widths[];
             Color colors[];
@@ -399,17 +402,17 @@ public class NeuralNet implements Genome<NeuralNet> {
             double weight = _weights[i].getEntry(j, m);
 
             // perform mode-specific processing
-            switch(mode) {
+            switch (mode) {
               case MAG:
-                if (Math.abs(weight) < 0.1) continue; // skip synapses which aren't connected
+                if (Math.abs(weight) < 0.1) { continue; } // skip synapses which aren't connected
 
                 double mag = Math.abs(weight);
 
                 widths = new int[1];
                 // NOTE: 0.5 = arbitrary constant less than 1
                 widths[0] = (int)(mag / (1 + mag) * diameter * 0.5);
-                
-                colors = new Color[]{ tgray };
+
+                colors = new Color[] { tgray };
 
                 break;
               case SVD:
@@ -423,10 +426,11 @@ public class NeuralNet implements Genome<NeuralNet> {
                 for (int w = 0; w < widths.length; w++) {
                   widths[w] = (int)(rgb[w] / (1 + rgb[w]) * diameter * 0.5);
                 }
-                
-                colors = new Color[]{ new Color(1f, 0, 0, 0.5f),
-                                      new Color(0, 1f, 0, 0.5f),
-                                      new Color(0, 0, 1f, 0.5f) };
+
+                colors = new Color[] { new Color(1f, 0, 0, 0.5f),
+                         new Color(0, 1f, 0, 0.5f),
+                         new Color(0, 0, 1f, 0.5f)
+                };
 
                 break;
               default:
@@ -437,9 +441,9 @@ public class NeuralNet implements Genome<NeuralNet> {
             for (int w = 0; w < widths.length; w++) {
               Vector2D origin = new Vector2D(x, y);
               Vector2D from = Util.multiply(grid, new Vector2D(0.5 + i, 0.5 + j))
-                .add(origin);
+                              .add(origin);
               Vector2D to = Util.multiply(grid, new Vector2D(1.5 + i, 0.5 + m))
-                .add(origin);
+                            .add(origin);
               // (x, y) perpendicular to (x, -y) or (-x, y)
               // both should be normalized
               Vector2D neuronVector = to.subtract(from);
@@ -448,8 +452,8 @@ public class NeuralNet implements Genome<NeuralNet> {
               Vector2D mid = from.add(to).scalarMultiply(0.5);
               // NOTE: 0.2 is a constant close to 0.0
               Vector2D offset = perpVector
-                .scalarMultiply(0.2 * (w * 2.0 / (widths.length-1) - 1.0))
-                .add(mid);
+                                .scalarMultiply(0.2 * (w * 2.0 / (widths.length - 1) - 1.0))
+                                .add(mid);
               g2.setColor(colors[w]);
               g2.setStroke(new BasicStroke(widths[w]));
               // g2.drawLine((int)from.getX(), (int)from.getY(),
@@ -467,37 +471,37 @@ public class NeuralNet implements Genome<NeuralNet> {
               //   labels overlapping. For simple midpoint text, set t=0.5.
               double t = (j + 1.0) / (outputs[i].length + 1.0);
               Util.placeText(g, Util.CENTER, String.format("%.2f", weight),
-                            (int)(x + grid.getX()*(i + 0.5 + t)),
-                            (int)(y + grid.getY()*(0.5 + j + (m-j)*t)));
+                             (int)(x + grid.getX() * (i + 0.5 + t)),
+                             (int)(y + grid.getY() * (0.5 + j + (m - j) * t)));
             }
 
           }
         }
 
         // diameter is halved for bias nodes
-        double d = j == outputs[i].length-1 ?
+        double d = j == outputs[i].length - 1 ?
                    diameter / 2 :
                    diameter;
         // circle is centered on square [i,j] with given side length, diameter d
         g.setColor(gray);
-        g.fillOval((int)(x + grid.getX()*(0.5 + i) - d/2),
-                   (int)(y + grid.getY()*(0.5 + j) - d/2),
+        g.fillOval((int)(x + grid.getX() * (0.5 + i) - d / 2),
+                   (int)(y + grid.getY() * (0.5 + j) - d / 2),
                    (int)d, (int)d);
         // draw border
         g.setColor(Color.BLACK);
-        g.drawOval((int)(x + grid.getX()*(0.5 + i) - d/2),
-                   (int)(y + grid.getY()*(0.5 + j) - d/2),
+        g.drawOval((int)(x + grid.getX() * (0.5 + i) - d / 2),
+                   (int)(y + grid.getY() * (0.5 + j) - d / 2),
                    (int)d, (int)d);
 
         // display the neuron's pre- and post-sigmoid values
         // NOTE: inputs (outputs[0]) and biases (outputs[i].last) don't get sigmoided
         g.setColor(contrast);
-        String str = i == 0 || j == outputs[i].length-1 ?
+        String str = i == 0 || j == outputs[i].length - 1 ?
                      String.format("%.2f", outputs[i][j]) :
                      String.format("%.2f => %.2f", outputs[i][j], sigmoid(outputs[i][j]));
         Util.placeText(g, Util.CENTER, str,
-                       (int)(x + grid.getX()*(0.5 + i)),
-                       (int)(y + grid.getY()*(0.5 + j)));
+                       (int)(x + grid.getX() * (0.5 + i)),
+                       (int)(y + grid.getY() * (0.5 + j)));
       }
     }
   }

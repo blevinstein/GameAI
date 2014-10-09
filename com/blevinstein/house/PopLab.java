@@ -35,7 +35,7 @@ class PopLab extends JPanel implements KeyListener {
 
   private Population<NeuralNet> pop;
 
-  private Map<String,Function<Boolean[],Boolean[]>> functions = new HashMap<>();
+  private Map<String, Function<Boolean[], Boolean[]>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
 
   public PopLab() {
@@ -44,55 +44,56 @@ class PopLab extends JPanel implements KeyListener {
     // receive key events
     this.setFocusable(true);
     this.addKeyListener(this);
-    
+
     // add combo box for selecting functions to learn
     selectFunction = new JComboBox<String>();
     selectFunction.setFocusable(false);
     selectFunction.setBounds(10, 10, 200, 25);
     this.add(selectFunction);
-    
+
     addFunction("XOR", inputs ->
-        new Boolean[]{inputs[0] ^ inputs[1]});
+                new Boolean[] {inputs[0] ^ inputs[1]});
     addFunction("A", inputs ->
-        new Boolean[]{inputs[0]});
+                new Boolean[] {inputs[0]});
     addFunction("B", inputs ->
-        new Boolean[]{inputs[1]});
+                new Boolean[] {inputs[1]});
     addFunction("AND", inputs ->
-        new Boolean[]{inputs[0] && inputs[1]});
+                new Boolean[] {inputs[0] && inputs[1]});
     addFunction("OR", inputs ->
-        new Boolean[]{inputs[0] || inputs[1]});
+                new Boolean[] {inputs[0] || inputs[1]});
 
     setFunction(functions.get(selectFunction.getItemAt(0)));
     selectFunction.addActionListener(e ->
-        setFunction(functions.get(
-            selectFunction.getItemAt(
-              selectFunction.getSelectedIndex()))));
+                                     setFunction(functions.get(
+                                           selectFunction.getItemAt(
+                                               selectFunction.getSelectedIndex()))));
 
     // init population
     pop = new Population<NeuralNet>(POPULATION_SIZE,
-        () -> new NeuralNet(new int[]{2,2,1}));
+                                    () -> new NeuralNet(new int[] {2, 2, 1}));
   }
 
-  private void addFunction(String name, Function<Boolean[],Boolean[]> function) {
+  private void addFunction(String name, Function<Boolean[], Boolean[]> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
 
-  private void setFunction(Function<Boolean[],Boolean[]> f) {
+  private void setFunction(Function<Boolean[], Boolean[]> f) {
     // setup grading policy
     DefaultGrader.register((net) -> {
-      NetAdapter<Boolean[],Boolean[]> adapter =
-        new NetAdapter<>(Converters.array(Boolean.class, 2),
-                         Converters.array(Boolean.class, 1));
+      NetAdapter<Boolean[], Boolean[]> adapter =
+      new NetAdapter<>(Converters.array(Boolean.class, 2),
+      Converters.array(Boolean.class, 1));
       Boolean cases[][] = {{false, false},
-                           {false, true},
-                           {true, false},
-                           {false, false}};
+        {false, true},
+        {true, false},
+        {false, false}
+      };
       double score = 0.0;
       for (Boolean[] kase : cases) {
         boolean expected = f.apply(kase)[0];
         boolean actual = adapter.process(kase)[0];
-        if (actual == expected) score += 1;
+        if (actual == expected) { score += 1; }
       }
       return score;
     }, NeuralNet.class);
@@ -119,16 +120,16 @@ class PopLab extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     // show histogram
-    Util.drawHistogram(g, pop.fitness(), 1.0, 10, 10, getWidth()-20, getHeight()-100);
+    Util.drawHistogram(g, pop.fitness(), 1.0, 10, 10, getWidth() - 20, getHeight() - 100);
 
     // show a perfect example
     for (int i = 0; i < pop.fitness().length; i++) {
       if (pop.fitness()[i] == 4.0) {
-        NetAdapter<Boolean[],Boolean[]> adapter =
+        NetAdapter<Boolean[], Boolean[]> adapter =
           new NetAdapter<>(Converters.array(Boolean.class, 2),
                            Converters.array(Boolean.class, 1));
         adapter.drawState(g, Util.randomBits(2),
-                          10, 10 + 25, (getWidth()-20)/2, (getHeight()-20)/2);
+                          10, 10 + 25, (getWidth() - 20) / 2, (getHeight() - 20) / 2);
         break;
       }
     }
@@ -136,27 +137,27 @@ class PopLab extends JPanel implements KeyListener {
     // draw overlay text last
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, 15));
-    
+
     // draw stats
-    Util.placeText(g, Util.NE, pop.stats(), getWidth()-20, 20);;
+    Util.placeText(g, Util.NE, pop.stats(), getWidth() - 20, 20);;
 
     // draw help
     if (displayHelp) {
-      Util.placeText(g, Util.SE, HELP, getWidth()-20, getHeight()-20);
+      Util.placeText(g, Util.SE, HELP, getWidth() - 20, getHeight() - 20);
     } else {
-      Util.placeText(g, Util.SE, "H for help", getWidth()-20, getHeight()-20);
+      Util.placeText(g, Util.SE, "H for help", getWidth() - 20, getHeight() - 20);
     }
   }
 
   @SuppressWarnings("unchecked")
   public void keyPressed(KeyEvent e) {
-    switch(e.getKeyCode()) {
+    switch (e.getKeyCode()) {
       case KeyEvent.VK_E:
         evolving = !evolving;
         break;
       case KeyEvent.VK_L:
         Population<NeuralNet> newPop = Json.load("patients.json", pop.getClass());
-        if (newPop != null) pop = newPop;
+        if (newPop != null) { pop = newPop; }
         repaint();
         break;
       case KeyEvent.VK_S:
@@ -171,7 +172,7 @@ class PopLab extends JPanel implements KeyListener {
     }
   }
   public void keyReleased(KeyEvent e) {
-    switch(e.getKeyCode()) {
+    switch (e.getKeyCode()) {
       case KeyEvent.VK_H:
         displayHelp = false;
         break;

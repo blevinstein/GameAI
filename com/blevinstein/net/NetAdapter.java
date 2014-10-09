@@ -11,7 +11,7 @@ import java.awt.Graphics;
 // TODO: Revisit this implementation, decide whether it's worth trying to
 // move this kind of stuff into the NeuralNet class itself.
 
-public class NetAdapter<X,Y> {
+public class NetAdapter<X, Y> {
   private Converter<X> _cin;
   private Converter<Y> _cout;
 

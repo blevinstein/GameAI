@@ -49,7 +49,7 @@ class OpticsLab extends JPanel implements KeyListener {
     GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
   */
   private String[] allFonts = {"Arial", "Times New Roman"};
-  private Supplier<Pair<BufferedImage,String>> testCaseGenerator = () -> {
+  private Supplier<Pair<BufferedImage, String>> testCaseGenerator = () -> {
     // pick a number 0-25
     int num = (int)(Math.random() * 26);
     // get the corresponding letter
@@ -70,11 +70,11 @@ class OpticsLab extends JPanel implements KeyListener {
     g.setFont(new Font(font, Font.PLAIN, 30));
     //g.setFont(new Font("Arial", Font.PLAIN, 34));
     Util.placeText(g, Util.CENTER, letter,
-        image.getWidth()/2, image.getHeight()/2);
-        /*
-        image.getWidth()/2 + (int)(image.getWidth()/4*Util.random()),
-        image.getHeight()/2 + (int)(image.getHeight()/4*Util.random()));
-        */
+    image.getWidth() / 2, image.getHeight() / 2);
+    /*
+    image.getWidth()/2 + (int)(image.getWidth()/4*Util.random()),
+    image.getHeight()/2 + (int)(image.getHeight()/4*Util.random()));
+    */
 
     // return the image and letter
     return new ImmutablePair<>(image, letter);
@@ -115,7 +115,7 @@ class OpticsLab extends JPanel implements KeyListener {
   public void run() {
     Throttle t = new Throttle(100);
     while (true) {
-      if (training) trainRandom();
+      if (training) { trainRandom(); }
       repaint();
       t.sleep();
     }
@@ -128,7 +128,7 @@ class OpticsLab extends JPanel implements KeyListener {
     // clear the screen
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
-    
+
     // image in the top left
     if (image != null) {
       double scale = Math.min( (getWidth() / 2 - 20) / image.getWidth(),
@@ -154,25 +154,25 @@ class OpticsLab extends JPanel implements KeyListener {
 
     // letter in the bottom left
     g.setFont(new Font("Arial", Font.PLAIN, 100));
-    Util.placeText(g, Util.CENTER, guess, getWidth()/4, getHeight()*3/4);
-    
+    Util.placeText(g, Util.CENTER, guess, getWidth() / 4, getHeight() * 3 / 4);
+
     g.setFont(new Font("Arial", Font.PLAIN, 15));
-    
+
     // draw success % since last reset
     Util.placeText(g, Util.NE,
                    String.format("Success: %2.2f%%", correctPercent),
-                   getWidth()-20, 20);
-    
+                   getWidth() - 20, 20);
+
     // draw help
     if (displayHelp) {
-      Util.placeText(g, Util.SE, HELP, getWidth()-20, getHeight()-20);
+      Util.placeText(g, Util.SE, HELP, getWidth() - 20, getHeight() - 20);
     } else {
-      Util.placeText(g, Util.SE, "H for help", getWidth()-20, getHeight()-20);
+      Util.placeText(g, Util.SE, "H for help", getWidth() - 20, getHeight() - 20);
     }
   }
 
   public void keyPressed(KeyEvent e) {
-    switch(e.getKeyCode()) {
+    switch (e.getKeyCode()) {
       case KeyEvent.VK_R:
         correct = incorrect = 0;
         break;
@@ -181,7 +181,7 @@ class OpticsLab extends JPanel implements KeyListener {
         break;
       case KeyEvent.VK_L:
         NeuralNet newNet = Json.load("classifier.json", NeuralNet.class);
-        if (newNet != null) _classifier.setNet(newNet);
+        if (newNet != null) { _classifier.setNet(newNet); }
         break;
       case KeyEvent.VK_T:
         training = !training;
@@ -195,13 +195,13 @@ class OpticsLab extends JPanel implements KeyListener {
     }
   }
   public void keyReleased(KeyEvent e) {
-    switch(e.getKeyCode()) {
+    switch (e.getKeyCode()) {
       case KeyEvent.VK_H:
         displayHelp = false;
         break;
     }
   }
   public void keyTyped(KeyEvent e) {}
-  
+
   private static final long serialVersionUID = 1;
 }

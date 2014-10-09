@@ -15,7 +15,7 @@ public class Converters {
 
   private static boolean ready = false;
   private static void init() {
-    if (ready) return;
+    if (ready) { return; }
     register(new BinaryConverter(), Boolean.class);
     ready = true;
   }
@@ -45,9 +45,9 @@ public class Converters {
   // create a heterogenous ListConverter
   public static ListConverter list(List<String> classNames) {
     return new ListConverter(
-        classNames.stream()
-        .map(cn -> get(cn))
-        .collect(Collectors.toList()));
+             classNames.stream()
+             .map(cn -> get(cn))
+             .collect(Collectors.toList()));
   }
 
   // create an ArrayConverter

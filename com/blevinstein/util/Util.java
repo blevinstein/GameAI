@@ -20,11 +20,11 @@ public abstract class Util {
   // NOTE: expects positive values in the array
   public static int choose(double prob[]) {
     double total = 0;
-    for (int i = 0; i < prob.length; i++) total += prob[i];
-    
+    for (int i = 0; i < prob.length; i++) { total += prob[i]; }
+
     double chosen = total * Math.random();
     int k = 0;
-    while (chosen > prob[k]) chosen -= prob[k++];
+    while (chosen > prob[k]) { chosen -= prob[k++]; }
     return k;
   }
 
@@ -36,19 +36,19 @@ public abstract class Util {
   public static final int CENTER = 0, NE = 1, S = 2, SE = 3;
   public static void placeText(Graphics g, int align, String s, int x, int y) {
     FontMetrics fm = g.getFontMetrics();
-    switch(align) {
+    switch (align) {
       case CENTER:
         g.drawString(s,
-            x - fm.stringWidth(s)/2,
-            y + fm.getAscent()/2 - fm.getDescent()/2);
+                     x - fm.stringWidth(s) / 2,
+                     y + fm.getAscent() / 2 - fm.getDescent() / 2);
         break;
       case NE:
         g.drawString(s,
-            x - fm.stringWidth(s),
-            y + fm.getAscent());
+                     x - fm.stringWidth(s),
+                     y + fm.getAscent());
         break;
       case S:
-        g.drawString(s, x - fm.stringWidth(s)/2, y - fm.getDescent());
+        g.drawString(s, x - fm.stringWidth(s) / 2, y - fm.getDescent());
         break;
       case SE:
         g.drawString(s, x - fm.stringWidth(s), y - fm.getDescent());
@@ -64,21 +64,21 @@ public abstract class Util {
     double min = Arrays.stream(values).min().orElse(0.0);
     double max = Arrays.stream(values).max().orElse(1.0);
 
-    int buckets = (int)Math.floor((max-min)/bucketSize+1); // number of buckets needed
+    int buckets = (int)Math.floor((max - min) / bucketSize + 1); // number of buckets needed
     int width = sx / buckets;
 
     // put each value into a bucket
     int count[] = new int[buckets];
     int most = 0;
     for (int i = 0; i < values.length; i++) {
-      int b = (int)((values[i]-min)/bucketSize);
+      int b = (int)((values[i] - min) / bucketSize);
       count[b]++;
-      if (count[b] > count[most]) most = b;
+      if (count[b] > count[most]) { most = b; }
     }
 
     // draw the buckets
     for (int i = 0; i < count.length; i++) {
-      int height = sy * count[i]/count[most];
+      int height = sy * count[i] / count[most];
       g.setColor(Color.LIGHT_GRAY);
       g.fillRect(x + width * i, y + sy - height,
                  width,         height);
@@ -86,7 +86,7 @@ public abstract class Util {
       // add label
       g.setColor(Color.BLACK);
       Util.placeText(g, Util.S,
-                     String.format("[%.1f, %.1f)", min + bucketSize * i, min + bucketSize * (i+1)),
+                     String.format("[%.1f, %.1f)", min + bucketSize * i, min + bucketSize * (i + 1)),
                      (int)(x + width * (i + 0.5)), y + sy - 10);
     }
   }

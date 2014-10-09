@@ -18,7 +18,7 @@ public class EnumConverter implements Converter<Integer> {
     // Accepts a value in [0, n)
     if (value < 0 || value >= _n)
       throw new IllegalArgumentException(
-          "Value " + value + " is not between 0 and " + _n + "!");
+        "Value " + value + " is not between 0 and " + _n + "!");
 
     // Gives n bits of output
     double inputs[] = new double[_n];
@@ -34,13 +34,14 @@ public class EnumConverter implements Converter<Integer> {
     // Accepts a set of _n inputs
     if (doubles.length != _n)
       throw new IllegalArgumentException(
-          "Received " + doubles.length + "bits, expected " + _n + "!");
+        "Received " + doubles.length + "bits, expected " + _n + "!");
 
     // Returns the index of the largest input
     Integer result = 0;
     for (int i = 1; i < _n; i++) {
-      if (doubles[i] > doubles[result])
+      if (doubles[i] > doubles[result]) {
         result = i;
+      }
     }
     return result;
   }

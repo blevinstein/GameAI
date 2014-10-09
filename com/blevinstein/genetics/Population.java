@@ -36,7 +36,7 @@ public class Population<T extends Genome<T>> {
 
   private double[] _fitness; // private for HIPPA reasons
   public double[] fitness() { return _fitness; }
-  
+
   private Grader<T> _grader;
   public void setGrader(Grader<T> grader) { _grader = grader; }
 
@@ -46,7 +46,7 @@ public class Population<T extends Genome<T>> {
     // HACK: create a dummy object to get it's class
     _grader = DefaultGrader.get(generator.get().getClass().getName());
     _pop = new ArrayList<T>();
-    while (_pop.size() < size) _pop.add(generator.get());
+    while (_pop.size() < size) { _pop.add(generator.get()); }
     _fitness = calcFitness();
   }
   public Population(List<T> pop) {
@@ -57,7 +57,7 @@ public class Population<T extends Genome<T>> {
   public Population(T array[]) {
     _grader = DefaultGrader.get(array[0].getClass().getName());
     _pop = new ArrayList<T>();
-    for (T genome : array) _pop.add(genome);
+    for (T genome : array) { _pop.add(genome); }
     _fitness = calcFitness();
   }
 
@@ -102,9 +102,10 @@ public class Population<T extends Genome<T>> {
     threadPool.shutdown();
     while (true) {
       try {
-        if (threadPool.awaitTermination(5, TimeUnit.MILLISECONDS))
+        if (threadPool.awaitTermination(5, TimeUnit.MILLISECONDS)) {
           break;
-      } catch(InterruptedException e) {}
+        }
+      } catch (InterruptedException e) {}
     }
 
     return f;
@@ -116,8 +117,8 @@ public class Population<T extends Genome<T>> {
     double worst = 0;
     double avg = 0;
     for (int i = 0; i < _fitness.length; i++) {
-      if (_fitness[i] > best || i == 0) best = _fitness[i];
-      if (_fitness[i] < worst || i == 0) worst = _fitness[i];
+      if (_fitness[i] > best || i == 0) { best = _fitness[i]; }
+      if (_fitness[i] < worst || i == 0) { worst = _fitness[i]; }
       avg += _fitness[i];
     }
     avg /= _fitness.length;
@@ -126,7 +127,7 @@ public class Population<T extends Genome<T>> {
 
   public List<T> bestN(int n) {
     // add all elements to a priority queue
-    PriorityQueue<Integer> pq = new PriorityQueue<Integer>(_pop.size(), (i1, i2) -> Double.compare(_fitness[i2],_fitness[i1]));
+    PriorityQueue<Integer> pq = new PriorityQueue<Integer>(_pop.size(), (i1, i2) -> Double.compare(_fitness[i2], _fitness[i1]));
     for (int i = 0; i < _pop.size(); i++) {
       pq.add(i);
     }

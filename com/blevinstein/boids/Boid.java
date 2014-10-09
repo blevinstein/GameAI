@@ -7,7 +7,7 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 public class Boid {
   private static final double MAX_ACCEL = 1.0;
   // NOTE: no maximum velocity
-  
+
   private final double _radius = 1.0;
 
   private Vector2D _position;

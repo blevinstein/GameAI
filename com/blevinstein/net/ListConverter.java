@@ -23,8 +23,9 @@ public class ListConverter implements Converter<List<?>> {
       double results[] = c.toDoubles(values.get(v));
 
       // check output length
-      if (results.length != c.bits())
+      if (results.length != c.bits()) {
         throw new RuntimeException("Wrong output length!");
+      }
 
       // copy results into larger array
       System.arraycopy(results, 0, allResults, i, results.length);
@@ -36,8 +37,9 @@ public class ListConverter implements Converter<List<?>> {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public List<?> fromDoubles(double[] doubles) {
     // check input length
-    if (doubles.length != bits())
+    if (doubles.length != bits()) {
       throw new RuntimeException("Wrong input length!");
+    }
 
     List results = new ArrayList<>();
 

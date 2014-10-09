@@ -29,7 +29,7 @@ public class Throttle {
     if (waitTime > 0) {
       try {
         Thread.sleep(waitTime / 1000000L);
-      } catch(InterruptedException e) {}
+      } catch (InterruptedException e) {}
     }
     long lastTime = System.nanoTime();
 

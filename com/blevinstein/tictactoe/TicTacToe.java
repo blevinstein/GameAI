@@ -34,10 +34,10 @@ class TicTacToe extends JPanel implements KeyListener {
   private Game game = new Game();
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
-  
+
   private Population<NeuralNet> population;
-  private Learner<T3State,T3Move> player1 = netLearner, player2 = null;
-  private int wins[] = new int[]{0, 0};
+  private Learner<T3State, T3Move> player1 = netLearner, player2 = null;
+  private int wins[] = new int[] {0, 0};
   private T3Move suggested; // the best move, as suggested by the AI
 
   @SuppressWarnings("unchecked")
@@ -67,25 +67,25 @@ class TicTacToe extends JPanel implements KeyListener {
       }
       return score;
     }, NeuralNet.class);
-   
+
     // HACK: creates a NetLearner to get the right size of neural net
     population = new Population<NeuralNet>(POPULATION_SIZE,
-        () -> new NetLearner().net());
+                                           () -> new NetLearner().net());
 
     setMode(netLearner, null, "NxP");
-    
+
     // load learners
     try {
       Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
-      if (map != null) memLearner = new MemoryLearner(map);
+      if (map != null) { memLearner = new MemoryLearner(map); }
 
       Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
-      if (pop != null) population = pop;
+      if (pop != null) { population = pop; }
     } catch (Exception e) {
       System.err.println("Couldn't load. " + e.getMessage());
     }
   }
-  
+
   public void run() {
     // separate thread
     new Thread(() -> {
@@ -117,19 +117,19 @@ class TicTacToe extends JPanel implements KeyListener {
     // clear the screen
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
-    
+
     // draw the board
     game.state().draw(g, 10, 10, 300, cursor, suggested);
-    
+
     // draw the neural network's thoughts
     netLearner.drawThoughts(g, game.state(), 330, 10, 300);
     //netLearner.net().drawState(g, game.state().toDoubles(), 10, 330, 1024 - 20, 768 - 330 - 20);
-    
+
     // show frameRate and mode
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, 25));
     String str = String.format("%d FPS, Mode %s", (int)frameRate, modeStr);
-    Util.placeText(g, Util.NE, str, getWidth()-10, 10);
+    Util.placeText(g, Util.NE, str, getWidth() - 10, 10);
   }
 
   private String modeStr = "";
@@ -137,71 +137,71 @@ class TicTacToe extends JPanel implements KeyListener {
   private T3Move cursor = new T3Move();
   @SuppressWarnings("unchecked")
   public void keyPressed(KeyEvent e) {
-    switch(e.getKeyCode()) {
-    case KeyEvent.VK_SPACE:
-      if (game.state().validMove(cursor)) {
-        game.moveMade(cursor); 
-      } else {
-        Toolkit.getDefaultToolkit().beep();
-      }
-      break;
-    case KeyEvent.VK_S:
-      Json.save(memLearner.map(), "brain.json");
-      Json.save(population, "pop.json");
-      break;
-    case KeyEvent.VK_L:
-      Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
-      if (map != null) memLearner = new MemoryLearner(map);
-      Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
-      if (pop != null) population = pop;
-      break;
-    case KeyEvent.VK_M:
-      // different "game modes"
-      mode = (mode + 1) % 5;
-      switch (mode) {
-      case 0: 
-        setMode(netLearner, null, "NxP"); 
+    switch (e.getKeyCode()) {
+      case KeyEvent.VK_SPACE:
+        if (game.state().validMove(cursor)) {
+          game.moveMade(cursor);
+        } else {
+          Toolkit.getDefaultToolkit().beep();
+        }
         break;
-      case 1: 
-        setMode(memLearner, memLearner, "MxM"); 
+      case KeyEvent.VK_S:
+        Json.save(memLearner.map(), "brain.json");
+        Json.save(population, "pop.json");
         break;
-      case 2: 
-        setMode(netLearner, netLearner, "NxN"); 
+      case KeyEvent.VK_L:
+        Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
+        if (map != null) { memLearner = new MemoryLearner(map); }
+        Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
+        if (pop != null) { population = pop; }
         break;
-      case 3: 
-        setMode(netLearner, memLearner, "NxM"); 
+      case KeyEvent.VK_M:
+        // different "game modes"
+        mode = (mode + 1) % 5;
+        switch (mode) {
+          case 0:
+            setMode(netLearner, null, "NxP");
+            break;
+          case 1:
+            setMode(memLearner, memLearner, "MxM");
+            break;
+          case 2:
+            setMode(netLearner, netLearner, "NxN");
+            break;
+          case 3:
+            setMode(netLearner, memLearner, "NxM");
+            break;
+          case 4:
+            setMode(memLearner, null, "MxP");
+            break;
+        }
         break;
-      case 4: 
-        setMode(memLearner, null, "MxP"); 
+      case KeyEvent.VK_U:
+        System.out.println("X " + wins[T3Square.X] + " O " + wins[T3Square.O]);
         break;
-      }
-      break;
-    case KeyEvent.VK_U:
-      System.out.println("X " + wins[T3Square.X] + " O " + wins[T3Square.O]);
-      break;
-    case KeyEvent.VK_UP:
-      cursor = cursor.up();
-      break;
-    case KeyEvent.VK_DOWN:
-      cursor = cursor.down();
-      break;
-    case KeyEvent.VK_LEFT:
-      cursor = cursor.left();
-      break;
-    case KeyEvent.VK_RIGHT:
-      cursor = cursor.right();
-      break;
-    case KeyEvent.VK_ESCAPE:
-      System.exit(0);
-      break;
+      case KeyEvent.VK_UP:
+        cursor = cursor.up();
+        break;
+      case KeyEvent.VK_DOWN:
+        cursor = cursor.down();
+        break;
+      case KeyEvent.VK_LEFT:
+        cursor = cursor.left();
+        break;
+      case KeyEvent.VK_RIGHT:
+        cursor = cursor.right();
+        break;
+      case KeyEvent.VK_ESCAPE:
+        System.exit(0);
+        break;
     }
   }
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
-  
+
   // MISC METHODS
-  private void setMode(Learner<T3State,T3Move> a,
-                       Learner<T3State,T3Move> b, String str) {
+  private void setMode(Learner<T3State, T3Move> a,
+                       Learner<T3State, T3Move> b, String str) {
     player1 = a;
     player2 = b;
     game = newGame();
@@ -213,13 +213,13 @@ class TicTacToe extends JPanel implements KeyListener {
   private void mainLoop() {
     if (game.done()) {
       // count wins
-      switch(game.winner()) {
+      switch (game.winner()) {
         case T3Square.X: wins[T3Square.X]++; break;
         case T3Square.O: wins[T3Square.O]++; break;
       }
       // start new game
       game = newGame();
-    } else if(game.canStep()) {
+    } else if (game.canStep()) {
       game.step();
       suggested = memLearner.query(game.state().normalize(game.toMove()));
     }

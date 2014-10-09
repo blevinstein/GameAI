@@ -13,21 +13,21 @@ import java.util.ArrayList;
 class Game {
   private T3State _state;
   public T3State state() { return _state; }
-  private ArrayList<Learner<T3State,T3Move>> players;
+  private ArrayList<Learner<T3State, T3Move>> players;
 
   public Game() {
     this(null, null);
   }
-  public Game(Learner<T3State,T3Move> p) {
+  public Game(Learner<T3State, T3Move> p) {
     this(p, null);
   }
-  public Game(Learner<T3State,T3Move> p1, Learner<T3State,T3Move> p2) {
+  public Game(Learner<T3State, T3Move> p1, Learner<T3State, T3Move> p2) {
     _state = new T3State();
-    players = new ArrayList<Learner<T3State,T3Move>>();
+    players = new ArrayList<Learner<T3State, T3Move>>();
     players.add(p1);
     players.add(p2);
   }
-  
+
   // returns next player to move
   public int toMove() {
     return done() ? -1 : _state.toMove();
@@ -35,7 +35,7 @@ class Game {
   public boolean done() {
     return _state.terminal();
   }
-  
+
   // plays moves until done or until waiting for user input
   // returns number of moves made
   public int play() {
@@ -46,43 +46,44 @@ class Game {
     }
     return movesMade;
   }
-  
+
   // returns true if step() can be executed
   // returns false if game is over
   // returns false if waiting on user input
   public boolean canStep() {
     return !done() && players.get(toMove()) != null;
   }
-  
+
   public void step() {
-    if (!canStep()) throw new IllegalArgumentException("Cannot make move.");
-    
-    Learner<T3State,T3Move> player = players.get(toMove());
+    if (!canStep()) { throw new IllegalArgumentException("Cannot make move."); }
+
+    Learner<T3State, T3Move> player = players.get(toMove());
     T3Move m = player.play(_state.normalize(toMove()));
     for (int i = 0; i < players.size(); i++) {
-      if (i == toMove()) continue; // don't tell players about their own moves
-      if (players.get(i) == null) continue; // skip null players (users)
-      if (!_state.normalize(i).validMove(m))
+      if (i == toMove()) { continue; } // don't tell players about their own moves
+      if (players.get(i) == null) { continue; } // skip null players (users)
+      if (!_state.normalize(i).validMove(m)) {
         throw new IllegalArgumentException("Invalid move.");
+      }
       players.get(i).moveMade(_state.normalize(i), m);
     }
     moveMade(m);
 
     feedback();
   }
-  
+
   // if applicable, give feedback to players
   private void feedback() {
     if (done()) {
       for (int i = 0; i < 2; i++) {
-        Learner<T3State,T3Move> player = players.get(i);
+        Learner<T3State, T3Move> player = players.get(i);
         if (player != null) {
           player.feedback(_state.score(i));
         }
       }
     }
   }
-    
+
   // register an attempted move by the player or AI
   // throws an exception for invalid moves
   public void moveMade(T3Move m) {
@@ -93,9 +94,9 @@ class Game {
       throw new IllegalArgumentException("Invalid move: " + m);
     }
   }
-  
+
   public int winner() {
-    if (!done()) return -1;
+    if (!done()) { return -1; }
     return _state.score(T3Square.X) > _state.score(T3Square.O) ? T3Square.X : T3Square.O;
   }
 }
