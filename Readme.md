@@ -40,3 +40,10 @@ IDEAS
 -----
 - multi-neural-net learner, has multiple neural nets to represent different
   "questions" (with different network sizes), more complicated games
+
+LIBRARIES USED
+--------------
+- Apache Commons (Lang, IO, and Math3)
+  http://commons.apache.org/
+- Gson
+  https://code.google.com/p/google-gson/
