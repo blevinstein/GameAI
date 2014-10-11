@@ -11,7 +11,7 @@
   <target name="t3_build" depends="build">
     <jar destfile="jar/TicTacToe.jar" basedir="build">
       <manifest>
-        <attribute name="Main-Class" value="TicTacToe" />
+        <attribute name="Main-Class" value="com.blevinstein.tictactoe.TicTacToe" />
       </manifest>
     </jar>
   </target>
@@ -22,7 +22,7 @@
   <target name="house_build" depends="build">
     <jar destfile="jar/House.jar" basedir="build">
       <manifest>
-        <attribute name="Main-Class" value="House" />
+        <attribute name="Main-Class" value="com.blevinstein.house.House" />
       </manifest>
     </jar>
   </target>
@@ -33,7 +33,7 @@
   <target name="boids_build" depends="build">
     <jar destfile="jar/Boids.jar" basedir="build">
       <manifest>
-        <attribute name="Main-Class" value="Boids" />
+        <attribute name="Main-Class" value="com.blevinstein.boids.Boids" />
       </manifest>
     </jar>
   </target>
