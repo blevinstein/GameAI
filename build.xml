@@ -33,7 +33,7 @@
   <target name="boids_build" depends="build">
     <jar destfile="jar/Boids.jar" basedir="build">
       <manifest>
-        <attribute name="Main-Class" value="com.blevinstein.boids.Boids" />
+        <attribute name="Main-Class" value="com.blevinstein.boids.BoidWorld" />
       </manifest>
     </jar>
   </target>
