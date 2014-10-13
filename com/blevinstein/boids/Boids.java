@@ -1,28 +1,23 @@
 package com.blevinstein.boids;
 
-import javafx.application.Application;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.Scene;
-import javafx.scene.Group;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class Boids extends Application {
-  @Override
-  public void start(Stage stage) {
-    stage.setTitle("BoidWorld");
-    Canvas canvas = new Canvas(600, 400);
-    stage.setScene(new Scene(new Group(canvas)));
+public class Boids extends JPanel {
+  public static void main(String[] args) {
+    JFrame frame = new JFrame();
+    frame.setSize(1024, 768 + 25);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    BoidWorld world = new BoidWorld(canvas, 100);
+    JPanel panel = new JPanel();
+    frame.add(panel);
 
-    stage.show();
+    BoidWorld world = new BoidWorld(100, panel);
+
+    frame.setVisible(true);
 
     world.mainloop();
   }
-
-  public static void main(String[] args) {
-    launch(args);
-  }
+  
+  private static final long serialVersionUID = 1;
 }

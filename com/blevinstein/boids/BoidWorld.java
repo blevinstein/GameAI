@@ -2,10 +2,10 @@ package com.blevinstein.boids;
 
 import com.blevinstein.util.Throttle;
 
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
+import java.awt.Graphics2D;
+import javax.swing.JPanel;
 
+import org.jbox2d.callbacks.DebugDraw;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -17,26 +17,26 @@ import org.jbox2d.dynamics.World;
 
 public class BoidWorld {
 
-  private Canvas canvas;
   private World world;
   private Throttle throttle;
+  private SwingDraw draw;
 
-  public BoidWorld(Canvas canvas, int fps) {
-    this.canvas = canvas;
+  private Body boidBody;
+
+  public BoidWorld(int fps, JPanel panel) {
+    draw = new SwingDraw(panel);
     throttle = new Throttle(fps);
-
     world = new World(new Vec2(0f, 0f));
-    world.setDebugDraw(new JavafxDraw(canvas));
+    world.setDebugDraw(draw);
 
-    Body boidBody = world.createBody(boidDef(new Vec2(0f, 0f)));
+    boidBody = world.createBody(boidDef(new Vec2(0f, 0f)));
     boidBody.createFixture(boidFixtureDef());
   }
 
   public void mainloop() {
-    GraphicsContext gc = canvas.getGraphicsContext2D();
     while (true) {
-      gc.setFill(Color.BLACK);
-      gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+      System.out.println(boidBody.getPosition());
+      draw.clear();
       world.step(1f/60, 8, 3);
       world.drawDebugData();
       throttle.sleep();
