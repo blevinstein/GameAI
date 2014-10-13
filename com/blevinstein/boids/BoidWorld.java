@@ -1,35 +1,81 @@
 package com.blevinstein.boids;
 
-import javafx.application.Application;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import com.blevinstein.util.Throttle;
 
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
+import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 
-public class BoidWorld extends Application {
+public class BoidWorld {
 
   private Canvas canvas;
   private World world;
+  private Throttle throttle;
 
-  @Override
-  public void start(Stage stage) {
-    // Setup window
-    stage.setTitle("BoidWorld");
-    canvas = new Canvas(600, 400);
-    stage.setScene(new Scene(new Group(canvas)));
+  public BoidWorld(Canvas canvas, int fps) {
+    this.canvas = canvas;
+    throttle = new Throttle(fps);
 
-    // Setup world
     world = new World(new Vec2(0f, 0f));
     world.setDebugDraw(new JavafxDraw(canvas));
 
-    // Show
-    stage.show();
+    Body boidBody = world.createBody(boidDef(new Vec2(0f, 0f)));
+    boidBody.createFixture(boidFixtureDef());
   }
 
-  public static void main(String[] args) {
-    launch(args);
+  public void mainloop() {
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+    while (true) {
+      gc.setFill(Color.BLACK);
+      gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+      world.step(1f/60, 8, 3);
+      world.drawDebugData();
+      throttle.sleep();
+    }
+  }
+
+  public BodyDef boidDef(Vec2 position) {
+    BodyDef def = new BodyDef();
+    def.active = true;
+    def.allowSleep = true;
+    def.angle = 0f;
+    def.angularDamping = 0.01f;
+    def.angularVelocity = 0f;
+    def.awake = true;
+    def.bullet = true;
+    def.fixedRotation = false;
+    def.gravityScale = 1f;
+    def.linearDamping = 0f;
+    def.linearVelocity = new Vec2(0f, 0f);
+    def.position = position;
+    def.type = BodyType.DYNAMIC;
+    def.userData = null;
+    return def;
+  }
+
+  public FixtureDef boidFixtureDef() {
+    FixtureDef def = new FixtureDef();
+    def.density = 1f;
+    def.friction = 0.1f;
+    def.isSensor = false;
+    def.restitution = 0.1f;
+    Vec2[] points = {new Vec2(1.5f, 0f),
+                     new Vec2(-1.5f, 1f),
+                     new Vec2(-0.5f, 0f),
+                     new Vec2(-1.5f, -1f)};
+    PolygonShape shape = new PolygonShape();
+    shape.set(points, points.length);
+    def.shape = shape;
+    def.userData = null;
+    return def;
   }
 }
