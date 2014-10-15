@@ -41,6 +41,17 @@
     <java jar="jar/Boids.jar" fork="true" />
   </target>
 
+  <target name="xade_build" depends="build">
+    <jar destfile="jar/Xade.jar" basedir="build">
+      <manifest>
+        <attribute name="Main-Class" value="com.blevinstein.xade.Xade" />
+      </manifest>
+    </jar>
+  </target>
+  <target name="xade" depends="xade_build">
+    <java jar="jar/Xade.jar" fork="true" />
+  </target>
+
   <target name="clean">
     <delete dir="build" />
     <delete dir="jar" />
