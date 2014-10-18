@@ -8,6 +8,22 @@
     </javac>
   </target>
 
+  <target name="junit" description="Unit tests" depends="xade_build">
+    <mkdir dir="test" />
+    <junit printsummary="yes" haltonfailure="no">
+      <classpath>
+        <pathelement location="build" />
+      </classpath>
+      <batchtest todir="test">
+        <fileset dir=".">
+          <include name="**/*Test.java" />
+        </fileset>
+        <formatter type="plain" />
+        <formatter type="xml" />
+      </batchtest>
+    </junit>
+  </target>
+
   <target name="t3_build" depends="build">
     <jar destfile="jar/TicTacToe.jar" basedir="build">
       <manifest>
@@ -55,6 +71,7 @@
   <target name="clean">
     <delete dir="build" />
     <delete dir="jar" />
+    <delete dir="test" />
     <delete>
       <fileset dir="." includes="**/*.class" />
     </delete>
