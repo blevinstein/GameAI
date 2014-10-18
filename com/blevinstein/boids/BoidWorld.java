@@ -19,12 +19,12 @@ public class BoidWorld {
 
   private World world;
   private Throttle throttle;
-  private SwingDraw draw;
+  private DebugDraw draw;
 
   private Body boidBody;
 
   public BoidWorld(int fps, JPanel panel) {
-    draw = new SwingDraw(panel);
+    //draw = new SwingDraw(panel);
     throttle = new Throttle(fps);
     world = new World(new Vec2(0f, 0f));
     world.setDebugDraw(draw);
@@ -36,7 +36,6 @@ public class BoidWorld {
   public void mainloop() {
     while (true) {
       System.out.println(boidBody.getPosition());
-      draw.clear();
       world.step(1f/60, 8, 3);
       world.drawDebugData();
       throttle.sleep();
