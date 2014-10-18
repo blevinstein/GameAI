@@ -3,6 +3,8 @@ package com.blevinstein.xade;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import java.awt.Shape;
+import java.awt.geom.Path2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,5 +57,16 @@ public class SimpleRoute extends Route {
   }
 
   public double length() { return length; }
+
+  public Shape shape() {
+    Path2D.Double path = new Path2D.Double();
+    Point start = points.get(0);
+    path.moveTo(start.getX(), start.getY());
+    for (int i = 1; i < points.size(); i++) {
+      Point p = points.get(i);
+      path.lineTo(p.getX(), p.getY());
+    }
+    return path;
+  }
 }
 

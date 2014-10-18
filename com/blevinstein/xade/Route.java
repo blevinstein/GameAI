@@ -1,5 +1,7 @@
 package com.blevinstein.xade;
 
+import java.awt.Shape;
+
 // represents a route
 public abstract class Route {
   // returns the position of a point along the route at time t
@@ -10,5 +12,7 @@ public abstract class Route {
   public abstract Point direction(double t);
   // returns the total length of the route
   public abstract double length();
+  // returns a Shape to be drawn
+  public abstract Shape shape();
 }
 
