@@ -37,14 +37,21 @@ public class SimpleRoute extends Route {
     return ImmutablePair.of(segment, offset);
   }
 
-  public Point get(double position) {
-    Pair<Integer, Double> relativePosition = getRelativePosition(position);
+  public Point position(double t) {
+    Pair<Integer, Double> relativePosition = getRelativePosition(t);
 
     int segment = relativePosition.getLeft();
     double offset = relativePosition.getRight();
 
     return Point.interpolate(points.get(segment), points.get(segment + 1),
         offset / sublength.get(segment));
+  }
+
+  public Point direction(double t) {
+    int segment = getRelativePosition(t).getLeft();
+    Point a = points.get(segment);
+    Point b = points.get(segment + 1);
+    return b.sub(a).norm();
   }
 
   public double length() { return length; }

@@ -38,6 +38,11 @@ public class Point {
     return Math.sqrt(mag2());
   }
 
+  // return normalized, so that mag() = 1
+  public Point norm() {
+    return this.times(1.0/mag());
+  }
+
   public static double dist(Point a, Point b) {
     return a.sub(b).mag();
   }

@@ -18,5 +18,8 @@ public class PointTest {
   public void testMagnitude() {
     Point a = new Point(3.0, 4.0);
     assertEquals(a.mag(), 5.0, 0.001);
+    
+    Point normalized = a.norm();
+    assertEquals(normalized.mag(), 1.0, 0.001);
   }
 }

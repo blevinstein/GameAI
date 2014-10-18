@@ -16,9 +16,13 @@ public class RouteTest {
     Route route = new SimpleRoute(points);
 
     assertEquals(12.0, route.length(), 0.001);
-    assertEquals(new Point(), route.get(0.0));
-    assertEquals(a, route.get(3.0));
-    assertEquals(b, route.get(8.0));
-    assertEquals(new Point(), route.get(12.0));
+
+    assertEquals(new Point(), route.position(0.0));
+    assertEquals(a, route.position(3.0));
+    assertEquals(b, route.position(8.0));
+    assertEquals(new Point(), route.position(12.0));
+
+    assertEquals(new Point(1.0, 0.0), route.direction(1.0));
+    assertEquals(new Point(0.0, -1.0), route.direction(11.0));
   }
 }
