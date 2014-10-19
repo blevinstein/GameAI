@@ -10,18 +10,18 @@ import java.util.List;
 
 public class SimpleRoute extends Route {
   private List<Point> points;
-  private List<Double> sublength;
+  private List<Double> sublengths;
   private double length;
 
   public SimpleRoute(List<Point> points) {
     this.points = points;
    
     // calculate lengths
-    sublength = new ArrayList<>();
+    sublengths = new ArrayList<>();
     length = 0;
     for (int i = 0; i < points.size() - 1; i++) {
       double newlen = Point.dist(points.get(i), points.get(i+1));
-      sublength.add(newlen);
+      sublengths.add(newlen);
       length += newlen;
     }
   }
@@ -32,8 +32,8 @@ public class SimpleRoute extends Route {
     }
     int segment = 0;
     double offset = position;
-    while (offset > sublength.get(segment)) {
-      offset -= sublength.get(segment);
+    while (offset > sublengths.get(segment)) {
+      offset -= sublengths.get(segment);
       segment++;
     }
     return ImmutablePair.of(segment, offset);
@@ -46,7 +46,7 @@ public class SimpleRoute extends Route {
     double offset = relativePosition.getRight();
 
     return Point.interpolate(points.get(segment), points.get(segment + 1),
-        offset / sublength.get(segment));
+        offset / sublengths.get(segment));
   }
 
   public Point direction(double t) {
