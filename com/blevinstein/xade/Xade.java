@@ -10,6 +10,7 @@ import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 class Xade extends JPanel implements KeyListener {
   public Xade() {
   }
@@ -55,7 +56,5 @@ class Xade extends JPanel implements KeyListener {
     frame.setVisible(true);
     display.run();
   }
-
-  private static final long serialVersionUID = 1;
 }
 
