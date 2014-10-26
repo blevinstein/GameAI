@@ -10,4 +10,8 @@ public class Move {
     this.destination = destination;
     this.source = source;
   }
+
+  public int getArmies() { return armies; }
+  public City getDestination() { return destination; }
+  public City getSource() { return source; }
 }
