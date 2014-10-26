@@ -3,6 +3,7 @@ package com.blevinstein.xade;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
 
+import com.google.common.collect.ImmutableList;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,20 +13,31 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import java.util.List;
 
 @SuppressWarnings("serial")
 class Xade extends JPanel implements KeyListener, ComponentListener {
   private final int FPS = 60;
   private boolean done = false;
   private World world = new World();
-  private Camera camera = new Camera(100, 100);
+  private Camera camera = new Camera();
 
   public Xade() {
-    camera.focus(new Point(0.0, 0.0), 100.0, 100.0);
-    world.add(new City(new Point(-50.0, -50.0), 5.0));
-    world.add(new City(new Point(50.0, -50.0), 5.0));
-    world.add(new City(new Point(-50.0, 50.0), 5.0));
-    world.add(new City(new Point(50.0, 50.0), 5.0));
+    // position camera
+    camera.center(new Point(0.0, 0.0));
+    camera.input(100.0, 100.0);
+
+    List<Color> playerColors = Misc.chooseColors(4);
+    List<Point> positions = ImmutableList.of(new Point(-50.0, -50.0), new Point(-50.0, 50.0),
+        new Point(50.0, -50.0), new Point(50.0, 50.0));
+    for (int i = 0; i < 4; i++) {
+      // each player gets a city
+      City newCity = new City(positions.get(i), 5.0);
+      world.add(newCity);
+      Player newPlayer = new Player()
+        .setColor(playerColors.get(i));
+      world.add(newPlayer);
+    }
   }
 
   public void paintComponent(Graphics g) {
@@ -47,7 +59,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   public void componentHidden(ComponentEvent e) {}
   public void componentMoved(ComponentEvent e) {}
   public void componentResized(ComponentEvent e) {
-    camera.resize(getWidth(), getHeight());
+    camera.output(getWidth(), getHeight());
   }
   public void componentShown(ComponentEvent e) {}
 
