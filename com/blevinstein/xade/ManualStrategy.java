@@ -13,7 +13,9 @@ public class ManualStrategy implements Strategy {
   }
 
   public void makeMove(Move move) {
-    moveBuffer.add(move);
+    if (world.validMove(move)) {
+      moveBuffer.add(move);
+    }
   }
 
   // implements Strategy
