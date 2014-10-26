@@ -19,9 +19,19 @@ public class World {
   public void add(City city) {
     cities.add(city);
   }
+  public int getCityCount() { return cities.size(); }
+  public City getCity(int i) {
+    if (i < 0 || i >= cities.size()) { throw new IllegalArgumentException(); }
+    return cities.get(i);
+  }
 
   public void add(Player player) {
     players.add(player);
+  }
+  public int getPlayerCount() { return players.size(); }
+  public Player getPlayer(int i) {
+    if (i < 0 || i >= players.size()) { throw new IllegalArgumentException(); }
+    return players.get(i);
   }
 
   public void step(double timeStep) {
