@@ -6,16 +6,19 @@ import com.blevinstein.util.Util;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
-class Xade extends JPanel implements KeyListener {
+class Xade extends JPanel implements KeyListener, ComponentListener {
   private final int FPS = 60;
   private boolean done = false;
   private World world = new World();
+  private Camera camera;
 
   public void paintComponent(Graphics g) {
     // clear the screen
@@ -23,12 +26,22 @@ class Xade extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     Graphics2D g2 = (Graphics2D) g;
+    g2.setTransform(camera.getTransform());
     world.draw(g2);
   }
 
+  // implements KeyListener
   public void keyPressed(KeyEvent e) {}
   public void keyReleased(KeyEvent e) {}
   public void keyTyped(KeyEvent e) {}
+
+  // implements ComponentListener
+  public void componentHidden(ComponentEvent e) {}
+  public void componentMoved(ComponentEvent e) {}
+  public void componentResized(ComponentEvent e) {
+    camera.resize(getWidth(), getHeight());
+  }
+  public void componentShown(ComponentEvent e) {}
 
   private void mainLoop() {
     done = false;
