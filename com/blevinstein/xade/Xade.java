@@ -25,18 +25,23 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   public Xade() {
     // position camera
     camera.center(new Point(0.0, 0.0));
-    camera.input(100.0, 100.0);
+    camera.input(150.0, 150.0);
 
     List<Color> playerColors = Misc.chooseColors(4);
     List<Point> positions = ImmutableList.of(new Point(-50.0, -50.0), new Point(-50.0, 50.0),
         new Point(50.0, -50.0), new Point(50.0, 50.0));
     for (int i = 0; i < 4; i++) {
-      // each player gets a city
+      // create a city
+      // TODO(blevinstein): world.createCity()
       City newCity = new City(positions.get(i), 5.0);
       world.add(newCity);
+      // TODO(blevinstein): world.createPlayer()
+      // create a player
       Player newPlayer = new Player()
         .setColor(playerColors.get(i));
       world.add(newPlayer);
+      // put the player in the city
+      newCity.add(newPlayer, 1);
     }
   }
 
