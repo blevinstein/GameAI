@@ -19,7 +19,10 @@ public class Camera {
   }
 
   public void focus(Point center, double w, double h) {
-    xfm = new AffineTransform(width/w, 0, 0, height/h, center.getX() * width/w, center.getY() * height/h);
+    // translate center to middle of screen
+    xfm = AffineTransform.getTranslateInstance(width / 2 - center.getX(), height / 2 - center.getY());
+    // scale
+    xfm.scale(width / w, height / h);
   }
 
   public AffineTransform getTransform() { return xfm; }
