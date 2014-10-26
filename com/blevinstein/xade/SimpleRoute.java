@@ -1,5 +1,7 @@
 package com.blevinstein.xade;
 
+import com.google.common.collect.ImmutableList;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -39,6 +41,14 @@ public class SimpleRoute extends Route {
     return ImmutablePair.of(segment, offset);
   }
 
+  public int getPointCount() { return points.size(); }
+  public Point getPoint(int i) {
+    if (i < 0 || i >= points.size()) {
+      throw new IllegalArgumentException();
+    }
+    return points.get(i);
+  }
+
   public Point position(double t) {
     Pair<Integer, Double> relativePosition = getRelativePosition(t);
 
@@ -67,6 +77,16 @@ public class SimpleRoute extends Route {
       path.lineTo(p.getX(), p.getY());
     }
     return path;
+  }
+
+  public static SimpleRoute shortest(City a, City b) {
+    // ab = unit vector from a to b
+    Point ab = b.getLocation().sub(a.getLocation()).norm();
+    // a_edge = a_loc + ab * radius
+    Point a_edge = a.getLocation().add(ab.times(a.getRadius()));
+    // b_edge = b_loc - ab * radius
+    Point b_edge = b.getLocation().sub(ab.times(b.getRadius()));
+    return new SimpleRoute(ImmutableList.of(a_edge, b_edge));
   }
 }
 
