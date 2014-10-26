@@ -12,22 +12,7 @@ import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
 class Xade extends JPanel implements KeyListener {
-  public Xade() {
-  }
-
-  public void run() {
-    // separate thread
-    new Thread(() -> {
-    }).start();
-
-    // main loop and repainting
-    Throttle throttle = new Throttle(60); // target frame rate
-    while (true) {
-      mainLoop();
-      repaint();
-      throttle.sleep();
-    }
-  }
+  private boolean done = false;
 
   public void paintComponent(Graphics g) {
     // clear the screen
@@ -40,7 +25,14 @@ class Xade extends JPanel implements KeyListener {
   public void keyTyped(KeyEvent e) {}
 
   private void mainLoop() {
+    done = false;
+    Throttle throttle = new Throttle(60); // target frame rate
+    while (!done) {
+      repaint();
+      throttle.sleep();
+    }
   }
+  private void stop() { done = true; }
 
   // DRIVER
   public static void main(String[] args) {
@@ -54,7 +46,8 @@ class Xade extends JPanel implements KeyListener {
     frame.addKeyListener(display);
 
     frame.setVisible(true);
-    display.run();
+
+    display.mainLoop();
   }
 }
 

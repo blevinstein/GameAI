@@ -3,7 +3,7 @@ package com.blevinstein.xade;
 public class Army {
   private Player player;
   private State state;
-  private int count;
+  private int size;
 
   // attributes
   private double speed = 1.0;
@@ -18,3 +18,4 @@ public class Army {
     this.state = state.update(t);
   }
 }
+
