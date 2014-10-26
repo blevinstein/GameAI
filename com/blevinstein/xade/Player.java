@@ -6,14 +6,14 @@ import java.util.function.Function;
 
 public class Player {
   private List<Army> armies;
-  private Function<World, List<Move>> strategy;
+  private Strategy strategy;
 
-  public Player(Function<World, List<Move>> strategy) {
+  public Player(Strategy strategy) {
     this.strategy = strategy;
   }
 
   public List<Move> getMoves(World world) {
-    return strategy.apply(world);
+    return strategy.getMoves(world);
   }
 
   public List<Army> getArmies() { return armies; }
