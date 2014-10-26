@@ -31,7 +31,8 @@ public class Camera {
     // translate center to middle of screen
     xfm = AffineTransform.getTranslateInstance(width / 2 - center.getX(), height / 2 - center.getY());
     // scale
-    xfm.scale(width / w, height / h);
+    double scale = Math.min(width / w, height / h);
+    xfm.scale(scale, scale);
   }
 
   public AffineTransform getTransform() { return xfm; }

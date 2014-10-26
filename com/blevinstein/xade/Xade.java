@@ -18,12 +18,14 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   private final int FPS = 60;
   private boolean done = false;
   private World world = new World();
-  private Camera camera = new Camera(1, 1);
+  private Camera camera = new Camera(100, 100);
 
   public Xade() {
     camera.focus(new Point(0.0, 0.0), 100.0, 100.0);
-    world.add(new City(new Point(0.0, 0.0), 5.0));
-    world.add(new City(new Point(10.0, 10.0), 5.0));
+    world.add(new City(new Point(-50.0, -50.0), 5.0));
+    world.add(new City(new Point(50.0, -50.0), 5.0));
+    world.add(new City(new Point(-50.0, 50.0), 5.0));
+    world.add(new City(new Point(50.0, 50.0), 5.0));
   }
 
   public void paintComponent(Graphics g) {
