@@ -9,8 +9,7 @@ public class Camera {
   private AffineTransform xfm;
   // focus state
   Point center;
-  double w;
-  double h;
+  private double scale;
 
   public Camera(double width, double height) {
     this.width = width;
@@ -21,17 +20,18 @@ public class Camera {
   public void resize(double width, double height) {
     this.width = width;
     this.height = height;
-    focus(center, w, h);
+    focus(center, scale);
   }
 
-  public void focus(Point center, double w, double h) {
+  public void focus(Point center, double min_width, double min_height) {
+    focus(center, Math.min(width / min_width, height / min_height));
+  }
+  public void focus(Point center, double scale) {
     this.center = center;
-    this.w = w;
-    this.h = h;
+    this.scale = scale;
     // translate center to middle of screen
     xfm = AffineTransform.getTranslateInstance(width / 2 - center.getX(), height / 2 - center.getY());
     // scale
-    double scale = Math.min(width / w, height / h);
     xfm.scale(scale, scale);
   }
 
