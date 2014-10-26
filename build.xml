@@ -18,6 +18,7 @@
         <fileset dir=".">
           <include name="**/*Test.java" />
         </fileset>
+        <formatter type="plain" />
       </batchtest>
     </junit>
   </target>
