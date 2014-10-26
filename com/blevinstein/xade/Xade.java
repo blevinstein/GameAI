@@ -18,7 +18,13 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   private final int FPS = 60;
   private boolean done = false;
   private World world = new World();
-  private Camera camera;
+  private Camera camera = new Camera(1, 1);
+
+  public Xade() {
+    camera.focus(new Point(0.0, 0.0), 100.0, 100.0);
+    world.add(new City(new Point(0.0, 0.0), 5.0));
+    world.add(new City(new Point(10.0, 10.0), 5.0));
+  }
 
   public void paintComponent(Graphics g) {
     // clear the screen
@@ -64,6 +70,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
     Xade display = new Xade();
     frame.add(display);
     frame.addKeyListener(display);
+    frame.addComponentListener(display);
 
     frame.setVisible(true);
 
