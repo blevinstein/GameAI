@@ -2,6 +2,7 @@ package com.blevinstein.xade;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,22 +11,37 @@ public class World {
   private List<City> cities;
   private List<Player> players;
 
+  public World() {
+    this.cities = new ArrayList<>();
+    this.players = new ArrayList<>();
+  }
+
+  public World add(City city) {
+    cities.add(city);
+    return this;
+  }
+
+  public World add(Player player) {
+    players.add(player);
+    return this;
+  }
+
   public void step(double timeStep) {
     // get moves from each player
-    Map<Player, Map<Army, State>> moveLists = new HashMap<>();
+    Map<Player, List<Move>> moveLists = new HashMap<>();
     for (Player player : players) {
-      Map<Army, State> moves = player.getMoves(this);
-      moveLists.put(player, player.getMoves(this));
+      List<Move> moves = player.getMoves(this);
+      moveLists.put(player, moves);
     }
     // update each army
     for (Player player : players) {
-      Map<Army, State> moves = moveLists.get(player);
+      List<Move> moves = moveLists.get(player);
+      for (Move move : moves) {
+        // if move is possible
+        // make move
+      }
       for (Army army : player.getArmies()) {
-        if (moves.containsKey(army)) {
-          army.setState(moves.get(army));
-        } else {
-          army.update(timeStep);
-        }
+        army.update(timeStep);
       }
     }
   }
