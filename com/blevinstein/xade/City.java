@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO(blevinstein): implement city radius growth?
+// TODO(blevinstein): test add/remove/get for army counts
 
 public class City implements Drawable {
   private Point location;
@@ -51,19 +52,24 @@ public class City implements Drawable {
     }
   }
 
+  /*
+   * Adds "count" armies controlled by player "p"
+   */
   public void add(Player p, int count) {
     if (count < 0) { throw new IllegalArgumentException(); }
     if (count == 0) { return; }
 
-    int currentCount = occupiers.containsKey(p) ? occupiers.get(p) : 0;
-    occupiers.put(p, currentCount + count);
+    occupiers.put(p, get(p) + count);
   }
 
+  /*
+   * Removes "count" armies controlled by player "p"
+   */
   public void remove(Player p, int count) {
     if (count < 0) { throw new IllegalArgumentException(); }
     if (count == 0) { return; }
 
-    int currentCount = occupiers.containsKey(p) ? occupiers.get(p) : 0;
+    int currentCount = get(p);
     if (count > currentCount) { throw new IllegalStateException(); }
 
     int newCount = currentCount - count;
@@ -72,6 +78,24 @@ public class City implements Drawable {
     } else {
       occupiers.put(p, newCount);
     }
+  }
+
+  /*
+   * Gets the number of armies present controlled by player "p"
+   */
+  public int get(Player p) {
+    return occupiers.containsKey(p) ? occupiers.get(p) : 0;
+  }
+
+  /*
+   * Gets the total number of armies present
+   */
+  public int total() {
+    int sum = 0;
+    for (Player p : occupiers.keySet()) {
+      sum += occupiers.get(p);
+    }
+    return sum;
   }
 
   public void update(double t) {
