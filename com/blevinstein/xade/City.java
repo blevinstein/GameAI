@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.Set;
 public class City implements Drawable {
   private Point location;
   private double radius = 10.0;
-  private Map<Player, Integer> occupiers;
+  private Map<Player, Integer> occupiers = new HashMap<>();
   // attributes
   private double buildRate = 0.1;
   // derived state
@@ -36,7 +37,7 @@ public class City implements Drawable {
   public void draw(Graphics2D g) {
     // draw outline
     g.setColor(owner == null ? Color.GRAY : owner.getColor());
-    g.drawOval((int)location.getX(), (int)location.getY(), (int)(radius * 2), (int)(radius * 2));
+    g.drawOval((int)(location.getX() - radius), (int)(location.getY() - radius), (int)(radius * 2), (int)(radius * 2));
    
     if (owner != null) {
       g.setColor(owner.getColor());
