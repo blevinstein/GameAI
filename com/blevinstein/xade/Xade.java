@@ -50,7 +50,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
 
   public void paintComponent(Graphics g) {
     // clear the screen
-    g.setColor(Color.WHITE);
+    g.setColor(Color.BLACK);
     g.fillRect(0, 0, getWidth(), getHeight());
 
     Graphics2D g2 = (Graphics2D) g;

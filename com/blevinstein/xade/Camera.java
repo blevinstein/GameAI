@@ -1,6 +1,8 @@
 package com.blevinstein.xade;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.NoninvertibleTransformException;
 
 // TODO(blevinstein): add tests
 
@@ -47,4 +49,34 @@ public class Camera {
   }
 
   public AffineTransform getTransform() { return xfm; }
+
+  /*
+   * Apply the transformation, world coords -> screen coords
+   */
+  public Point apply(Point p) {
+    // Create a Point2D to store the result of the transformation
+    Point2D dest = new Point2D.Double();
+    return toPoint(xfm.transform(toPoint2D(p), dest));
+  }
+
+  /*
+   * Apply the reverse transformation, screen coords -> world coords
+   */
+  public Point applyInverse(Point p) {
+    // Create a Point2D to store the result of the transformation
+    Point2D dest = new Point2D.Double();
+    try {
+      return toPoint(xfm.inverseTransform(toPoint2D(p), dest));
+    } catch(NoninvertibleTransformException e) {
+      throw new IllegalStateException();
+    }
+  }
+ 
+  // Simple conversion functions
+  private Point2D toPoint2D(Point p) { 
+    return new Point2D.Double(p.getX(), p.getY());
+  }
+  private Point toPoint(Point2D p) {
+    return new Point(p.getX(), p.getY());
+  }
 }
