@@ -55,12 +55,16 @@ public class Point {
     return a.add(b.sub(a).times(t));
   }
 
+  public boolean equals(Point other, double tol) {
+    return Math.abs(x - other.x) < tol
+      && Math.abs(y - other.y) < tol;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof Point) {
       Point other = (Point) obj;
-      // TODO: add tolerance, should use equals on floating point #s
-      return x == other.x && y == other.y;
+      return equals(other, 0.01);
     }
     return false;
   }
