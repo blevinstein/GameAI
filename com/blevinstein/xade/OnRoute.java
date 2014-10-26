@@ -26,7 +26,7 @@ public class OnRoute implements State {
     // get direction
     // get Ship
     // apply rotation and translation
-    return new DrawableAdapter(new Ellipse2D.Double(location.getX(), location.getY(), 1.0, 1.0));
+    return null;
   }
 
   public State update(double t) {

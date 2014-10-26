@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
 import java.util.ArrayList;
@@ -67,6 +69,13 @@ public class SimpleRoute extends Route {
   }
 
   public double length() { return length; }
+
+  @Override
+  public void draw(Graphics2D g) {
+    g.setColor(Color.BLACK);
+    Shape path = shape(); // TODO(blevinstein): refactor
+    g.draw(path);
+  }
 
   public Shape shape() {
     Path2D.Double path = new Path2D.Double();
