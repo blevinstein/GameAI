@@ -34,6 +34,20 @@ public class World {
     return players.get(i);
   }
 
+  public boolean validMove(Player player, Move move) {
+    // Invalid arguments
+    if (!cities.contains(move.getSource())
+        || !cities.contains(move.getDestination())
+        || move.getArmies() <= 0) {
+      return false;
+    }
+    // Insufficient armies at source
+    if (move.getSource().get(player) < move.getArmies()) {
+      return false;
+    }
+    return true;
+  }
+
   public void step(double timeStep) {
     // get moves from each player
     Map<Player, List<Move>> moveLists = new HashMap<>();
