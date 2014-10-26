@@ -16,14 +16,12 @@ public class World {
     this.players = new ArrayList<>();
   }
 
-  public World add(City city) {
+  public void add(City city) {
     cities.add(city);
-    return this;
   }
 
-  public World add(Player player) {
+  public void add(Player player) {
     players.add(player);
-    return this;
   }
 
   public void step(double timeStep) {
@@ -32,6 +30,10 @@ public class World {
     for (Player player : players) {
       List<Move> moves = player.getMoves(this);
       moveLists.put(player, moves);
+    }
+    // update each city
+    for (City city : cities) {
+      city.update(timeStep);
     }
     // update each army
     for (Player player : players) {
@@ -46,20 +48,18 @@ public class World {
     }
   }
 
-  public void draw(Graphics2D g) { draw(g, null); }
-  public void draw(Graphics2D g, AffineTransform xfm) {
+  public void draw(Graphics2D g) {
     for (Player player : players) {
-      //Drawable.draw(g, player, xfm);
       for (Army army : player.getArmies()) {
         State state = army.getState();
         Drawable d = state.drawable();
         if (d != null) {
-          Drawable.draw(g, d, xfm);
+          d.draw(g);
         }
       }
     }
     for (City city : cities) {
-      Drawable.draw(g, city, xfm);
+      city.draw(g);
     }
   }
 }
