@@ -14,12 +14,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+// TODO(blevinstein): implement city radius growth?
+
 public class City implements Drawable {
   private Point location;
   private double radius = 10.0;
   private Map<Player, Integer> occupiers = new HashMap<>();
   // attributes
-  private double buildRate = 0.1;
+  private double buildRate = 1.0;
   // derived state
   private Player owner = null;
   private double buildTime = 0.0;
@@ -43,7 +45,7 @@ public class City implements Drawable {
    
     if (owner != null) {
       g.setColor(owner.getColor());
-      g.setFont(new Font("Arial", Font.PLAIN, 18));
+      g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
       Util.placeText(g, Util.CENTER, occupiers.get(owner).toString(),
           (int)location.getX(), (int)location.getY());
     }

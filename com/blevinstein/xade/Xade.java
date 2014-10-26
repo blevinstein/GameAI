@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -25,15 +26,17 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   public Xade() {
     // position camera
     camera.center(new Point(0.0, 0.0));
-    camera.input(150.0, 150.0);
+    camera.input(1000.0, 1000.0);
 
+    // setup basic map
     List<Color> playerColors = Misc.chooseColors(4);
-    List<Point> positions = ImmutableList.of(new Point(-50.0, -50.0), new Point(-50.0, 50.0),
-        new Point(50.0, -50.0), new Point(50.0, 50.0));
+    double side = 400.0;
+    List<Point> positions = ImmutableList.of(new Point(-side, -side), new Point(-side, side),
+        new Point(side, -side), new Point(side, side));
     for (int i = 0; i < 4; i++) {
       // create a city
       // TODO(blevinstein): world.createCity()
-      City newCity = new City(positions.get(i), 5.0);
+      City newCity = new City(positions.get(i), 50.0);
       world.add(newCity);
       // TODO(blevinstein): world.createPlayer()
       // create a player
@@ -52,6 +55,8 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
 
     Graphics2D g2 = (Graphics2D) g;
     g2.setTransform(camera.getTransform());
+    g2.setRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+          RenderingHints.VALUE_ANTIALIAS_ON));
     world.draw(g2);
   }
 
