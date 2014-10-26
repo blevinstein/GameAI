@@ -33,6 +33,8 @@ public class City implements Drawable {
 
   public double getRadius() { return radius; }
 
+  public Player getOwner() { return owner; }
+
   // implements Drawable
   public void draw(Graphics2D g) {
     // draw outline

@@ -20,7 +20,7 @@ public class WorldTest {
   public void testAddPlayer() {
     World w = new World();
     assertEquals(0, w.getPlayerCount());
-    Player a = new Player(Color.BLACK, new NullStrategy());
+    Player a = new Player();
     w.add(a);
     assertEquals(1, w.getPlayerCount());
     assertEquals(a, w.getPlayer(0));
