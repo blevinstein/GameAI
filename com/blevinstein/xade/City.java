@@ -23,13 +23,16 @@ public class City implements Drawable {
   private Map<Player, Integer> occupiers = new HashMap<>();
   // attributes
   private double buildRate = 1.0;
+  private double rotation;
   // derived state
   private Player owner = null;
   private double buildTime = 0.0;
+  private double angle = 0.0;
 
   public City(Point location, double radius) {
     this.location = location;
     this.radius = radius;
+    this.rotation = Util.random();
   }
   
   public Point getLocation() { return location; }
@@ -43,12 +46,27 @@ public class City implements Drawable {
     // draw outline
     g.setColor(owner == null ? Color.GRAY : owner.getColor());
     g.drawOval((int)(location.getX() - radius), (int)(location.getY() - radius), (int)(radius * 2), (int)(radius * 2));
-   
+  
+    // Owner unit count displayed in middle
     if (owner != null) {
       g.setColor(owner.getColor());
       g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
       Util.placeText(g, Util.CENTER, ""+get(owner),
           (int)location.getX(), (int)location.getY());
+    }
+
+    // Non-owner unit count displayed orbiting the city
+    int nonOwners = occupiers.keySet().size() - (owner != null ? 1 : 0);
+    if (nonOwners > 0) {
+      List<Point> numberPoints = orbitPoints(nonOwners);
+      int index = 0;
+      for (Player player : occupiers.keySet()) {
+        if (player == owner) { continue; }
+        Point point = numberPoints.get(index++);
+        g.setColor(player.getColor());
+        g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
+        Util.placeText(g, Util.CENTER, ""+get(player), (int)point.getX(), (int)point.getY());
+      }
     }
   }
 
@@ -99,6 +117,9 @@ public class City implements Drawable {
   }
 
   public void update(double t) {
+    // rotate
+    angle += rotation * t;
+
     // if occupied by only one player, they become the owner
     Set<Player> players = occupiers.keySet();
     if (players.size() == 1) {
@@ -120,13 +141,13 @@ public class City implements Drawable {
   public List<Point> orbitPoints(int n) {
     if (n < 0) { throw new IllegalArgumentException(); }
     if (n == 0) { return ImmutableList.<Point>of(); }
-    // calculate angle between points
-    double angle = 2.0 * Math.PI / n;
+    // calculate offset between points
+    double offset = 2.0 * Math.PI / n;
     // calculate position of points
     List<Point> points = new ArrayList<>();
     for (int i = 0; i < n; i++) {
-      points.add(new Point(location.getX() + radius * Math.cos(angle * i),
-          location.getY() + radius * Math.sin(angle * i)));
+      points.add(new Point(location.getX() + radius * Math.cos(offset * i + angle),
+          location.getY() + radius * Math.sin(offset * i + angle)));
     }
     return points;
   }
