@@ -1,5 +1,6 @@
 package com.blevinstein.xade;
 
+import java.awt.Color;
 import java.awt.geom.Ellipse2D;
 import java.util.Objects;
 
@@ -13,20 +14,23 @@ public class OnRoute implements State {
     this(route, destination, speed, 0.0);
   }
 
-  public OnRoute(Route route, City destination, double speed, double distance) {
+  private OnRoute(Route route, City destination, double speed, double distance) {
     this.route = route;
     this.destination = destination;
     this.speed = speed;
     this.distance = distance;
   }
 
+  public Point location() {
+    return route.position(distance);
+  }
+
   public Drawable drawable() {
     Point location = route.position(distance);
-    // TODO
-    // get direction
-    // get Ship
-    // apply rotation and translation
-    return null;
+    return (g) -> {
+      g.setColor(Color.WHITE);
+      g.draw(route.shape());
+    };
   }
 
   public State update(double t) {

@@ -70,13 +70,6 @@ public class SimpleRoute extends Route {
 
   public double length() { return length; }
 
-  @Override
-  public void draw(Graphics2D g) {
-    g.setColor(Color.BLACK);
-    Shape path = shape(); // TODO(blevinstein): refactor
-    g.draw(path);
-  }
-
   public Shape shape() {
     Path2D.Double path = new Path2D.Double();
     Point start = points.get(0);

@@ -24,6 +24,9 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   private Camera camera = new Camera();
 
   public Xade() {
+    this.setFocusable(true);
+    this.addKeyListener(this);
+
     // position camera
     camera.center(new Point(0.0, 0.0));
     camera.input(1000.0, 1000.0);
@@ -45,6 +48,13 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
       world.add(newPlayer);
       // put the player in the city
       newCity.add(newPlayer, 1);
+      
+      // give the user a player to control
+      if (i == 0) {
+        MouseStrategy strategy = new MouseStrategy(world, newPlayer, camera);
+        this.addMouseListener(strategy);
+        newPlayer.setStrategy(strategy);
+      }
     }
   }
 
@@ -87,13 +97,11 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   // DRIVER
   public static void main(String[] args) {
     JFrame frame = new JFrame();
-    //frame.setSize(1024, 768 + 25);
-    frame.setSize(640, 320 + 25);
+    frame.setSize(1024, 768 + 25);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     Xade display = new Xade();
     frame.add(display);
-    frame.addKeyListener(display);
     frame.addComponentListener(display);
 
     frame.setVisible(true);

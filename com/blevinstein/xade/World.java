@@ -4,8 +4,10 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class World {
   private List<City> cities;
@@ -63,11 +65,23 @@ public class World {
     for (Player player : players) {
       List<Move> moves = moveLists.get(player);
       for (Move move : moves) {
-        // if move is possible
-        // make move
+        if (validMove(player, move)) {
+          // Remove units from source city
+          move.getSource().remove(player, move.getArmies());
+          // Create a route
+          Route route = SimpleRoute.shortest(move.getSource(), move.getDestination());
+          // Create a new state
+          State state = new OnRoute(route, move.getDestination(), 100.0);
+          // Create an army with the new state
+          Army newArmy = new Army(player, state, move.getArmies());
+          player.add(newArmy);
+        }
       }
-      for (Army army : player.getArmies()) {
-        army.update(timeStep);
+      for (Iterator<Army> iter = player.getArmies().iterator(); iter.hasNext(); ) {
+        Army army = iter.next();
+        if (army.update(timeStep)) {
+          iter.remove();
+        }
       }
     }
   }
@@ -75,8 +89,7 @@ public class World {
   public void draw(Graphics2D g) {
     for (Player player : players) {
       for (Army army : player.getArmies()) {
-        State state = army.getState();
-        Drawable d = state.drawable();
+        Drawable d = army.drawable();
         if (d != null) {
           d.draw(g);
         }
@@ -85,5 +98,19 @@ public class World {
     for (City city : cities) {
       city.draw(g);
     }
+  }
+
+  // Returns nearest city to a given point, and the distance between the two
+  // NOTE: distance is calculated as (distance_to_center - radius), so it is negative when the
+  //     point is inside the radius of the city
+  public Pair<City, Double> closestCity(Point point) {
+    Pair<City, Double> closest = Pair.of(null, 0.0);
+    for (City city : cities) {
+      double distance = city.getLocation().sub(point).mag() - city.getRadius();
+      if (closest.getLeft() == null || distance < closest.getRight()) {
+        closest = Pair.of(city, distance);
+      }
+    }
+    return closest;
   }
 }

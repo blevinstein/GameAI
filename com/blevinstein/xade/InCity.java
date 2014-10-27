@@ -9,6 +9,12 @@ public class InCity implements State {
     this.city = city;
   }
 
+  public City getCity() { return city; }
+
+  public Point location() {
+    return city.getLocation();
+  }
+
   public Drawable drawable() {
     return null; // not drawable
   }
