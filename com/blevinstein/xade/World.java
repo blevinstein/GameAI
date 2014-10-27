@@ -1,5 +1,6 @@
 package com.blevinstein.xade;
 
+import com.google.common.collect.ImmutableList;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ public class World {
     if (i < 0 || i >= cities.size()) { throw new IllegalArgumentException(); }
     return cities.get(i);
   }
+  public List<City> getCityList() { return ImmutableList.copyOf(cities); }
 
   public void add(Player player) {
     players.add(player);
@@ -35,6 +37,7 @@ public class World {
     if (i < 0 || i >= players.size()) { throw new IllegalArgumentException(); }
     return players.get(i);
   }
+  public List<Player> getPlayerList() { return ImmutableList.copyOf(players); }
 
   public boolean validMove(Player player, Move move) {
     // Invalid arguments
@@ -54,7 +57,7 @@ public class World {
     // get moves from each player
     Map<Player, List<Move>> moveLists = new HashMap<>();
     for (Player player : players) {
-      List<Move> moves = player.getMoves(this);
+      List<Move> moves = player.getMoves();
       moveLists.put(player, moves);
     }
     // update each city

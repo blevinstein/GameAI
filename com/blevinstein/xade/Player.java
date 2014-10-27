@@ -46,8 +46,8 @@ public class Player {
 
   public Color getColor() { return color; }
 
-  public List<Move> getMoves(World world) {
-    return strategy.getMoves(world);
+  public List<Move> getMoves() {
+    return strategy.getMoves();
   }
 
   public List<Army> getArmies() { return armies; }
