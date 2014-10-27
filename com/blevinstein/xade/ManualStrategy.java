@@ -22,7 +22,7 @@ public class ManualStrategy implements Strategy {
 
   // implements Strategy
   @Override
-  public List<Move> getMoves(World world) {
+  public List<Move> getMoves() {
     List<Move> moves = ImmutableList.copyOf(moveBuffer);
     moveBuffer.clear();
     return moves;
