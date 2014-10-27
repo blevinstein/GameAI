@@ -55,8 +55,8 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
         this.addMouseListener(strategy);
         newPlayer.setStrategy(strategy);
       }
-      // give the user an active opponent
-      if (i == 3) {
+      // give the user active opponents
+      if (i > 0) {
         FloodStrategy strategy = new FloodStrategy(world, newPlayer);
         newPlayer.setStrategy(strategy);
       }
