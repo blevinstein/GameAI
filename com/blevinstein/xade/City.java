@@ -47,7 +47,7 @@ public class City implements Drawable {
     if (owner != null) {
       g.setColor(owner.getColor());
       g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
-      Util.placeText(g, Util.CENTER, occupiers.get(owner).toString(),
+      Util.placeText(g, Util.CENTER, ""+get(owner),
           (int)location.getX(), (int)location.getY());
     }
   }
