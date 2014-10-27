@@ -22,7 +22,8 @@ public class MouseStrategy extends ManualStrategy implements MouseListener, Mous
       if (selected == null) {
         selected = closest.getLeft();
       } else {
-        Move move = new Move(1, selected, closest.getLeft());
+        int armies = selected.get(player) / 2;
+        Move move = new Move(armies, selected, closest.getLeft());
         makeMove(move);
       }
     } else {

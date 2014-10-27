@@ -22,8 +22,9 @@ public class City implements Drawable {
   private double radius = 10.0;
   private Map<Player, Integer> occupiers = new HashMap<>();
   // attributes
-  private double buildRate = 1.0;
-  private double killRate = 1.0;
+  private double buildRate = 2.0;
+  private double killRate = 2.0;
+  private double killPower = 1.5;
   private double rotation;
   // derived state
   private Player owner = null;
@@ -142,7 +143,7 @@ public class City implements Drawable {
     for (Player player : players) {
       int strength = get(player);
       int all = total();
-      double avgKilled = killRate * t * (all - strength) / all;
+      double avgKilled = killRate * t * Math.pow(all - strength, killPower) / all;
       int killed = (int)avgKilled + (Math.random() < avgKilled % 1.0 ? 1 : 0);
       if (killed > strength) { killed = strength; }
       killMap.put(player, killed);

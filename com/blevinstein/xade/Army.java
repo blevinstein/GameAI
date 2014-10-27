@@ -1,5 +1,9 @@
 package com.blevinstein.xade;
 
+import com.blevinstein.util.Util;
+import java.awt.Color;
+import java.awt.Font;
+
 public class Army {
   private Player player;
   private State state;
@@ -36,20 +40,17 @@ public class Army {
   }
 
   public Drawable drawable() {
-    // draw state, if applicable
-    final Drawable drawState = state.drawable();
     // draw army
     double dotRadius = 10.0;
     Point location = state.location();
 
     return (g) -> {
-      if (drawState != null) {
-        drawState.draw(g);
-      }
       if (location != null) {
         g.setColor(player.getColor());
         g.drawOval((int)(location.getX() - dotRadius), (int)(location.getY() - dotRadius),
             (int)(dotRadius * 2), (int)(dotRadius * 2));
+        g.setFont(new Font("Arial", Font.PLAIN, (int)(dotRadius)));
+        Util.placeText(g, Util.CENTER, ""+size, (int)location.getX(), (int)location.getY());
       }
     };
   }

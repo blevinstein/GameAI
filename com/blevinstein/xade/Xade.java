@@ -56,6 +56,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
         newPlayer.setStrategy(strategy);
       }
     }
+    world.add(new City(new Point(), 50.0));
   }
 
   public void paintComponent(Graphics g) {
