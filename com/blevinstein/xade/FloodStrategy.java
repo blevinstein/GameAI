@@ -33,7 +33,7 @@ public class FloodStrategy implements Strategy {
       }
     }
     int armies = (strongest.get(player) - weakest.get(player)) / 2;
-    if (armies < 10 || strongest == null || weakest == null) {
+    if (armies < 1 || strongest == null || weakest == null) {
       return ImmutableList.of();
     }
     return ImmutableList.of(new Move(armies, strongest, weakest));
