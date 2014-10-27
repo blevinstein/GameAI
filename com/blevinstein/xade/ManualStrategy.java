@@ -5,15 +5,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManualStrategy implements Strategy {
-  private World world;
+  protected World world;
+  protected Player player;
   private List<Move> moveBuffer = new ArrayList<>();
 
-  public ManualStrategy(World world) {
+  public ManualStrategy(World world, Player player) {
     this.world = world;
+    this.player = player;
   }
 
   public void makeMove(Move move) {
-    if (world.validMove(move)) {
+    if (world.validMove(player, move)) {
       moveBuffer.add(move);
     }
   }
