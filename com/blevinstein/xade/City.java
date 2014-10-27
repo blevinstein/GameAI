@@ -23,10 +23,11 @@ public class City implements Drawable {
   private Map<Player, Integer> occupiers = new HashMap<>();
   // attributes
   private double buildRate = 1.0;
+  private double killRate = 1.0;
   private double rotation;
   // derived state
   private Player owner = null;
-  private double buildTime = 0.0;
+  private double built = 0.0;
   private double angle = 0.0;
 
   public City(Point location, double radius) {
@@ -127,14 +128,27 @@ public class City implements Drawable {
     }
     // the owner builds troops
     if (owner == null) {
-      buildTime = 0.0;
+      built = 0.0;
     } else {
-      buildTime += t;
-      int produced = (int) (buildTime * buildRate);
-      if (produced > 0) {
-        add(owner, produced);
-        buildTime -= produced / buildRate;
+      built += buildRate * t;
+      if (built >= 1.0) {
+        add(owner, (int)built);
+        built = built % 1.0;
       }
+    }
+
+    // combat
+    Map<Player, Integer> killMap = new HashMap<>();
+    for (Player player : players) {
+      int strength = get(player);
+      int all = total();
+      double avgKilled = killRate * t * (all - strength) / all;
+      int killed = (int)avgKilled + (Math.random() < avgKilled % 1.0 ? 1 : 0);
+      if (killed > strength) { killed = strength; }
+      killMap.put(player, killed);
+    }
+    for (Player player : killMap.keySet()) {
+      remove(player, killMap.get(player));
     }
   }
 
