@@ -10,6 +10,7 @@ import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,12 +59,13 @@ public class City implements Drawable {
     }
 
     // Non-owner unit count displayed orbiting the city
-    int nonOwners = occupiers.keySet().size() - (owner != null ? 1 : 0);
-    if (nonOwners > 0) {
-      List<Point> numberPoints = orbitPoints(nonOwners);
+    // Copy occupiers and remove owner to avoid race conditions
+    Set<Player> playerSet = new HashSet<>(occupiers.keySet());
+    if (owner != null) { playerSet.remove(owner); }
+    if (playerSet.size() > 0) {
+      List<Point> numberPoints = orbitPoints(playerSet.size());
       int index = 0;
-      for (Player player : occupiers.keySet()) {
-        if (player == owner) { continue; }
+      for (Player player : playerSet) {
         Point point = numberPoints.get(index++);
         g.setColor(player.getColor());
         g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
