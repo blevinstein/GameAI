@@ -20,6 +20,13 @@ public class Player {
     this.strategy = new NullStrategy();
   }
 
+  public void add(Army army) {
+    armies.add(army);
+  }
+  public void remove(Army army) {
+    armies.remove(army);
+  }
+
   public Player setColor(Color color) {
     this.color = color;
     return this;
