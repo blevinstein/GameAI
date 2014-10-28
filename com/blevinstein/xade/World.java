@@ -90,6 +90,7 @@ public class World {
   }
 
   public void draw(Graphics2D g) {
+    // TODO: addDrawable(obj), perhaps also createPlayer/createArmy/createCity
     for (Player player : players) {
       for (Army army : player.getArmies()) {
         Drawable d = army.drawable();
