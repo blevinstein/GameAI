@@ -3,8 +3,10 @@ Some experiments with machine learning to play games. Currently just
 
 To play with this code, you just need Java and Ant, then run one of:
 
-ant t3 (tic-tac-toe program)
+ant t3 (tic-tac-toe program) (**does not build**)
 ant house (neural network inspection program)
+ant boids (physics-based 2D moving "boid" simulation) (**blocked by jbox2d frustrations**)
+ant xade (physics-less game simulation)
 
 TODO
 ====
