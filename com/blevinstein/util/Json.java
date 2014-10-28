@@ -36,10 +36,12 @@ public class Json {
   private static Gson init() {
     GsonBuilder builder = new GsonBuilder();
     builder.setPrettyPrinting();
+    /*
     builder.registerTypeAdapter(Population.class, new PopulationSerializer());
     builder.registerTypeAdapter(Population.class, new PopulationDeserializer());
     builder.registerTypeAdapter(NeuralNet.class, new NeuralNetSerializer());
     builder.registerTypeAdapter(NeuralNet.class, new NeuralNetDeserializer());
+    */
     return builder.create();
   }
 
@@ -66,13 +68,14 @@ public class Json {
     }
   }
 
+  /*
   private static class PopulationSerializer
     implements JsonSerializer<Population<NeuralNet>> {
     public JsonElement serialize(Population<NeuralNet> src,
                                  Type typeOfSrc,
                                  JsonSerializationContext context) {
       JsonArray array = new JsonArray();
-      for (NeuralNet net : src.pop()) {
+      for (NeuralNet net : src.getPopulation()) {
         array.add(gson.toJsonTree(net.toDoubles()));
       }
       return array;
@@ -92,8 +95,8 @@ public class Json {
       return new Population<NeuralNet>(list);
     }
   }
-
   // TODO: make Population[Des,S]erializer work for Population<?>
+
   public static class NeuralNetSerializer
     implements JsonSerializer<NeuralNet> {
     public JsonElement serialize(NeuralNet src,
@@ -114,4 +117,5 @@ public class Json {
       return new NeuralNet(gson.fromJson(json, double[][][].class));
     }
   }
+  */
 }

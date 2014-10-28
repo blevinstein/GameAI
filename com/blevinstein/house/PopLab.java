@@ -1,11 +1,9 @@
 package com.blevinstein.house;
 
-import com.blevinstein.genetics.DefaultGrader;
-import com.blevinstein.genetics.Population;
 import com.blevinstein.net.Converters;
 import com.blevinstein.net.NetAdapter;
+import com.blevinstein.net.NetPopulation;
 import com.blevinstein.net.NeuralNet;
-import com.blevinstein.util.Json;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
 
@@ -28,12 +26,11 @@ class PopLab extends JPanel implements KeyListener {
 
   private String HELP =
     "Choose a function for the population to learn. " +
-    "Press S to save, L to load a saved population. " +
     "Presse E to start/stop evolution. ";
 
   private final int POPULATION_SIZE = 100;
 
-  private Population<NeuralNet> pop;
+  private SimplePopulation population;
 
   private Map<String, Function<Boolean[], Boolean[]>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
@@ -68,9 +65,7 @@ class PopLab extends JPanel implements KeyListener {
                                            selectFunction.getItemAt(
                                                selectFunction.getSelectedIndex()))));
 
-    // init population
-    pop = new Population<NeuralNet>(POPULATION_SIZE,
-                                    () -> new NeuralNet(new int[] {2, 2, 1}));
+    population = new SimplePopulation(POPULATION_SIZE);
   }
 
   private void addFunction(String name, Function<Boolean[], Boolean[]> function) {
@@ -78,25 +73,9 @@ class PopLab extends JPanel implements KeyListener {
     functions.put(name, function);
   }
 
+  private Function<Boolean[], Boolean[]> currentFunction;
   private void setFunction(Function<Boolean[], Boolean[]> f) {
-    // setup grading policy
-    DefaultGrader.register((net) -> {
-      NetAdapter<Boolean[], Boolean[]> adapter =
-      new NetAdapter<>(Converters.array(Boolean.class, 2),
-      Converters.array(Boolean.class, 1));
-      Boolean cases[][] = {{false, false},
-        {false, true},
-        {true, false},
-        {false, false}
-      };
-      double score = 0.0;
-      for (Boolean[] kase : cases) {
-        boolean expected = f.apply(kase)[0];
-        boolean actual = adapter.process(kase)[0];
-        if (actual == expected) { score += 1; }
-      }
-      return score;
-    }, NeuralNet.class);
+    currentFunction = f;
   }
 
   boolean evolving = false;
@@ -105,7 +84,7 @@ class PopLab extends JPanel implements KeyListener {
     Throttle t2 = new Throttle(4); // limit epochs/second
     while (true) {
       if (evolving) {
-        pop = pop.epoch();
+        population.evolve();
         t2.sleep();
       }
       repaint();
@@ -120,6 +99,7 @@ class PopLab extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     // show histogram
+    /*
     Util.drawHistogram(g, pop.fitness(), 1.0, 10, 10, getWidth() - 20, getHeight() - 100);
 
     // show a perfect example
@@ -140,6 +120,7 @@ class PopLab extends JPanel implements KeyListener {
 
     // draw stats
     Util.placeText(g, Util.NE, pop.stats(), getWidth() - 20, 20);;
+    */
 
     // draw help
     if (displayHelp) {
@@ -154,14 +135,6 @@ class PopLab extends JPanel implements KeyListener {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_E:
         evolving = !evolving;
-        break;
-      case KeyEvent.VK_L:
-        Population<NeuralNet> newPop = Json.load("patients.json", pop.getClass());
-        if (newPop != null) { pop = newPop; }
-        repaint();
-        break;
-      case KeyEvent.VK_S:
-        Json.save(pop, "patients.json");
         break;
       case KeyEvent.VK_H:
         displayHelp = true;
@@ -179,6 +152,37 @@ class PopLab extends JPanel implements KeyListener {
     }
   }
   public void keyTyped(KeyEvent e) {}
+
+  // Represents a population of 2-input 1-output neural networks learning a function
+  public static class SimplePopulation extends NetPopulation {
+    private Function<Boolean[], Boolean[]> function;
+
+    public SimplePopulation(int size) {
+      super(size, () -> new NeuralNet(new int[]{2, 2, 1}));
+    }
+    
+    public void setFunction(Function<Boolean[], Boolean[]> function) {
+      this.function = function;
+    }
+
+    @Override
+    public double getFitness(NeuralNet individual) {
+      NetAdapter<Boolean[], Boolean[]> adapter =
+          new NetAdapter<>(Converters.array(Boolean.class, 2),
+          Converters.array(Boolean.class, 1));
+      Boolean cases[][] = {{false, false},
+          {false, true},
+          {true, false},
+          {false, false}};
+      double score = 0.0;
+      for (Boolean[] kase : cases) {
+        boolean expected = function.apply(kase)[0];
+        boolean actual = adapter.process(kase)[0];
+        if (actual == expected) { score += 1; }
+      }
+      return score;
+    }
+  }
 
   public static final long serialVersionUID = 1;
 }

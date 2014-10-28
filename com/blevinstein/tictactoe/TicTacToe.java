@@ -1,8 +1,7 @@
 package com.blevinstein.tictactoe;
 
 import com.blevinstein.game.Learner;
-import com.blevinstein.genetics.DefaultGrader;
-import com.blevinstein.genetics.Population;
+import com.blevinstein.net.NetPopulation;
 import com.blevinstein.net.NeuralNet;
 import com.blevinstein.util.Json;
 import com.blevinstein.util.Throttle;
@@ -35,42 +34,15 @@ class TicTacToe extends JPanel implements KeyListener {
   private MemoryLearner memLearner = new MemoryLearner();
   private NetLearner netLearner = new NetLearner();
 
-  private Population<NeuralNet> population;
+  private PlayerPopulation population;
   private Learner<T3State, T3Move> player1 = netLearner, player2 = null;
   private int wins[] = new int[] {0, 0};
   private T3Move suggested; // the best move, as suggested by the AI
 
   @SuppressWarnings("unchecked")
   public TicTacToe() {
-    // set grading policy, Learner -> double
-    DefaultGrader.register((network) -> {
-      NetLearner student = new NetLearner(network);
-      // simulate 100 games, 1 point for ties, 2 points for wins
-      double score = 0;
-      for (int i = 0; i < 100; i++) {
-        Game g = new Game(student, memLearner); // NOTE: student is player 0
-        // TODO: possible bug, memlearner doesn't learn?
-        g.play();
-        switch (g.winner()) {
-          case -1: score += 1.0; break; // tie
-          case  0: score += 2.0; break; // student wins
-          case  1:               break; // student loses
-        }
-        // DEBUG
-        /*
-        if (score == 200) {
-          System.out.println("student played X");
-          System.out.println(g.state());
-          System.out.println("memlearner knows " + memLearner.map().size());
-        }
-        */
-      }
-      return score;
-    }, NeuralNet.class);
-
     // HACK: creates a NetLearner to get the right size of neural net
-    population = new Population<NeuralNet>(POPULATION_SIZE,
-                                           () -> new NetLearner().net());
+    population = new PlayerPopulation(POPULATION_SIZE);
 
     setMode(netLearner, null, "NxP");
 
@@ -79,7 +51,7 @@ class TicTacToe extends JPanel implements KeyListener {
       Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
       if (map != null) { memLearner = new MemoryLearner(map); }
 
-      Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
+      PlayerPopulation pop = Json.load("pop.json", population.getClass());
       if (pop != null) { population = pop; }
     } catch (Exception e) {
       System.err.println("Couldn't load. " + e.getMessage());
@@ -93,7 +65,7 @@ class TicTacToe extends JPanel implements KeyListener {
       Throttle t = new Throttle(2);
       while (true) {
         long before = System.currentTimeMillis();
-        population = population.epoch();
+        population.evolve();
         long after = System.currentTimeMillis();
         System.out.println(population.stats() + " Duration " + (after - before) + " ms");
         netLearner = new NetLearner(population.bestN(1).get(0));
@@ -152,7 +124,7 @@ class TicTacToe extends JPanel implements KeyListener {
       case KeyEvent.VK_L:
         Map<String, Double> map = Json.load("brain.json", memLearner.map().getClass());
         if (map != null) { memLearner = new MemoryLearner(map); }
-        Population<NeuralNet> pop = Json.load("pop.json", population.getClass());
+        PlayerPopulation pop = Json.load("pop.json", population.getClass());
         if (pop != null) { population = pop; }
         break;
       case KeyEvent.VK_M:
@@ -239,6 +211,43 @@ class TicTacToe extends JPanel implements KeyListener {
 
     frame.setVisible(true);
     display.run();
+  }
+
+  public class PlayerPopulation extends NetPopulation {
+    private Learner<T3State, T3Move> opponent;
+
+    public PlayerPopulation(int size) {
+      super(size, () -> new NetLearner().net());
+    }
+
+    @Override
+    public double getFitness(NeuralNet network) {
+      if (opponent == null) {
+        throw new IllegalStateException();
+      }
+      NetLearner student = new NetLearner(network);
+      // simulate 100 games, 1 point for ties, 2 points for wins
+      double score = 0;
+      for (int i = 0; i < 100; i++) {
+        Game g = new Game(student, memLearner); // NOTE: student is player 0
+        // TODO: possible bug, memlearner doesn't learn?
+        g.play();
+        switch (g.winner()) {
+          case -1: score += 1.0; break; // tie
+          case  0: score += 2.0; break; // student wins
+          case  1:               break; // student loses
+        }
+        // DEBUG
+        /*
+        if (score == 200) {
+          System.out.println("student played X");
+          System.out.println(g.state());
+          System.out.println("memlearner knows " + memLearner.map().size());
+        }
+        */
+      }
+      return score;
+    }
   }
 
   private static final long serialVersionUID = 1;

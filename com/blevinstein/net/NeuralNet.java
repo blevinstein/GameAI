@@ -1,8 +1,5 @@
 package com.blevinstein.net;
 
-import com.blevinstein.genetics.Genome;
-import com.blevinstein.genetics.Population;
-import com.blevinstein.util.Json;
 import com.blevinstein.util.Util;
 
 import java.awt.BasicStroke;
@@ -25,10 +22,8 @@ import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Represents a neural net using matrices.
-//
-// Implements Genome so that it can be a member of a Population.
 
-public class NeuralNet implements Genome<NeuralNet> {
+public class NeuralNet {
   //[ y0 ]   [ w00 w01 w02 t0 ][ x0 ]
   //[ y1 ] = [ w10 w11 w12 t1 ][ x1 ]
   //[ -1 ]   [ 0   0   0   1  ][ x2 ]
@@ -237,90 +232,12 @@ public class NeuralNet implements Genome<NeuralNet> {
   // so, to get desired norm X, scale by X/norm
   private void normalize() {
     for (int k = 0; k < _weights.length; k++) {
+      setupMatrix(_weights[k]);
       double desired_norm = Math.sqrt(_weights[k].getColumnDimension());
       double current_norm = _weights[k].getFrobeniusNorm();
       _weights[k] = _weights[k].scalarMultiply(desired_norm / current_norm);
       setupMatrix(_weights[k]);
     }
-  }
-
-  // translate into a 3D array for easy serialization
-  public double[][][] toDoubles() {
-    double arr[][][] = new double[N][][];
-    for (int k = 0; k < N; k++) {
-      int rows = _weights[k].getRowDimension();
-      int cols = _weights[k].getColumnDimension();
-      arr[k] = new double[rows][];
-      for (int i = 0; i < rows; i++) {
-        arr[k][i] = new double[cols];
-        for (int j = 0; j < cols; j++) {
-          arr[k][i][j] = _weights[k].getEntry(i, j);
-        }
-      }
-    }
-    return arr;
-  }
-
-  // methods to implement Genome<Self>, allow inclusion in a population
-  private final double MAX_MUTATION = 1.0;
-  private final double MUTATION_RATE = 0.1;
-  private final double RESIZE_RATE = 0.01;
-  public NeuralNet mutate() {
-    // TODO: fix this code to allow architecture to mutate w/o ugliness
-    // TODO: allow number of layers to change?
-    RealMatrix w[] = new RealMatrix[N];
-    for (int k = 0; k < N; k++) {
-      // HACKy
-      int rows = k == 0 ?                        // if first matrix
-                 _weights[0].getRowDimension() : // number of inputs
-                 w[k - 1].getColumnDimension();  // else copy from last layer
-      int cols = _weights[k].getColumnDimension();
-      // with some probability, change the output size of the matrix
-      if (k < N - 1 && Math.random() < RESIZE_RATE) {
-        cols += Math.random() < 0.5 ? 1 : -1;
-        if (cols < 2) { cols = 2; } // must have 2 neurons, 1 + bias, in each layer
-      }
-
-      w[k] = MatrixUtils.createRealMatrix(rows, cols);
-      for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-          // HACK: looks ugly
-          double value = i < _weights[k].getRowDimension() &&
-                         j < _weights[k].getColumnDimension() ?
-                         _weights[k].getEntry(i, j) :
-                         Math.random() < 0.5 ? 1 : -1;
-          // with probability MUTATION_RATE..
-          if (Math.random() < MUTATION_RATE) {
-            // ..alter the weight by less than MAX_MUTATION
-            value += Util.random() * MAX_MUTATION;
-          }
-          w[k].setEntry(i, j, value);
-        }
-      }
-    }
-    return new NeuralNet(w);
-  }
-  public NeuralNet crossover(NeuralNet other) {
-    // TODO: handle crossover between varied architectures?
-    // TODO: don't just cut between matrices
-    RealMatrix otherWeights[] = other.weights();
-
-    if (_weights.length != otherWeights.length) {
-      throw new RuntimeException("Invalid crossover attempted.");
-    }
-
-    RealMatrix newWeights[] = new RealMatrix[N];
-    // choose a point to cut
-    int cross = (int)(Math.random() * (N + 1));
-    // return this[0..x] :: other[x..N]
-    for (int i = 0; i < N; i++) {
-      if (i < cross) {
-        newWeights[i] = _weights[i].copy();
-      } else {
-        newWeights[i] = otherWeights[i].copy();
-      }
-    }
-    return new NeuralNet(newWeights);
   }
 
   // Draws from [x,y] to [x+sx, y+sy].
