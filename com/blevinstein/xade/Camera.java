@@ -4,48 +4,61 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.NoninvertibleTransformException;
 
-// TODO(blevinstein): add tests
-
+/*
+ * Represents a view as an AffineTransform from input coords to screen coords
+ */
 public class Camera {
   // output
   private AffineTransform xfm = new AffineTransform();
   // output size
-  private double width = 1.0;
-  private double height = 1.0;
+  protected double width = 1.0;
+  protected double height = 1.0;
   // input size
-  private double min_width = 1.0;
-  private double min_height = 1.0;
+  protected double min_width = 1.0;
+  protected double min_height = 1.0;
   // input center
-  Point center = new Point(0.0, 0.0);
+  protected Point center = new Point(0.0, 0.0);
 
   public Camera() {
     refocus();
   }
 
-  public void center(Point center) {
+  // set the center of view, with respect to input coords
+  public Camera center(Point center) {
     this.center = center;
     refocus();
+    return this;
   }
 
-  public void output(double width, double height) {
+  // set the width and height of the output
+  public Camera output(double width, double height) {
     this.width = width;
     this.height = height;
     refocus();
+    return this;
   }
 
-  public void input(double min_width, double min_height) {
+  // set the width and height of the field of view
+  // NOTE: output may include more than specified to fix aspect ratio
+  public Camera input(double min_width, double min_height) {
     this.min_width = min_width;
     this.min_height = min_height;
     refocus();
+    return this;
   }
 
-  public void refocus() {
+  // called internally to recalculate the AffineTransform
+  protected void refocus() {
     // recalculate scale
     double scale = Math.min(width / min_width, height / min_height);
-    // translate center to middle of screen
-    xfm = AffineTransform.getTranslateInstance(width / 2 - center.getX(), height / 2 - center.getY());
+    xfm = new AffineTransform();
+    // NOTE: transformations appear in reverse order here
+    // translate origin to middle of screen
+    xfm.translate(width / 2, height / 2);
     // scale
     xfm.scale(scale, scale);
+    // translate center to origin
+    xfm.translate(-center.getX(), -center.getY());
   }
 
   public AffineTransform getTransform() { return xfm; }
