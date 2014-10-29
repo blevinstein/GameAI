@@ -6,6 +6,7 @@ import java.util.List;
 public class FloodStrategy implements Strategy {
   private World world;
   private Player player;
+  private int atom = 1;
 
   public FloodStrategy(World world, Player player) {
     this.world = world;
@@ -36,9 +37,10 @@ public class FloodStrategy implements Strategy {
       return ImmutableList.of();
     }
     int armies = (strongest.get(player) - weakest.get(player)) / 2;
-    if (armies < 4) {
+    if (armies < atom) {
       return ImmutableList.of();
     }
+    atom++;
     return ImmutableList.of(new Move(armies, strongest, weakest));
   }
 }
