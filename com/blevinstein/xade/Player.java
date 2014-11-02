@@ -1,7 +1,9 @@
 package com.blevinstein.xade;
 
+import com.google.common.collect.ImmutableList;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -37,7 +39,7 @@ public class Player {
     return this;
   }
 
-  public List<City> getCities() { return cities; }
+  public List<City> getCities() { return ImmutableList.copyOf(cities); }
   public List<City> getOwnedCities() {
     return cities.stream()
       .filter(city -> city.getOwner() == this)
@@ -50,5 +52,14 @@ public class Player {
     return strategy.getMoves();
   }
 
-  public List<Army> getArmies() { return armies; }
+  public List<Army> getArmies() { return ImmutableList.copyOf(armies); }
+  public void updateArmies(double t) {
+    for (Iterator<Army> iter = armies.iterator(); iter.hasNext(); ) {
+      Army army = iter.next();
+      army.update(t);
+      if (army.dead()) {
+        iter.remove();
+      }
+    }
+  }
 }

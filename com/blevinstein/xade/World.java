@@ -80,12 +80,8 @@ public class World {
           player.add(newArmy);
         }
       }
-      for (Iterator<Army> iter = player.getArmies().iterator(); iter.hasNext(); ) {
-        Army army = iter.next();
-        if (army.update(timeStep)) {
-          iter.remove();
-        }
-      }
+      // update each army, remove if necessary
+      player.updateArmies(timeStep);
     }
   }
 

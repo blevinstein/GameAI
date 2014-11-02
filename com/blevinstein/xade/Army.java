@@ -15,6 +15,8 @@ public class Army {
     this.size = size;
   }
 
+  public boolean dead() { return state == null;}
+
   public Player getPlayer() { return player; }
 
   public State getState() { return state; }
@@ -22,21 +24,18 @@ public class Army {
   public int getSize() { return size; }
 
   /*
-   * Updates the state. Returns true if the army should be removed.
+   * Updates the state.
    */
-  public boolean update(double t) {
+  public void update(double t) {
     state = state.update(t);
+    // TODO: return this info instead of accessing player?
+    
     // intercept InCity state, remove Army
     if (state instanceof InCity) {
       InCity inCity = (InCity) state;
       inCity.getCity().add(player, size);
       state = null;
     }
-    // null state causes Army to be removed
-    if (state == null) {
-      return true;
-    }
-    return false;
   }
 
   public Drawable drawable() {

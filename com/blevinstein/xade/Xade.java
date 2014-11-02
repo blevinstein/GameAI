@@ -1,6 +1,7 @@
 package com.blevinstein.xade;
 
 import com.blevinstein.util.Throttle;
+import com.blevinstein.util.Ticker;
 import com.blevinstein.util.Util;
 
 import com.google.common.collect.ImmutableList;
@@ -22,6 +23,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   private boolean done = false;
   private World world = new World();
   private Camera camera = new Camera();
+  private Ticker ticker = new Ticker(FPS);
 
   public Xade() {
     this.setFocusable(true);
@@ -69,9 +71,13 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
   }
 
   public void paintComponent(Graphics g) {
-    // clear the screen
+    // Clear the screen
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, getWidth(), getHeight());
+    
+    // Print current fps
+    g.setColor(Color.WHITE);
+    Util.placeText(g, Util.NW, "" + ticker.tick(), 20, 20);
 
     Graphics2D g2 = (Graphics2D) g;
     g2.setTransform(camera.getTransform());
