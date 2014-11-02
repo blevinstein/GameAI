@@ -18,9 +18,9 @@ public class TestsTest {
     NormalDistribution distribution = new NormalDistribution();
 
     // Expect at most 2 * alpha percentage failures
-    assertAtLeast(
-        () -> !getFails(() -> assertAverage(() -> distribution.sample(), 0.0, alpha, 20)),
-        (int)(100 * (1 - alpha * 2)), 100);
+    assertAtLeast((int)(100 * (1 - alpha * 2)), 100, () -> {
+          assertAverage(0.0, alpha, 20, () -> distribution.sample());
+    });
   }
 
   @Test
@@ -31,10 +31,15 @@ public class TestsTest {
 
   @Test
   public void testAssertAtLeast() {
-    final Iterator<Boolean> good = ImmutableList.of(true, true, false).iterator();
-    assertAtLeast(() -> good.next(), 2, 3);
+    final Iterator<Boolean> mask = ImmutableList.of(true, true, false).iterator();
+    assertAtLeast(2, 3, () -> {
+        if (!mask.next()) { fail(); }
+    });
 
-    final Iterator<Boolean> bad = ImmutableList.of(true, false, false).iterator();
-    assertFails(() -> assertAtLeast(() -> bad.next(), 2, 3));
+    final Iterator<Boolean> mask2 = ImmutableList.of(true, true, false).iterator();
+    assertFails(() ->
+        assertAtLeast(2, 3, () -> {
+            if(mask2.next()) { fail(); }
+        }));
   }
 }
