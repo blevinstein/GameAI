@@ -1,14 +1,18 @@
 <project default="build">
+
+  <property file="build.properties"/>
   
   <target name="build">
     <mkdir dir="build" />
     <mkdir dir="jar" />
-    <javac srcdir="." destdir="build" includeantruntime="false" debug="on">
+
+    <javac srcdir="." destdir="build" includeantruntime="false" debug="on"
+        classpath="${build.classpath}">
       <compilerarg value="-Xlint" />
     </javac>
   </target>
 
-  <target name="junit" description="Unit tests" depends="xade_build">
+  <target name="junit" description="Unit tests" depends="build">
     <mkdir dir="test" />
     <junit printsummary="yes" haltonfailure="no">
       <classpath>
@@ -31,7 +35,7 @@
     </jar>
   </target>
   <target name="t3" depends="t3_build">
-    <java jar="jar/TicTacToe.jar" fork="true" />
+    <java jar="jar/TicTacToe.jar" fork="true"/>
   </target>
 
   <target name="house_build" depends="build">
@@ -42,7 +46,7 @@
     </jar>
   </target>
   <target name="house" depends="house_build">
-    <java jar="jar/House.jar" fork="true" />
+    <java jar="jar/House.jar" fork="true"/>
   </target>
 
   <target name="boids_build" depends="build">
@@ -53,7 +57,7 @@
     </jar>
   </target>
   <target name="boids" depends="boids_build">
-    <java jar="jar/Boids.jar" fork="true" />
+    <java jar="jar/Boids.jar" fork="true"/>
   </target>
 
   <target name="xade_build" depends="build">
@@ -64,7 +68,7 @@
     </jar>
   </target>
   <target name="xade" depends="xade_build">
-    <java jar="jar/Xade.jar" fork="true" />
+    <java jar="jar/Xade.jar" fork="true"/>
   </target>
 
   <target name="clean">
