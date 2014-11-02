@@ -33,7 +33,7 @@ public abstract class Util {
     return Math.random() * 2 - 1;
   }
 
-  public static final int CENTER = 0, NE = 1, S = 2, SE = 3;
+  public static final int CENTER = 0, NE = 1, S = 2, SE = 3, NW = 4;
   public static void placeText(Graphics g, int align, String s, int x, int y) {
     FontMetrics fm = g.getFontMetrics();
     switch (align) {
@@ -46,6 +46,9 @@ public abstract class Util {
         g.drawString(s,
                      x - fm.stringWidth(s),
                      y + fm.getAscent());
+        break;
+      case NW:
+        g.drawString(s, x, y + fm.getAscent());
         break;
       case S:
         g.drawString(s, x - fm.stringWidth(s) / 2, y - fm.getDescent());
