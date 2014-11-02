@@ -12,7 +12,7 @@
     </javac>
   </target>
 
-  <target name="junit" description="Unit tests" depends="build">
+  <target name="test" description="Unit tests" depends="build">
     <mkdir dir="test" />
     <junit printsummary="yes" haltonfailure="no">
       <classpath>
