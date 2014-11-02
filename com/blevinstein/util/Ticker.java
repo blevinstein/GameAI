@@ -9,6 +9,7 @@ import java.util.Arrays;
 //   to complete the circuit.
 
 public class Ticker {
+  // TODO: add tests, allow mocking of clock
   private int index;
   private int N;
   private long ticks[];
