@@ -3,6 +3,7 @@ package com.blevinstein.xade;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Ticker;
 import com.blevinstein.util.Util;
+import com.blevinstein.util.Util.Align;
 
 import com.google.common.collect.ImmutableList;
 import java.awt.Color;
@@ -77,7 +78,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
     
     // Print current fps
     g.setColor(Color.WHITE);
-    Util.placeText(g, Util.NW, "" + ticker.tick(), 20, 20);
+    Util.placeText(g, Align.NW, "" + ticker.tick(), 20, 20);
 
     Graphics2D g2 = (Graphics2D) g;
     g2.setTransform(camera.getTransform());

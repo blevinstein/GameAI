@@ -1,60 +1,44 @@
 package com.blevinstein.net;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ListConverter implements Converter<List<?>> {
-  List<Converter<?>> _converters;
+public class ListConverter<T> implements Converter<List<T>> {
+  private Converter<T> converter;
+  private int n;
 
-  public ListConverter(List<Converter<?>> converters) {
-    _converters = converters;
+  public ListConverter(Converter<T> converter, int n) {
+    this.converter = converter;
+    this.n = n;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public double[] toDoubles(List<?> values) {
-    // TODO: do this with streams instead, implement ZipStream(List, List)?
+  public Signal toSignal(List<T> values) {
+    checkArgument(values.size() == n, "Incorrect number of values provided.");
 
-    double allResults[] = new double[bits()];
-    int i = 0;
-    for (int v = 0; v < values.size(); v++) { // for each value/converter pair
-      // get doubles
-      Converter c = _converters.get(v);
-      double results[] = c.toDoubles(values.get(v));
-
-      // check output length
-      if (results.length != c.bits()) {
-        throw new RuntimeException("Wrong output length!");
+    List<Double> result = new ArrayList<>();
+    for (T value : values) {
+      for (double bit : converter.toSignal(value).getRaw()) {
+        result.add(bit);
       }
-
-      // copy results into larger array
-      System.arraycopy(results, 0, allResults, i, results.length);
-      i += results.length;
     }
-    return allResults;
+    return new Signal(result);
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public List<?> fromDoubles(double[] doubles) {
-    // check input length
-    if (doubles.length != bits()) {
-      throw new RuntimeException("Wrong input length!");
+  public List<T> fromSignal(Signal signal) {
+    int bits = converter.bits();
+    double[] raw = signal.getRaw();
+    List<Signal> signals = new ArrayList<>();
+    for (int i = 0; i < raw.length; i += bits) {
+      signals.add(new Signal(Arrays.copyOfRange(raw, i, bits)));
     }
-
-    List results = new ArrayList<>();
-
-    int i = 0;
-    for (int v = 0; v < _converters.size(); v++) { // for each converter
-      // get value from doubles, add to list
-      Converter c = _converters.get(v);
-      int bits = c.bits();
-      results.add(c.fromDoubles(Arrays.copyOfRange(doubles, i, bits)));
-      i += bits;
-    }
-    return results;
+    return Lists.transform(signals, s -> converter.fromSignal(s));
   }
 
   public int bits() {
-    return _converters.stream().mapToInt(c -> c.bits()).sum();
+    return converter.bits() * n;
   }
 }

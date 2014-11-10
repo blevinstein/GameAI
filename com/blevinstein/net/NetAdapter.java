@@ -1,5 +1,7 @@
 package com.blevinstein.net;
 
+import static com.blevinstein.net.NeuralNet2.Style;
+
 import java.util.function.Function;
 import java.awt.Graphics;
 
@@ -12,35 +14,35 @@ import java.awt.Graphics;
 // move this kind of stuff into the NeuralNet class itself.
 
 public class NetAdapter<X, Y> {
-  private Converter<X> _cin;
-  private Converter<Y> _cout;
+  private Converter<X> cin;
+  private Converter<Y> cout;
 
-  private NeuralNet _net;
-  public NeuralNet net() { return _net; }
-  public void setNet(NeuralNet net) { _net = net; }
+  private NeuralNet2 net;
+  public NeuralNet2 getNet() { return net; }
+  public void setNet(NeuralNet2 net) { this.net = net; }
 
   public NetAdapter(Converter<X> cin, Converter<Y> cout) {
-    _cin = cin;
-    _cout = cout;
-    _net = new NeuralNet(cin.bits(), cout.bits());
+    this.cin = cin;
+    this.cout = cout;
+    this.net = new NeuralNet2(cin.bits(), cout.bits());
   }
 
   public Y process(X input) {
-    double[] rawInput = _cin.toDoubles(input);
-    double[] rawOutput = _net.process(rawInput);
-    return _cout.fromDoubles(rawOutput);
+    Signal inputSignal = cin.toSignal(input);
+    Signal outputSignal = net.apply(inputSignal);
+    return cout.fromSignal(outputSignal);
   }
-
+  
   public void backpropagate(X input, Y target) {
-    double[] rawInput = _cin.toDoubles(input);
-    double[] rawTarget = _cout.toDoubles(target);
-    _net.backpropagate(rawInput, rawTarget);
+    Signal inputSignal = cin.toSignal(input);
+    Signal targetSignal = cout.toSignal(target);
+    net.backpropagate(inputSignal, targetSignal);
   }
 
   public void drawState(Graphics g, X input, int x, int y, int sx, int sy) {
-    _net.drawState(g, _cin.toDoubles(input), x, y, sx, sy);
+    net.drawState(g, cin.toSignal(input), x, y, sx, sy);
   }
-  public void drawState(Graphics g, X input, int x, int y, int sx, int sy, int mode) {
-    _net.drawState(g, _cin.toDoubles(input), x, y, sx, sy, mode);
+  public void drawState(Graphics g, X input, int x, int y, int sx, int sy, Style mode) {
+    net.drawState(g, cin.toSignal(input), x, y, sx, sy, mode);
   }
 }

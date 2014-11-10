@@ -1,6 +1,7 @@
 package com.blevinstein.xade;
 
 import com.blevinstein.util.Util;
+import com.blevinstein.util.Util.Align;
 import java.awt.Color;
 import java.awt.Font;
 
@@ -49,7 +50,7 @@ public class Army {
         g.drawOval((int)(location.getX() - dotRadius), (int)(location.getY() - dotRadius),
             (int)(dotRadius * 2), (int)(dotRadius * 2));
         g.setFont(new Font("Arial", Font.PLAIN, (int)(dotRadius)));
-        Util.placeText(g, Util.CENTER, ""+size, (int)location.getX(), (int)location.getY());
+        Util.placeText(g, Align.CENTER, ""+size, (int)location.getX(), (int)location.getY());
       }
     };
   }

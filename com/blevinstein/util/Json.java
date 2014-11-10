@@ -1,7 +1,6 @@
 package com.blevinstein.util;
 
 import com.blevinstein.genetics.Population;
-import com.blevinstein.net.NeuralNet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

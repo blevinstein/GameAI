@@ -27,17 +27,6 @@
     </junit>
   </target>
 
-  <target name="t3_build" depends="build">
-    <jar destfile="jar/TicTacToe.jar" basedir="build">
-      <manifest>
-        <attribute name="Main-Class" value="com.blevinstein.tictactoe.TicTacToe" />
-      </manifest>
-    </jar>
-  </target>
-  <target name="t3" depends="t3_build">
-    <java jar="jar/TicTacToe.jar" fork="true"/>
-  </target>
-
   <target name="house_build" depends="build">
     <jar destfile="jar/House.jar" basedir="build">
       <manifest>

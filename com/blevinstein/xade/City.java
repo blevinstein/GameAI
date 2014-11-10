@@ -1,6 +1,7 @@
 package com.blevinstein.xade;
 
 import com.blevinstein.util.Util;
+import com.blevinstein.util.Util.Align;
 
 import com.google.common.collect.ImmutableList;
 import java.awt.Color;
@@ -54,7 +55,7 @@ public class City implements Drawable {
     if (owner != null) {
       g.setColor(owner.getColor());
       g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
-      Util.placeText(g, Util.CENTER, ""+get(owner),
+      Util.placeText(g, Align.CENTER, ""+get(owner),
           (int)location.getX(), (int)location.getY());
     }
 
@@ -69,7 +70,7 @@ public class City implements Drawable {
         Point point = numberPoints.get(index++);
         g.setColor(player.getColor());
         g.setFont(new Font("Arial", Font.PLAIN, (int)(radius/2)));
-        Util.placeText(g, Util.CENTER, ""+get(player), (int)point.getX(), (int)point.getY());
+        Util.placeText(g, Align.CENTER, ""+get(player), (int)point.getX(), (int)point.getY());
       }
     }
   }

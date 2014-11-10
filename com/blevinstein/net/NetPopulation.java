@@ -1,10 +1,11 @@
 package com.blevinstein.net;
 
+import static com.blevinstein.net.Util.chain;
+
 import com.blevinstein.genetics.Population;
 import com.blevinstein.util.Util;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.ArrayList; import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -23,81 +25,83 @@ import org.apache.commons.math3.linear.RealMatrix;
 //   With probability 1-CROSSOVER_RATE, a new individual is copied from the old,
 //   sampling from the _fitness-weighted population.
 
-public abstract class NetPopulation extends Population<NeuralNet> {
-  public NetPopulation(Collection<NeuralNet> collection) {
+public abstract class NetPopulation extends Population<NeuralNet2> {
+  public NetPopulation(Collection<NeuralNet2> collection) {
     super(collection);
   }
 
-  public NetPopulation(int size, Supplier<NeuralNet> supplier) {
+  public NetPopulation(int size, Supplier<NeuralNet2> supplier) {
     super(size, supplier);
   }
 
-  public abstract double getFitness(NeuralNet net);
+  public abstract double getFitness(NeuralNet2 net);
   
-  private final double MAX_MUTATION = 1.0;
-  private final double MUTATION_RATE = 0.1;
-  private final double RESIZE_RATE = 0.01;
-
   @Override
-  public NeuralNet mutate(NeuralNet self) {
-    // TODO: fix this code to allow architecture to mutate w/o ugliness
+  public NeuralNet2 mutate(NeuralNet2 net) {
+    double maxMutation = 1.0;
+    double mutationRate = 0.1;
+    double resizeRate = 0.01;
     // TODO: allow number of layers to change?
-    int N = self.weights().length;
-    RealMatrix w[] = new RealMatrix[N];
-    for (int k = 0; k < N; k++) {
-      // HACKy
-      int rows = k == 0 ?                        // if first matrix
-                 self.weights()[0].getRowDimension() : // number of inputs
-                 w[k - 1].getColumnDimension();  // else copy from last layer
-      int cols = self.weights()[k].getColumnDimension();
-      // with some probability, change the output size of the matrix
-      if (k < N - 1 && Math.random() < RESIZE_RATE) {
-        cols += Math.random() < 0.5 ? 1 : -1;
-        if (cols < 2) { cols = 2; } // must have 2 neurons, 1 + bias, in each layer
-      }
 
-      w[k] = MatrixUtils.createRealMatrix(rows, cols);
-      for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-          // HACK: looks ugly
-          double value = i < self.weights()[k].getRowDimension() &&
-                         j < self.weights()[k].getColumnDimension() ?
-                         self.weights()[k].getEntry(i, j) :
-                         Math.random() < 0.5 ? 1 : -1;
-          // with probability MUTATION_RATE..
-          if (Math.random() < MUTATION_RATE) {
-            // ..alter the weight by less than MAX_MUTATION
-            value += Util.random() * MAX_MUTATION;
-          }
-          w[k].setEntry(i, j, value);
-        }
+    // Get current dimensions
+    List<Integer> dims = new ArrayList<>();
+    dims.add(net.getLayer(0).getRowDimension());
+    for (int i = 0; i < net.size(); i++) {
+      dims.add(net.getLayer(i).getColumnDimension());
+    }
+    // Tweak dimensions, ignoring first and last
+    for(int i = 1; i < dims.size() - 1; i++) {
+      if (Math.random() < resizeRate) {
+        int newDim = dims.get(i) + Math.random() < 0.5 ? 1 : -1;
+        if (newDim < 2) { newDim = 2; }
+        dims.set(i, newDim);
       }
     }
-    return new NeuralNet(w);
+
+    // Create new layers
+    List<RealMatrix> newLayers = new ArrayList<>();
+    int oldLayerIndex = 0;
+    for (Pair<Integer, Integer> dim : chain(dims)) {
+      int rows = dim.getLeft(), cols = dim.getRight();
+      RealMatrix newLayer = MatrixUtils.createRealMatrix(rows, cols);
+      RealMatrix oldLayer = net.getLayer(oldLayerIndex++);
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+          double value;
+          if (i < oldLayer.getRowDimension() && j < oldLayer.getColumnDimension()) {
+            value = oldLayer.getEntry(i, j);
+          } else {
+            value = NeuralNet2.newEntry();
+          }
+          if (Math.random() < mutationRate) {
+            value += Util.random() * maxMutation;
+          }
+          newLayer.setEntry(i, j, value);
+        }
+      }
+      newLayers.add(newLayer);
+    }
+    return new NeuralNet2(newLayers);
   }
 
   @Override
-  public NeuralNet crossover(NeuralNet self, NeuralNet other) {
+  public NeuralNet2 crossover(NeuralNet2 a, NeuralNet2 b) {
     // TODO: handle crossover between varied architectures?
     // TODO: don't just cut between matrices
-    RealMatrix otherWeights[] = other.weights();
-
-    if (self.weights().length != otherWeights.length) {
+    if (a.size() != b.size()) {
       throw new RuntimeException("Invalid crossover attempted.");
     }
 
-    int N = self.weights().length;
-    RealMatrix newWeights[] = new RealMatrix[N];
-    // choose a point to cut
-    int cross = (int)(Math.random() * (N + 1));
-    // return this[0..x] :: other[x..N]
-    for (int i = 0; i < N; i++) {
-      if (i < cross) {
-        newWeights[i] = self.weights()[i].copy();
+    // Choose layers randomly between a and b
+    List<RealMatrix> newLayers = new ArrayList<>();
+    for (int i = 0; i < a.size(); i++) {
+      if (Math.random() < 0.5) {
+        newLayers.add(a.getLayer(i));
       } else {
-        newWeights[i] = otherWeights[i].copy();
+        newLayers.add(b.getLayer(i));
       }
     }
-    return new NeuralNet(newWeights);
+
+    return new NeuralNet2(newLayers);
   }
 }

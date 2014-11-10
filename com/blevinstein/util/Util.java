@@ -9,8 +9,10 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+
 
 // Various static utility functions.
 
@@ -38,8 +40,10 @@ public abstract class Util {
     return Math.random() * 2 - 1;
   }
 
-  public static final int CENTER = 0, NE = 1, S = 2, SE = 3, NW = 4;
-  public static void placeText(Graphics g, int align, String s, int x, int y) {
+  public static enum Align {
+    CENTER, NE, S, SE, NW;
+  }
+  public static void placeText(Graphics g, Align align, String s, int x, int y) {
     FontMetrics fm = g.getFontMetrics();
     switch (align) {
       case CENTER:
@@ -93,18 +97,18 @@ public abstract class Util {
 
       // add label
       g.setColor(Color.BLACK);
-      Util.placeText(g, Util.S,
-                     String.format("[%.1f, %.1f)", min + bucketSize * i, min + bucketSize * (i + 1)),
-                     (int)(x + width * (i + 0.5)), y + sy - 10);
+      Util.placeText(g, Align.S,
+          String.format("[%.1f, %.1f)", min + bucketSize * i, min + bucketSize * (i + 1)),
+          (int)(x + width * (i + 0.5)), y + sy - 10);
     }
   }
 
-  public static Boolean[] randomBits(int n) {
-    Boolean b[] = new Boolean[n];
+  public static List<Boolean> randomBits(int n) {
+    List<Boolean> list = new ArrayList<>();
     for (int i = 0; i < n; i++) {
-      b[i] = Math.random() < 0.5;
+      list.add(Math.random() < 0.5);
     }
-    return b;
+    return list;
   }
 
   // gives whether two circles, centered at point p with radius r, intersect

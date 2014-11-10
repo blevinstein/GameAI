@@ -3,6 +3,8 @@ package com.blevinstein.image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
+import com.blevinstein.net.Signal;
+
 // Converts an image into neuron inputs by slicing the image into a N x M grid
 // and taking the average value (as in HSV) of each section of the image.
 //
@@ -16,7 +18,7 @@ public class ValueChannel extends Channel {
     _m = m;
   }
 
-  public double[] toDoubles(BufferedImage image) {
+  public Signal toSignal(BufferedImage image) {
     if (image == null) {
       throw new IllegalArgumentException();
     }
@@ -43,7 +45,7 @@ public class ValueChannel extends Channel {
     for (int i = 0; i < values.length; i++) {
       values[i] = (values[i] - min) / (max - min) * 2.0 - 1.0;
     }
-    return values;
+    return new Signal(values);
   }
 
   // Gets the average value (as in HSV) of all pixels in an image

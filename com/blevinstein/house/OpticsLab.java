@@ -3,10 +3,11 @@ package com.blevinstein.house;
 import com.blevinstein.image.ImageClassifier;
 import com.blevinstein.image.ValueChannel;
 import com.blevinstein.net.LetterConverter;
-import com.blevinstein.net.NeuralNet;
+import com.blevinstein.net.NeuralNet2;
 import com.blevinstein.util.Json;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
+import com.blevinstein.util.Util.Align;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -69,7 +70,7 @@ class OpticsLab extends JPanel implements KeyListener {
     g.setColor(Color.WHITE);
     g.setFont(new Font(font, Font.PLAIN, 30));
     //g.setFont(new Font("Arial", Font.PLAIN, 34));
-    Util.placeText(g, Util.CENTER, letter,
+    Util.placeText(g, Align.CENTER, letter,
     image.getWidth() / 2, image.getHeight() / 2);
     /*
     image.getWidth()/2 + (int)(image.getWidth()/4*Util.random()),
@@ -154,20 +155,20 @@ class OpticsLab extends JPanel implements KeyListener {
 
     // letter in the bottom left
     g.setFont(new Font("Arial", Font.PLAIN, 100));
-    Util.placeText(g, Util.CENTER, guess, getWidth() / 4, getHeight() * 3 / 4);
+    Util.placeText(g, Align.CENTER, guess, getWidth() / 4, getHeight() * 3 / 4);
 
     g.setFont(new Font("Arial", Font.PLAIN, 15));
 
     // draw success % since last reset
-    Util.placeText(g, Util.NE,
+    Util.placeText(g, Align.NE,
                    String.format("Success: %2.2f%%", correctPercent),
                    getWidth() - 20, 20);
 
     // draw help
     if (displayHelp) {
-      Util.placeText(g, Util.SE, HELP, getWidth() - 20, getHeight() - 20);
+      Util.placeText(g, Align.SE, HELP, getWidth() - 20, getHeight() - 20);
     } else {
-      Util.placeText(g, Util.SE, "H for help", getWidth() - 20, getHeight() - 20);
+      Util.placeText(g, Align.SE, "H for help", getWidth() - 20, getHeight() - 20);
     }
   }
 
@@ -177,10 +178,10 @@ class OpticsLab extends JPanel implements KeyListener {
         correct = incorrect = 0;
         break;
       case KeyEvent.VK_S:
-        Json.save(_classifier.net(), "classifier.json");
+        Json.save(_classifier.getNet(), "classifier.json");
         break;
       case KeyEvent.VK_L:
-        NeuralNet newNet = Json.load("classifier.json", NeuralNet.class);
+        NeuralNet2 newNet = Json.load("classifier.json", NeuralNet2.class);
         if (newNet != null) { _classifier.setNet(newNet); }
         break;
       case KeyEvent.VK_T:

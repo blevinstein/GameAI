@@ -1,7 +1,7 @@
 package com.blevinstein.net;
 
 public interface Converter<T> {
-  public double[] toDoubles(T value);
-  public T fromDoubles(double doubles[]);
+  public Signal toSignal(T value);
+  public T fromSignal(Signal signal);
   public int bits(); // return the bit width of this converter
 }

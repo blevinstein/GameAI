@@ -1,12 +1,14 @@
 package com.blevinstein.house;
 
 import com.blevinstein.net.BinaryConverter;
-import com.blevinstein.net.Converters;
+import com.blevinstein.net.ListConverter;
 import com.blevinstein.net.NetAdapter;
-import com.blevinstein.net.NeuralNet;
+import com.blevinstein.net.NeuralNet2;
+import com.blevinstein.net.NeuralNet2.Style;
 import com.blevinstein.util.Json;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
+import com.blevinstein.util.Util.Align;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -36,12 +38,12 @@ class NetLab extends JPanel implements KeyListener {
     "R to reset correct % stats. ";
 
 
-  private NetAdapter<Boolean[], Boolean> adapter = new NetAdapter<>(Converters.array(Boolean.class, 2),
-      new BinaryConverter());
-  private Boolean[] state = Util.randomBits(2);
-  private Map<String, Function<Boolean[], Boolean>> functions = new HashMap<>();
+  private NetAdapter<List<Boolean>, Boolean> adapter =
+      new NetAdapter<>(new ListConverter<Boolean>(new BinaryConverter(), 2), new BinaryConverter());
+  private List<Boolean> state = Util.randomBits(2);
+  private Map<String, Function<List<Boolean>, Boolean>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
-  private Function<Boolean[], Boolean> f;
+  private Function<List<Boolean>, Boolean> f;
 
   public NetLab() {
     super(null); // no layout manager
@@ -57,15 +59,15 @@ class NetLab extends JPanel implements KeyListener {
     this.add(selectFunction);
 
     addFunction("XOR", inputs ->
-                inputs[0] ^ inputs[1]);
+        inputs.get(0) ^ inputs.get(1));
     addFunction("A", inputs ->
-                inputs[0]);
+        inputs.get(0));
     addFunction("B", inputs ->
-                inputs[1]);
+        inputs.get(1));
     addFunction("AND", inputs ->
-                inputs[0] && inputs[1]);
+        inputs.get(0) && inputs.get(1));
     addFunction("OR", inputs ->
-                inputs[0] || inputs[1]);
+        inputs.get(0) || inputs.get(1));
 
     f = functions.get(selectFunction.getItemAt(0));
     selectFunction.addActionListener(e ->
@@ -74,7 +76,7 @@ class NetLab extends JPanel implements KeyListener {
                                                selectFunction.getSelectedIndex())));
   }
 
-  private void addFunction(String name, Function<Boolean[], Boolean> function) {
+  private void addFunction(String name, Function<List<Boolean>, Boolean> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
@@ -96,22 +98,22 @@ class NetLab extends JPanel implements KeyListener {
     g.fillRect(0, 0, getWidth(), getHeight());
 
     adapter.drawState(g, state, 10, 10, getWidth() - 20, getHeight() - 20,
-                      svd ? NeuralNet.SVD : NeuralNet.MAG);
+                      svd ? Style.SVD : Style.MAG);
 
     // draw overlay text last
     g.setColor(Color.BLACK);
     g.setFont(new Font("Arial", Font.PLAIN, 15));
 
     // draw success % since last reset
-    Util.placeText(g, Util.NE,
+    Util.placeText(g, Align.NE,
                    String.format("Success: %2.2f%%", correctPercent),
                    getWidth() - 20, 20);
 
     // draw help
     if (displayHelp) {
-      Util.placeText(g, Util.SE, HELP, getWidth() - 20, getHeight() - 20);
+      Util.placeText(g, Align.SE, HELP, getWidth() - 20, getHeight() - 20);
     } else {
-      Util.placeText(g, Util.SE, "H for help", getWidth() - 20, getHeight() - 20);
+      Util.placeText(g, Align.SE, "H for help", getWidth() - 20, getHeight() - 20);
     }
   }
 
@@ -139,7 +141,7 @@ class NetLab extends JPanel implements KeyListener {
   public void keyPressed(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_L:
-        NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
+        NeuralNet2 newNet = Json.load("patient.json", NeuralNet2.class);
         if (newNet != null) { adapter.setNet(newNet); }
         repaint();
         break;
@@ -147,7 +149,7 @@ class NetLab extends JPanel implements KeyListener {
         correct = incorrect = 0;
         break;
       case KeyEvent.VK_S:
-        Json.save(adapter.net(), "patient.json");
+        Json.save(adapter.getNet(), "patient.json");
         break;
       case KeyEvent.VK_T:
         training = !training;

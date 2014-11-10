@@ -1,12 +1,15 @@
 package com.blevinstein.house;
 
-import com.blevinstein.net.Converters;
+import com.blevinstein.net.BinaryConverter;
+import com.blevinstein.net.ListConverter;
 import com.blevinstein.net.NetAdapter;
 import com.blevinstein.net.NetPopulation;
-import com.blevinstein.net.NeuralNet;
+import com.blevinstein.net.NeuralNet2;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
+import com.blevinstein.util.Util.Align;
 
+import com.google.common.collect.ImmutableList;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.Color;
@@ -15,6 +18,7 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.function.Function;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -32,7 +36,7 @@ class PopLab extends JPanel implements KeyListener {
 
   private SimplePopulation population;
 
-  private Map<String, Function<Boolean[], Boolean[]>> functions = new HashMap<>();
+  private Map<String, Function<List<Boolean>, Boolean>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
 
   public PopLab() {
@@ -49,15 +53,15 @@ class PopLab extends JPanel implements KeyListener {
     this.add(selectFunction);
 
     addFunction("XOR", inputs ->
-                new Boolean[] {inputs[0] ^ inputs[1]});
+        inputs.get(0) ^ inputs.get(1));
     addFunction("A", inputs ->
-                new Boolean[] {inputs[0]});
+        inputs.get(0));
     addFunction("B", inputs ->
-                new Boolean[] {inputs[1]});
+        inputs.get(1));
     addFunction("AND", inputs ->
-                new Boolean[] {inputs[0] && inputs[1]});
+        inputs.get(0) && inputs.get(1));
     addFunction("OR", inputs ->
-                new Boolean[] {inputs[0] || inputs[1]});
+        inputs.get(0) || inputs.get(1));
 
     setFunction(functions.get(selectFunction.getItemAt(0)));
     selectFunction.addActionListener(e ->
@@ -68,13 +72,13 @@ class PopLab extends JPanel implements KeyListener {
     population = new SimplePopulation(POPULATION_SIZE);
   }
 
-  private void addFunction(String name, Function<Boolean[], Boolean[]> function) {
+  private void addFunction(String name, Function<List<Boolean>, Boolean> function) {
     selectFunction.addItem(name);
     functions.put(name, function);
   }
 
-  private Function<Boolean[], Boolean[]> currentFunction;
-  private void setFunction(Function<Boolean[], Boolean[]> f) {
+  private Function<List<Boolean>, Boolean> currentFunction;
+  private void setFunction(Function<List<Boolean>, Boolean> f) {
     currentFunction = f;
   }
 
@@ -124,9 +128,9 @@ class PopLab extends JPanel implements KeyListener {
 
     // draw help
     if (displayHelp) {
-      Util.placeText(g, Util.SE, HELP, getWidth() - 20, getHeight() - 20);
+      Util.placeText(g, Align.SE, HELP, getWidth() - 20, getHeight() - 20);
     } else {
-      Util.placeText(g, Util.SE, "H for help", getWidth() - 20, getHeight() - 20);
+      Util.placeText(g, Align.SE, "H for help", getWidth() - 20, getHeight() - 20);
     }
   }
 
@@ -155,29 +159,28 @@ class PopLab extends JPanel implements KeyListener {
 
   // Represents a population of 2-input 1-output neural networks learning a function
   public static class SimplePopulation extends NetPopulation {
-    private Function<Boolean[], Boolean[]> function;
+    private Function<List<Boolean>, Boolean> function;
 
     public SimplePopulation(int size) {
-      super(size, () -> new NeuralNet(new int[]{2, 2, 1}));
+      super(size, () -> new NeuralNet2(new int[]{2, 2, 1}));
     }
     
-    public void setFunction(Function<Boolean[], Boolean[]> function) {
+    public void setFunction(Function<List<Boolean>, Boolean> function) {
       this.function = function;
     }
 
     @Override
-    public double getFitness(NeuralNet individual) {
-      NetAdapter<Boolean[], Boolean[]> adapter =
-          new NetAdapter<>(Converters.array(Boolean.class, 2),
-          Converters.array(Boolean.class, 1));
-      Boolean cases[][] = {{false, false},
-          {false, true},
-          {true, false},
-          {false, false}};
+    public double getFitness(NeuralNet2 individual) {
+      NetAdapter<List<Boolean>, Boolean> adapter =
+          new NetAdapter<>(new ListConverter<Boolean>(new BinaryConverter(), 2), new BinaryConverter());
+      List<List<Boolean>> cases = ImmutableList.of(ImmutableList.of(false, false),
+          ImmutableList.of(false, true),
+          ImmutableList.of(true, false),
+          ImmutableList.of(true, true));
       double score = 0.0;
-      for (Boolean[] kase : cases) {
-        boolean expected = function.apply(kase)[0];
-        boolean actual = adapter.process(kase)[0];
+      for (List<Boolean> kase : cases) {
+        boolean expected = function.apply(kase);
+        boolean actual = adapter.process(kase);
         if (actual == expected) { score += 1; }
       }
       return score;

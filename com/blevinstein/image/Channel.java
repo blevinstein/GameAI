@@ -1,6 +1,7 @@
 package com.blevinstein.image;
 
 import com.blevinstein.net.Converter;
+import com.blevinstein.net.Signal;
 
 import java.awt.image.BufferedImage;
 
@@ -10,13 +11,13 @@ import java.awt.image.BufferedImage;
 // invalid to use it as an output converter.
 
 public abstract class Channel implements Converter<BufferedImage> {
-  public abstract double[] toDoubles(BufferedImage image);
+  public abstract Signal toSignal(BufferedImage image);
   public abstract int bits();
 
   // Input-only by default
   // NOTE: to return a low-res approximation, a Channel implementation can
   //       override this method
-  public BufferedImage fromDoubles(double doubles[]) {
+  public BufferedImage fromSignal(Signal signal) {
     throw new UnsupportedOperationException();
   }
 }

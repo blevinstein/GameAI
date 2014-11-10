@@ -1,5 +1,7 @@
 package com.blevinstein.net;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.Arrays;
 
 // Represents a conversion between a neural network and a finite selection.
@@ -8,43 +10,35 @@ import java.util.Arrays;
 // represented by an int 0-25, or as 26 neuron inputs.
 
 public class EnumConverter implements Converter<Integer> {
-  int _n;
+  int n;
 
   public EnumConverter(int n) {
-    _n = n;
+    this.n = n;
   }
 
-  public double[] toDoubles(Integer value) {
-    // Accepts a value in [0, n)
-    if (value < 0 || value >= _n)
-      throw new IllegalArgumentException(
-        "Value " + value + " is not between 0 and " + _n + "!");
+  public Signal toSignal(Integer value) {
+    checkArgument(value >= 0 && value < n,
+        String.format("Value %d is not between 0 and %d.", value, n));
 
-    // Gives n bits of output
-    double inputs[] = new double[_n];
-
-    // All zeroes except for the chosen value
-    Arrays.fill(inputs, 0.0);
-    inputs[value] = 1.0;
-
-    return inputs;
+    double[] doubles = new double[n];
+    Arrays.fill(doubles, -1.0);
+    doubles[value] = 1.0;
+    return new Signal(doubles);
   }
 
-  public Integer fromDoubles(double doubles[]) {
-    // Accepts a set of _n inputs
-    if (doubles.length != _n)
-      throw new IllegalArgumentException(
-        "Received " + doubles.length + "bits, expected " + _n + "!");
+  public Integer fromSignal(Signal signal) {
+    checkArgument(signal.size() == n,
+        String.format("Expected %d bits but received %d.", n, signal.size()));
 
     // Returns the index of the largest input
-    Integer result = 0;
-    for (int i = 1; i < _n; i++) {
-      if (doubles[i] > doubles[result]) {
+    int result = 0;
+    for (int i = 1; i < n; i++) {
+      if (signal.get(i) > signal.get(result)) {
         result = i;
       }
     }
     return result;
   }
 
-  public int bits() { return _n; }
+  public int bits() { return n; }
 }

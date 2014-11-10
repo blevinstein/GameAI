@@ -7,16 +7,16 @@ public class LetterConverter implements Converter<String> {
   // does all the heavy lifting
   private EnumConverter slave = new EnumConverter(26);
 
-  public double[] toDoubles(String value) {
+  public Signal toSignal(String value) {
     int loc = LETTERS.indexOf(value);
     if (loc == -1) {
       throw new IllegalArgumentException("Expected a letter, got " + value + "!");
     }
-    return slave.toDoubles(loc);
+    return slave.toSignal(loc);
   }
 
-  public String fromDoubles(double doubles[]) {
-    int loc = slave.fromDoubles(doubles);
+  public String fromSignal(Signal signal) {
+    int loc = slave.fromSignal(signal);
     return LETTERS.charAt(loc) + "";
   }
 
