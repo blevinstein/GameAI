@@ -38,6 +38,9 @@ public class NeuralNet {
 
   private final int N; // numbers of layers, for convenience
 
+  // TODO: add capability to normalize network output
+  // TODO: make NetAdapter the primary interface?
+
   public NeuralNet(int inputs, int outputs) {
     this(new int[] {inputs, (int)Math.round((inputs + outputs) / 2.0), outputs});
   }
@@ -106,9 +109,6 @@ public class NeuralNet {
   */
   private double sigmoid(double x) { return Math.tanh(x); }                        // S = tanh(x)
   private double d_sigmoid(double x) { double t = Math.tanh(x); return 1 - t * t; } // dS/dx = 1 - tanh(x)^2
-
-  // TODO: allow normalizing input, xi' = (xi - offset) * scalar
-  // TODO: allow normalizing output/feedback
 
   // convenience methods to append (wrap) and remove (unwrap)
   // a trailing -1

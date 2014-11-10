@@ -48,6 +48,7 @@ public abstract class Population<T> {
       }
       newPopulation.add(mutate(child));
     }
+    clearFitness();
     population = newPopulation;
     epochs++;
   }
@@ -72,7 +73,7 @@ public abstract class Population<T> {
   
   // memoized fitness function
   private Map<T, Double> fitnessMemory = new HashMap<>();
-  private double fitness(T individual) {
+  protected double fitness(T individual) {
     if (fitnessMemory.containsKey(individual)) {
       return fitnessMemory.get(individual);
     } else {
@@ -80,6 +81,9 @@ public abstract class Population<T> {
       fitnessMemory.put(individual, value);
       return value;
     }
+  }
+  protected void clearFitness() {
+    fitnessMemory.clear();
   }
 
   // returns the top n individuals by fitness

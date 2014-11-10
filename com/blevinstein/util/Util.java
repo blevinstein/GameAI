@@ -20,7 +20,12 @@ public abstract class Util {
   // NOTE: expects positive values in the array
   public static int choose(double prob[]) {
     double total = 0;
-    for (int i = 0; i < prob.length; i++) { total += prob[i]; }
+    for (int i = 0; i < prob.length; i++) {
+      if (prob[i] < 0) {
+        throw new IllegalArgumentException("choose() cannot handle negative elements");
+      }
+      total += prob[i];
+    }
 
     double chosen = total * Math.random();
     int k = 0;

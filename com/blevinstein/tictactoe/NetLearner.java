@@ -47,6 +47,10 @@ class NetLearner implements Learner<T3State, T3Move> {
 
     double input[] = s.toDoubles();
     double output[] = _net.process(input);
+    // normalize output -1..1 => 0..1
+    for (int i = 0; i < output.length; i++) {
+      output[i] = (output[i] + 1.0) / 2.0;
+    }
 
     int idx = Util.choose(output);
     T3Move m = new T3Move(idx / 3, idx % 3);

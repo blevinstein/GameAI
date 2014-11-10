@@ -43,6 +43,7 @@ class TicTacToe extends JPanel implements KeyListener {
   public TicTacToe() {
     // HACK: creates a NetLearner to get the right size of neural net
     population = new PlayerPopulation(POPULATION_SIZE);
+    population.setOpponent(memLearner);
 
     setMode(netLearner, null, "NxP");
 
@@ -218,6 +219,10 @@ class TicTacToe extends JPanel implements KeyListener {
 
     public PlayerPopulation(int size) {
       super(size, () -> new NetLearner().net());
+    }
+
+    public void setOpponent(Learner<T3State, T3Move> opponent) {
+      this.opponent = opponent;
     }
 
     @Override
