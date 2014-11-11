@@ -67,20 +67,22 @@ public class NeuralNet2 {
   }
 
   public NeuralNet2(int... sizes) {
-    // Copy into a List
+    layers = new ArrayList<>();
+
+    // Copy sizes into a List
     List<Integer> sizeList = new ArrayList<>();
     for (int size : sizes) { sizeList.add(size); }
 
     // Create each matrix
     for (Pair<Integer, Integer> dim : chain(sizeList)) {
-      // N+1 to include bias term
+      // I+1,J+1 to include bias term
       RealMatrix layer = MatrixUtils.createRealMatrix(dim.getLeft() + 1, dim.getRight() + 1);
       for (int i = 0; i < layer.getRowDimension(); i++) {
         for (int j = 0; j < layer.getColumnDimension(); j++) {
           layer.setEntry(i, j, newEntry());
         }
       }
-      layer = affinize(normalize(layer));
+      layers.add(affinize(normalize(layer)));
     }
   }
 
