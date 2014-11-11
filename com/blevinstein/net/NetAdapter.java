@@ -9,9 +9,6 @@ import java.awt.Graphics;
 // explicitly converting to and from double[] each time.
 //
 // Only exposes selected methods.
-//
-// TODO: Revisit this implementation, decide whether it's worth trying to
-// move this kind of stuff into the NeuralNet class itself.
 
 public class NetAdapter<X, Y> {
   private Converter<X> cin;

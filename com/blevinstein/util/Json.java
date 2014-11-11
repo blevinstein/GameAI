@@ -35,12 +35,6 @@ public class Json {
   private static Gson init() {
     GsonBuilder builder = new GsonBuilder();
     builder.setPrettyPrinting();
-    /*
-    builder.registerTypeAdapter(Population.class, new PopulationSerializer());
-    builder.registerTypeAdapter(Population.class, new PopulationDeserializer());
-    builder.registerTypeAdapter(NeuralNet.class, new NeuralNetSerializer());
-    builder.registerTypeAdapter(NeuralNet.class, new NeuralNetDeserializer());
-    */
     return builder.create();
   }
 
@@ -66,55 +60,4 @@ public class Json {
       return null;
     }
   }
-
-  /*
-  private static class PopulationSerializer
-    implements JsonSerializer<Population<NeuralNet>> {
-    public JsonElement serialize(Population<NeuralNet> src,
-                                 Type typeOfSrc,
-                                 JsonSerializationContext context) {
-      JsonArray array = new JsonArray();
-      for (NeuralNet net : src.getPopulation()) {
-        array.add(gson.toJsonTree(net.toDoubles()));
-      }
-      return array;
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static class PopulationDeserializer
-    implements JsonDeserializer<Population<NeuralNet>> {
-    public Population<NeuralNet> deserialize(JsonElement json,
-        Type type,
-        JsonDeserializationContext context)
-    throws JsonParseException {
-      double[][][][] array = gson.fromJson(json, double[][][][].class);
-      List<NeuralNet> list = new ArrayList<NeuralNet>();
-      for (double[][][] subarray : array) { list.add(new NeuralNet(subarray)); }
-      return new Population<NeuralNet>(list);
-    }
-  }
-  // TODO: make Population[Des,S]erializer work for Population<?>
-
-  public static class NeuralNetSerializer
-    implements JsonSerializer<NeuralNet> {
-    public JsonElement serialize(NeuralNet src,
-                                 Type typeOfSrc,
-                                 JsonSerializationContext context) {
-      // serialize as double[][][]
-      return gson.toJsonTree(src.toDoubles());
-    }
-  }
-
-  public static class NeuralNetDeserializer
-    implements JsonDeserializer<NeuralNet> {
-    public NeuralNet deserialize(JsonElement json,
-                                 Type type,
-                                 JsonDeserializationContext context)
-    throws JsonParseException {
-      // deserialize from double[][][]
-      return new NeuralNet(gson.fromJson(json, double[][][].class));
-    }
-  }
-  */
 }
