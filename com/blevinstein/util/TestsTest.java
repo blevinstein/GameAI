@@ -15,10 +15,11 @@ public class TestsTest {
   @Test
   public void testAssertAverage() {
     double alpha = 0.05;
+    int n = 100;
     NormalDistribution distribution = new NormalDistribution();
 
-    // Expect at most 2 * alpha percentage failures
-    assertAtLeast((int)(100 * (1 - alpha * 2)), 100, () -> {
+    // Expect at most 3 * alpha percentage failures
+    assertAtLeast((int)(n * (1 - alpha * 3)), n, () -> {
           assertAverage(0.0, alpha, 20, () -> distribution.sample());
     });
   }

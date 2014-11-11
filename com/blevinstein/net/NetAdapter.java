@@ -2,6 +2,7 @@ package com.blevinstein.net;
 
 import static com.blevinstein.net.NeuralNet.Style;
 
+import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import java.awt.Graphics;
 
@@ -21,7 +22,8 @@ public class NetAdapter<X, Y> {
   public NetAdapter(Converter<X> cin, Converter<Y> cout) {
     this.cin = cin;
     this.cout = cout;
-    this.net = new NeuralNet(cin.bits(), cout.bits());
+    this.net = NeuralNet.create(
+        ImmutableList.of(cin.bits(), Math.max(cin.bits(), cout.bits()), cout.bits()));
   }
 
   public Y process(X input) {

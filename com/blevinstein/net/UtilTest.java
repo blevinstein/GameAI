@@ -12,6 +12,10 @@ public class UtilTest {
     assertEquals(
         Util.chain(ImmutableList.of(1, 2, 3)),
         ImmutableList.of(Pair.of(1, 2), Pair.of(2, 3)));
+
+    assertEquals(
+        Util.chain(ImmutableList.of(2, 4)),
+        ImmutableList.of(Pair.of(2, 4)));
   }
 
   @Test

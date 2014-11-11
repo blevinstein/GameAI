@@ -59,22 +59,19 @@ public class NeuralNet {
     // deep copy
     return Lists.transform(layers, layer -> layer.copy());
   }
-
-  public NeuralNet(int inputs, int outputs) {
-    this(inputs,
-         (int)Math.round((inputs + outputs) / 2.0),
-         outputs);
+  public int getInputs() {
+    return layers.get(0).getRowDimension() - 1;
+  }
+  public int getOutputs() {
+    return layers.get(layers.size() - 1).getColumnDimension() - 1;
   }
 
-  public NeuralNet(int... sizes) {
-    layers = new ArrayList<>();
-
-    // Copy sizes into a List
-    List<Integer> sizeList = new ArrayList<>();
-    for (int size : sizes) { sizeList.add(size); }
-
+  public static NeuralNet create(List<Integer> sizes) {
     // Create each matrix
-    for (Pair<Integer, Integer> dim : chain(sizeList)) {
+    System.out.println("Create net size " + sizes);
+    List<RealMatrix> layers = new ArrayList<>();
+    for (Pair<Integer, Integer> dim : chain(sizes)) {
+      System.out.println("Create layer size " + dim.getLeft() + "," + dim.getRight());
       // I+1,J+1 to include bias term
       RealMatrix layer = MatrixUtils.createRealMatrix(dim.getLeft() + 1, dim.getRight() + 1);
       for (int i = 0; i < layer.getRowDimension(); i++) {
@@ -84,12 +81,13 @@ public class NeuralNet {
       }
       layers.add(affinize(normalize(layer)));
     }
+    return new NeuralNet(layers);
   }
 
   public NeuralNet(List<RealMatrix> layers) {
     this.layers = new ArrayList<>();
     for (int i = 0; i < layers.size(); i++) {
-      this.layers.add(affinize(normalize(layers.get(i))));
+      this.layers.add(layers.get(i));
     }
   }
 
@@ -132,6 +130,8 @@ public class NeuralNet {
   }
 
   public List<Signal> propagate(Signal input) {
+    checkArgument(input.size() + 1 == getInputs(), "Wrong size input supplied.");
+
     Signal current = input;
 
     List<Signal> wave = new ArrayList<>();
@@ -204,7 +204,7 @@ public class NeuralNet {
   // Synapse width corresponds to weight.
   // Arrowed "1.0 => 0.76" on neuron gives the input and output of the sigmoid.
   // mode determines method of drawing connections, MAG or SVD.
-  // TODO: refactor this monstrosity...
+  // TODO: refactor this awful crap into another file
   public void drawState(Graphics g, Signal input,
                         int x, int y, int sx, int sy) {
     drawState(g, input, x, y, sx, sy, Style.MAG);

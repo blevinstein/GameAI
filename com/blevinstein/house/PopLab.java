@@ -162,7 +162,7 @@ class PopLab extends JPanel implements KeyListener {
     private Function<List<Boolean>, Boolean> function;
 
     public SimplePopulation(int size) {
-      super(size, () -> new NeuralNet(new int[]{2, 2, 1}));
+      super(size, () -> NeuralNet.create(ImmutableList.of(2, 2, 1)));
     }
     
     public void setFunction(Function<List<Boolean>, Boolean> function) {
