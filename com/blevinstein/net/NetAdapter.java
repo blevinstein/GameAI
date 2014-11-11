@@ -1,6 +1,6 @@
 package com.blevinstein.net;
 
-import static com.blevinstein.net.NeuralNet2.Style;
+import static com.blevinstein.net.NeuralNet.Style;
 
 import java.util.function.Function;
 import java.awt.Graphics;
@@ -14,14 +14,14 @@ public class NetAdapter<X, Y> {
   private Converter<X> cin;
   private Converter<Y> cout;
 
-  private NeuralNet2 net;
-  public NeuralNet2 getNet() { return net; }
-  public void setNet(NeuralNet2 net) { this.net = net; }
+  private NeuralNet net;
+  public NeuralNet getNet() { return net; }
+  public void setNet(NeuralNet net) { this.net = net; }
 
   public NetAdapter(Converter<X> cin, Converter<Y> cout) {
     this.cin = cin;
     this.cout = cout;
-    this.net = new NeuralNet2(cin.bits(), cout.bits());
+    this.net = new NeuralNet(cin.bits(), cout.bits());
   }
 
   public Y process(X input) {

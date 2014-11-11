@@ -4,7 +4,7 @@ import com.blevinstein.net.BinaryConverter;
 import com.blevinstein.net.ListConverter;
 import com.blevinstein.net.NetAdapter;
 import com.blevinstein.net.NetPopulation;
-import com.blevinstein.net.NeuralNet2;
+import com.blevinstein.net.NeuralNet;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
 import com.blevinstein.util.Util.Align;
@@ -162,7 +162,7 @@ class PopLab extends JPanel implements KeyListener {
     private Function<List<Boolean>, Boolean> function;
 
     public SimplePopulation(int size) {
-      super(size, () -> new NeuralNet2(new int[]{2, 2, 1}));
+      super(size, () -> new NeuralNet(new int[]{2, 2, 1}));
     }
     
     public void setFunction(Function<List<Boolean>, Boolean> function) {
@@ -170,7 +170,7 @@ class PopLab extends JPanel implements KeyListener {
     }
 
     @Override
-    public double getFitness(NeuralNet2 individual) {
+    public double getFitness(NeuralNet individual) {
       NetAdapter<List<Boolean>, Boolean> adapter =
           new NetAdapter<>(new ListConverter<Boolean>(new BinaryConverter(), 2), new BinaryConverter());
       List<List<Boolean>> cases = ImmutableList.of(ImmutableList.of(false, false),

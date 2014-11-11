@@ -25,19 +25,19 @@ import org.apache.commons.math3.linear.RealMatrix;
 //   With probability 1-CROSSOVER_RATE, a new individual is copied from the old,
 //   sampling from the _fitness-weighted population.
 
-public abstract class NetPopulation extends Population<NeuralNet2> {
-  public NetPopulation(Collection<NeuralNet2> collection) {
+public abstract class NetPopulation extends Population<NeuralNet> {
+  public NetPopulation(Collection<NeuralNet> collection) {
     super(collection);
   }
 
-  public NetPopulation(int size, Supplier<NeuralNet2> supplier) {
+  public NetPopulation(int size, Supplier<NeuralNet> supplier) {
     super(size, supplier);
   }
 
-  public abstract double getFitness(NeuralNet2 net);
+  public abstract double getFitness(NeuralNet net);
   
   @Override
-  public NeuralNet2 mutate(NeuralNet2 net) {
+  public NeuralNet mutate(NeuralNet net) {
     double maxMutation = 1.0;
     double mutationRate = 0.1;
     double resizeRate = 0.01;
@@ -71,7 +71,7 @@ public abstract class NetPopulation extends Population<NeuralNet2> {
           if (i < oldLayer.getRowDimension() && j < oldLayer.getColumnDimension()) {
             value = oldLayer.getEntry(i, j);
           } else {
-            value = NeuralNet2.newEntry();
+            value = NeuralNet.newEntry();
           }
           if (Math.random() < mutationRate) {
             value += Util.random() * maxMutation;
@@ -81,11 +81,11 @@ public abstract class NetPopulation extends Population<NeuralNet2> {
       }
       newLayers.add(newLayer);
     }
-    return new NeuralNet2(newLayers);
+    return new NeuralNet(newLayers);
   }
 
   @Override
-  public NeuralNet2 crossover(NeuralNet2 a, NeuralNet2 b) {
+  public NeuralNet crossover(NeuralNet a, NeuralNet b) {
     // TODO: handle crossover between varied architectures?
     // TODO: don't just cut between matrices
     if (a.size() != b.size()) {
@@ -102,6 +102,6 @@ public abstract class NetPopulation extends Population<NeuralNet2> {
       }
     }
 
-    return new NeuralNet2(newLayers);
+    return new NeuralNet(newLayers);
   }
 }

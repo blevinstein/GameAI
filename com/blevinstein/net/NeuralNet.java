@@ -36,7 +36,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 // http://www.willamette.edu/~gorr/classes/cs449/precond.html
 // http://en.wikipedia.org/wiki/Backpropagation
 
-public class NeuralNet2 {
+public class NeuralNet {
   //[ y0 ]   [ w00 w01 w02 t0 ][ x0 ]
   //[ y1 ] = [ w10 w11 w12 t1 ][ x1 ]
   //[ -1 ]   [ 0   0   0   1  ][ x2 ]
@@ -60,13 +60,13 @@ public class NeuralNet2 {
     return Lists.transform(layers, layer -> layer.copy());
   }
 
-  public NeuralNet2(int inputs, int outputs) {
+  public NeuralNet(int inputs, int outputs) {
     this(inputs,
          (int)Math.round((inputs + outputs) / 2.0),
          outputs);
   }
 
-  public NeuralNet2(int... sizes) {
+  public NeuralNet(int... sizes) {
     layers = new ArrayList<>();
 
     // Copy sizes into a List
@@ -86,7 +86,7 @@ public class NeuralNet2 {
     }
   }
 
-  public NeuralNet2(List<RealMatrix> layers) {
+  public NeuralNet(List<RealMatrix> layers) {
     this.layers = new ArrayList<>();
     for (int i = 0; i < layers.size(); i++) {
       this.layers.add(affinize(normalize(layers.get(i))));

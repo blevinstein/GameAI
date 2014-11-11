@@ -3,7 +3,7 @@ package com.blevinstein.house;
 import com.blevinstein.image.ImageClassifier;
 import com.blevinstein.image.ValueChannel;
 import com.blevinstein.net.LetterConverter;
-import com.blevinstein.net.NeuralNet2;
+import com.blevinstein.net.NeuralNet;
 import com.blevinstein.util.Json;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
@@ -181,7 +181,7 @@ class OpticsLab extends JPanel implements KeyListener {
         Json.save(_classifier.getNet(), "classifier.json");
         break;
       case KeyEvent.VK_L:
-        NeuralNet2 newNet = Json.load("classifier.json", NeuralNet2.class);
+        NeuralNet newNet = Json.load("classifier.json", NeuralNet.class);
         if (newNet != null) { _classifier.setNet(newNet); }
         break;
       case KeyEvent.VK_T:

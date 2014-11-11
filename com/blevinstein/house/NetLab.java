@@ -3,8 +3,8 @@ package com.blevinstein.house;
 import com.blevinstein.net.BinaryConverter;
 import com.blevinstein.net.ListConverter;
 import com.blevinstein.net.NetAdapter;
-import com.blevinstein.net.NeuralNet2;
-import com.blevinstein.net.NeuralNet2.Style;
+import com.blevinstein.net.NeuralNet;
+import com.blevinstein.net.NeuralNet.Style;
 import com.blevinstein.util.Json;
 import com.blevinstein.util.Throttle;
 import com.blevinstein.util.Util;
@@ -141,7 +141,7 @@ class NetLab extends JPanel implements KeyListener {
   public void keyPressed(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_L:
-        NeuralNet2 newNet = Json.load("patient.json", NeuralNet2.class);
+        NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
         if (newNet != null) { adapter.setNet(newNet); }
         repaint();
         break;
