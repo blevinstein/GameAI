@@ -21,7 +21,7 @@ public class ListConverter<T> implements Converter<List<T>> {
 
     List<Double> result = new ArrayList<>();
     for (T value : values) {
-      for (double bit : converter.toSignal(value).getRaw()) {
+      for (double bit : converter.toSignal(value).getVector()) {
         result.add(bit);
       }
     }
@@ -30,7 +30,7 @@ public class ListConverter<T> implements Converter<List<T>> {
 
   public List<T> fromSignal(Signal signal) {
     int bits = converter.bits();
-    double[] raw = signal.getRaw();
+    double[] raw = signal.getVector();
     List<Signal> signals = new ArrayList<>();
     for (int i = 0; i < raw.length; i += bits) {
       signals.add(new Signal(Arrays.copyOfRange(raw, i, bits)));

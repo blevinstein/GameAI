@@ -3,7 +3,9 @@ package com.blevinstein.net;
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
 
 // Represents an input signal as a vector with an implicit trailing -1
 
@@ -33,10 +35,10 @@ public class Signal {
     return vector[i];
   }
   public double[] getVector() {
-    return wrap(vector);
-  }
-  public double[] getRaw() {
     return Arrays.copyOf(vector, vector.length);
+  }
+  public RealVector getRealVector() {
+    return new ArrayRealVector(wrap(vector));
   }
 
   public Signal sigmoid() {
@@ -77,5 +79,19 @@ public class Signal {
   public static double d_sigmoid(double x) {
     double t = Math.tanh(x);
     return 1 - t * t;
+  }
+
+  @Override
+  public boolean equals(Object object) {
+    if (object instanceof Signal) {
+      Signal other = (Signal) object;
+      return Arrays.equals(vector, other.getVector());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(vector);
   }
 }

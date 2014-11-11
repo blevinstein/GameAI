@@ -44,9 +44,6 @@ public class NeuralNet {
   // yi = Sum(wij * xj - ti)
   // t = threshold
   
-  // TODO: add capability to normalize network output
-  // TODO: make NetAdapter the primary interface?
-  
   private List<RealMatrix> layers;
 
   public int size() {
@@ -68,17 +65,10 @@ public class NeuralNet {
 
   public static NeuralNet create(List<Integer> sizes) {
     // Create each matrix
-    System.out.println("Create net size " + sizes);
     List<RealMatrix> layers = new ArrayList<>();
     for (Pair<Integer, Integer> dim : chain(sizes)) {
-      System.out.println("Create layer size " + dim.getLeft() + "," + dim.getRight());
       // I+1,J+1 to include bias term
-      RealMatrix layer = MatrixUtils.createRealMatrix(dim.getLeft() + 1, dim.getRight() + 1);
-      for (int i = 0; i < layer.getRowDimension(); i++) {
-        for (int j = 0; j < layer.getColumnDimension(); j++) {
-          layer.setEntry(i, j, newEntry());
-        }
-      }
+      RealMatrix layer = newMatrix(dim.getLeft() + 1, dim.getRight() + 1);
       layers.add(affinize(normalize(layer)));
     }
     return new NeuralNet(layers);
@@ -92,7 +82,16 @@ public class NeuralNet {
   }
 
   // TODO: write a new norm function that ignores the last column
-  
+
+  public static RealMatrix newMatrix(int rows, int cols) {
+    RealMatrix matrix = MatrixUtils.createRealMatrix(rows, cols);
+    for (int i = 0; i < matrix.getRowDimension(); i++) {
+      for (int j = 0; j < matrix.getColumnDimension(); j++) {
+        matrix.setEntry(i, j, newEntry());
+      }
+    }
+    return matrix;
+  }
   // Sets new entries randomly to +-1
   public static double newEntry() {
     return Math.random() < 0.5 ? 1 : -1;
@@ -108,7 +107,7 @@ public class NeuralNet {
     return result;
   }
 
-  // EXPERIMENTAL: adjust matrix so that the [Frobenius] norm stays constant
+  // EXPERIMENTAL: adjust matrix so that the [Frobenius] norm = sqrt(J)
   //
   // MATH:
   // when matrix is first created, set a_ij = 1/sqrt(A_j), A_j = fan-in to node j = I
@@ -189,8 +188,8 @@ public class NeuralNet {
     // weights -= learningRate * layerSlope
     double learningRate = 0.01;
     for (int i = 0; i < layers.size(); i++) {
-      RealMatrix layerSlope = new ArrayRealVector(wave.get(i).getVector()).outerProduct(
-          new ArrayRealVector(deltas.get(i).getVector()));
+      RealMatrix layerSlope = wave.get(i).getRealVector().outerProduct(
+          deltas.get(i).getRealVector());
       RealMatrix newLayer = layers.get(i).subtract(layerSlope.scalarMultiply(learningRate));
       layers.set(i, affinize(normalize(newLayer)));
     }
