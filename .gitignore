@@ -1,4 +1,7 @@
 *.json
-build
-jar
+build/
+jar/
 test/
+
+.idea/
+*.iml
