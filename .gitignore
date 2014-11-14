@@ -1,7 +1,7 @@
 *.json
 build/
 jar/
-test/
+out/
 
 .idea/
 *.iml
