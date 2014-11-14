@@ -1,9 +1,8 @@
 package com.blevinstein.net;
 
-import static com.blevinstein.net.NeuralNet.Style;
+import com.blevinstein.net.Util.Style;
 
 import com.google.common.collect.ImmutableList;
-import java.util.function.Function;
 import java.awt.Graphics;
 
 // Convenience class for dealing with neural net inputs and outputs without
@@ -39,9 +38,9 @@ public class NetAdapter<X, Y> {
   }
 
   public void drawState(Graphics g, X input, int x, int y, int sx, int sy) {
-    net.drawState(g, cin.toSignal(input), x, y, sx, sy);
+    Util.drawState(g, net, cin.toSignal(input), x, y, sx, sy);
   }
   public void drawState(Graphics g, X input, int x, int y, int sx, int sy, Style mode) {
-    net.drawState(g, cin.toSignal(input), x, y, sx, sy, mode);
+    Util.drawState(g, net, cin.toSignal(input), x, y, sx, sy, mode);
   }
 }

@@ -18,6 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.util.List;
 
+// TODO(blevinstein): fix broken mouse input
+
 @SuppressWarnings("serial")
 class Xade extends JPanel implements KeyListener, ComponentListener {
   private final int FPS = 60;
