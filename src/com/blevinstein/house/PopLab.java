@@ -2,7 +2,6 @@ package com.blevinstein.house;
 
 import com.blevinstein.net.BinaryConverter;
 import com.blevinstein.net.ListConverter;
-import com.blevinstein.net.NetAdapter;
 import com.blevinstein.net.NetPopulation;
 import com.blevinstein.net.NeuralNet;
 import com.blevinstein.util.Throttle;
@@ -13,15 +12,12 @@ import com.google.common.collect.ImmutableList;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Toolkit;
 import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 // This lab helps visualize the progress of an evolving population.
@@ -102,30 +98,6 @@ class PopLab extends JPanel implements KeyListener {
     g.setColor(Color.WHITE);
     g.fillRect(0, 0, getWidth(), getHeight());
 
-    // show histogram
-    /*
-    Util.drawHistogram(g, pop.fitness(), 1.0, 10, 10, getWidth() - 20, getHeight() - 100);
-
-    // show a perfect example
-    for (int i = 0; i < pop.fitness().length; i++) {
-      if (pop.fitness()[i] == 4.0) {
-        NetAdapter<Boolean[], Boolean[]> adapter =
-          new NetAdapter<>(Converters.array(Boolean.class, 2),
-                           Converters.array(Boolean.class, 1));
-        adapter.drawState(g, Util.randomBits(2),
-                          10, 10 + 25, (getWidth() - 20) / 2, (getHeight() - 20) / 2);
-        break;
-      }
-    }
-
-    // draw overlay text last
-    g.setColor(Color.BLACK);
-    g.setFont(new Font("Arial", Font.PLAIN, 15));
-
-    // draw stats
-    Util.placeText(g, Util.NE, pop.stats(), getWidth() - 20, 20);;
-    */
-
     // draw help
     if (displayHelp) {
       Util.placeText(g, Align.SE, HELP, getWidth() - 20, getHeight() - 20);
@@ -169,10 +141,10 @@ class PopLab extends JPanel implements KeyListener {
       this.function = function;
     }
 
+    // TODO(blevinstein): implement ListConverter somehow, and fix this
     @Override
     public double getFitness(NeuralNet individual) {
-      NetAdapter<List<Boolean>, Boolean> adapter =
-          new NetAdapter<>(new ListConverter<Boolean>(new BinaryConverter(), 2), new BinaryConverter());
+      NetAdapter<List<Boolean>, Boolean> adapter = individual.getAdapter();
       List<List<Boolean>> cases = ImmutableList.of(ImmutableList.of(false, false),
           ImmutableList.of(false, true),
           ImmutableList.of(true, false),

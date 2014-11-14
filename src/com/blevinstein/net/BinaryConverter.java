@@ -1,13 +1,18 @@
 package com.blevinstein.net;
 
-public class BinaryConverter implements Converter<Boolean> {
-  // implicit no-argument constructor
+import com.google.common.base.Converter;
 
-  public Signal toSignal(Boolean b) {
+public class BinaryConverter extends Converter<Boolean, Signal> {
+  // implicit no-argument constructor
+  // TODO(blevinstein): implements ProvidesBits, public int bits()?
+
+  @Override
+  public Signal doForward(Boolean b) {
     return new Signal(new double[] {b ? 1.0 : -1.0});
   }
 
-  public Boolean fromSignal(Signal signal) {
+  @Override
+  public Boolean doBackward(Signal signal) {
     return signal.get(0) > 0.0;
   }
 

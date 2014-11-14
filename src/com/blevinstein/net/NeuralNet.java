@@ -1,34 +1,21 @@
 package com.blevinstein.net;
 
 import static com.blevinstein.net.Util.chain;
-import static com.blevinstein.util.Util.multiply;
-import static com.blevinstein.util.Util.placeText;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.blevinstein.util.Util.Align;
-
+import com.google.common.base.Converter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.geom.QuadCurve2D;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.DiagonalMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 // Represents a neural net using metrices.
 //
@@ -36,7 +23,7 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 // http://www.willamette.edu/~gorr/classes/cs449/precond.html
 // http://en.wikipedia.org/wiki/Backpropagation
 
-public class NeuralNet<X, Y> {
+public class NeuralNet {
   //[ y0 ]   [ w00 w01 w02 t0 ][ x0 ]
   //[ y1 ] = [ w10 w11 w12 t1 ][ x1 ]
   //[ -1 ]   [ 0   0   0   1  ][ x2 ]
@@ -54,13 +41,17 @@ public class NeuralNet<X, Y> {
   }
   public List<RealMatrix> getLayers() {
     // deep copy
-    return Lists.transform(layers, layer -> layer.copy());
+    return Lists.transform(layers, RealMatrix::copy);
   }
   public int getInputs() {
     return layers.get(0).getRowDimension() - 1;
   }
   public int getOutputs() {
     return layers.get(layers.size() - 1).getColumnDimension() - 1;
+  }
+
+  public static NeuralNet create(int input, int output) {
+    return create(ImmutableList.of(input, Math.max(input, output), output));
   }
 
   public static NeuralNet create(List<Integer> sizes) {
@@ -196,6 +187,36 @@ public class NeuralNet<X, Y> {
     }
     
     checkState(!Double.isNaN(layers.get(0).getEntry(0, 0)), "Matrix has diverged!");
+  }
+
+  public <X, Y> NetAdapter<X, Y> getAdapter(Converter<X, Signal> cin, Converter<Signal, Y> cout) {
+    return new NetAdapter<>(cin, cout);
+  }
+
+  public class NetAdapter<X, Y> {
+    private Converter<X, Signal> cin;
+    private Converter<Signal, Y> cout;
+
+    public NetAdapter(Converter<X, Signal> cin, Converter<Signal, Y> cout) {
+      this.cin = cin;
+      this.cout = cout;
+    }
+
+    public Y netApply(X input) {
+      return cout.convert(apply(cin.convert(input)));
+    }
+
+    public void netBackpropagate(X input, Y target) {
+      backpropagate(cin.convert(input), cout.reverse().convert(target));
+    }
+
+    public void drawState(Graphics g, X input, int x, int y, int sx, int sy) {
+      Util.drawState(g, NeuralNet.this, cin.convert(input), x, y, sx, sy);
+    }
+
+    public void drawState(Graphics g, X input, int x, int y, int sx, int sy, Util.Style mode) {
+      Util.drawState(g, NeuralNet.this, cin.convert(input), x, y, sx, sy, mode);
+    }
   }
 
 }
