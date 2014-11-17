@@ -6,6 +6,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Converter;
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -13,6 +14,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -32,6 +35,8 @@ public class NeuralNet {
   // t = threshold
   
   private List<RealMatrix> layers;
+
+  private static Logger logger = Logger.getLogger("com.blevinstein.net.NeuralNet");
 
   public int size() {
     return layers.size();
@@ -121,13 +126,12 @@ public class NeuralNet {
   }
 
   public List<Signal> propagate(Signal input) {
-    checkArgument(input.size() + 1 == getInputs(), "Wrong size input supplied.");
-
-    Signal current = input;
+    checkArgument(input.size() == getInputs(), "Wrong size input supplied.");
 
     List<Signal> wave = new ArrayList<>();
-    wave.add(current);
+    wave.add(input);
 
+    Signal current = input;
     for (RealMatrix layer : layers) {
       current = current.sigmoid().apply(layer);
       wave.add(current);
@@ -180,13 +184,32 @@ public class NeuralNet {
     // weights -= learningRate * layerSlope
     double learningRate = 0.01;
     for (int i = 0; i < layers.size(); i++) {
-      RealMatrix layerSlope = wave.get(i).getRealVector().outerProduct(
-          deltas.get(i).getRealVector());
-      RealMatrix newLayer = layers.get(i).subtract(layerSlope.scalarMultiply(learningRate));
+      RealMatrix layerDelta = wave.get(i).getRealVector().outerProduct(
+          deltas.get(i + 1).getRealVector_zeroed()).scalarMultiply(learningRate);
+      RealMatrix newLayer = layers.get(i).subtract(layerDelta);
       layers.set(i, affinize(normalize(newLayer)));
     }
     
     checkState(!Double.isNaN(layers.get(0).getEntry(0, 0)), "Matrix has diverged!");
+  }
+
+  @Override
+  public String toString() {
+    return layers.toString();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof NeuralNet) {
+      NeuralNet other = (NeuralNet) obj;
+      return this.layers.equals(other.layers);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(layers);
   }
 
   public <X, Y> NetAdapter<X, Y> getAdapter(Converter<X, Signal> cin, Converter<Signal, Y> cout) {

@@ -4,13 +4,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
 import com.blevinstein.net.Signal;
+import com.google.common.base.Converter;
 
 // Converts an image into neuron inputs by slicing the image into a N x M grid
 // and taking the average value (as in HSV) of each section of the image.
 //
 // TODO: MultiChannel, construct w/ Channel[], e.g. RGBChannel
 
-public class ValueChannel extends Channel {
+public class ValueChannel extends Converter<BufferedImage, Signal> {
   private int _n, _m;
 
   public ValueChannel(int n, int m) {
@@ -18,7 +19,7 @@ public class ValueChannel extends Channel {
     _m = m;
   }
 
-  public Signal toSignal(BufferedImage image) {
+  public Signal doForward(BufferedImage image) {
     if (image == null) {
       throw new IllegalArgumentException();
     }
@@ -48,6 +49,10 @@ public class ValueChannel extends Channel {
     return new Signal(values);
   }
 
+  public BufferedImage doBackward(Signal signal) {
+    throw new UnsupportedOperationException();
+  }
+
   // Gets the average value (as in HSV) of all pixels in an image
   // NOTE: returns in range 0.0-1.0
   private double avgValue(BufferedImage image) {
@@ -68,9 +73,5 @@ public class ValueChannel extends Channel {
     }
     double avg = total / (w * h);
     return avg;
-  }
-
-  public int bits() {
-    return _n * _m;
   }
 }

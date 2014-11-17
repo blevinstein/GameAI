@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
@@ -15,6 +16,8 @@ import static com.blevinstein.util.Util.multiply;
 import static com.blevinstein.util.Util.placeText;
 
 public class Util {
+
+  private static Logger logger = Logger.getLogger("com.blevinstein.net.Util");
   /**
    * chain({0, 1, 2, 3}) -> {(0, 1), (1, 2), (2, 3)}
    */
@@ -74,9 +77,9 @@ public class Util {
 
     // draw neurons
     for (int i = 0; i < wave.size(); i++) { // each layer
-      for (int j = 0; j < wave.get(i).size(); j++) { // each neuron
+      for (int j = 0; j <= wave.get(i).size(); j++) { // each neuron
         // skip the last bias element
-        if (i == wave.size() - 1 && j == wave.get(i).size() - 1) {
+        if (i == wave.size() - 1 && j == wave.get(i).size()) {
           continue;
         }
 
@@ -86,7 +89,7 @@ public class Util {
         Color tgray = new Color(value, value, value, 0.5f); // translucent gray
         Color contrast = value > 0.5 ? Color.BLACK : Color.WHITE;
 
-        // draw synapses, layer i, outgoing from neuron j...
+        // draw synapses outgoing from layer i neuron j...
         if (i + 1 < wave.size()) { // except for last row
 
           // SVD-related preprocessing
@@ -107,7 +110,7 @@ public class Util {
           }
 
           // ...to neuron m
-          for (int m = 0; m < wave.get(i + 1).size() - 1; m++) {
+          for (int m = 0; m < wave.get(i + 1).size(); m++) {
 
             int widths[];
             Color colors[];
@@ -184,7 +187,7 @@ public class Util {
               g2.setColor(contrast);
               // t is used to determine placement along the synapse, to avoid
               //   labels overlapping. For simple midpoint text, set t=0.5.
-              double t = (j + 1.0) / (wave.get(i).size() + 1.0);
+              double t = (j + 1.0) / wave.get(i).size();
               placeText(g, com.blevinstein.util.Util.Align.CENTER, String.format("%.2f", weight),
                   (int) (x + grid.getX() * (i + 0.5 + t)),
                   (int) (y + grid.getY() * (0.5 + j + (m - j) * t)));
@@ -194,7 +197,7 @@ public class Util {
         }
 
         // diameter is halved for bias nodes
-        double d = j == wave.get(i).size() - 1 ?
+        double d = j == wave.get(i).size() ?
             diameter / 2 :
             diameter;
         // circle is centered on square [i,j] with given side length, diameter d
@@ -211,7 +214,7 @@ public class Util {
         // display the neuron's pre- and post-sigmoid values
         // NOTE: biases don't get sigmoided
         g.setColor(contrast);
-        String str = j == wave.get(i).size() - 1 ?
+        String str = j == wave.get(i).size() ?
             String.format("%.2f", wave.get(i).get(j)) :
             String.format("%.2f => %.2f", wave.get(i).get(j),
                 Signal.sigmoid(wave.get(i).get(j)));

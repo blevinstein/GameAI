@@ -2,25 +2,19 @@ package com.blevinstein.net;
 
 import com.google.common.base.Converter;
 
-public class LetterConverter extends Converter<String, Signal> {
+public class LetterConverter extends Converter<String, Integer> {
 
   public static String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  // does all the heavy lifting
-  private EnumConverter slave = new EnumConverter(26);
-
-  public Signal doForward(String value) {
+  public Integer doForward(String value) {
     int loc = LETTERS.indexOf(value);
     if (loc == -1) {
       throw new IllegalArgumentException("Expected a letter, got " + value + "!");
     }
-    return slave.convert(loc);
+    return loc;
   }
 
-  public String doBackward(Signal signal) {
-    int loc = slave.reverse().convert(signal);
-    return LETTERS.charAt(loc) + "";
+  public String doBackward(Integer i) {
+    return LETTERS.charAt(i) + "";
   }
-
-  public int bits() { return slave.bits(); }
 }

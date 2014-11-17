@@ -1,27 +1,25 @@
 package com.blevinstein.house;
 
 import com.blevinstein.net.BinaryConverter;
-import com.blevinstein.net.ListConverter;
-import com.blevinstein.net.NetAdapter;
 import com.blevinstein.net.NeuralNet;
-import com.blevinstein.net.NeuralNet.Style;
-import com.blevinstein.util.Json;
+import com.blevinstein.net.Util.Style;
 import com.blevinstein.util.Throttle;
+import com.blevinstein.util.Json;
 import com.blevinstein.util.Util;
 import com.blevinstein.util.Util.Align;
+import com.google.common.collect.ImmutableList;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Toolkit;
 import java.util.function.Function;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 // This lab helps diagnose neural net behavior.
@@ -37,9 +35,11 @@ class NetLab extends JPanel implements KeyListener {
     "T to start/stop training of the net. " +
     "R to reset correct % stats. ";
 
+  private static Logger logger = Logger.getLogger("com.blevinstein.net.NetLab");
 
-  private NetAdapter<List<Boolean>, Boolean> adapter =
-      new NetAdapter<>(new ListConverter<Boolean>(new BinaryConverter(), 2), new BinaryConverter());
+  private NeuralNet net = NeuralNet.create(2, 1);
+  private NeuralNet.NetAdapter<List<Boolean>, List<Boolean>> adapter = net.getAdapter(new BinaryConverter(),
+      new BinaryConverter().reverse());
   private List<Boolean> state = Util.randomBits(2);
   private Map<String, Function<List<Boolean>, Boolean>> functions = new HashMap<>();
   private JComboBox<String> selectFunction;
@@ -48,7 +48,6 @@ class NetLab extends JPanel implements KeyListener {
   public NetLab() {
     super(null); // no layout manager
 
-    // receive key events
     this.setFocusable(true);
     this.addKeyListener(this);
 
@@ -56,7 +55,7 @@ class NetLab extends JPanel implements KeyListener {
     selectFunction = new JComboBox<String>();
     selectFunction.setFocusable(false);
     selectFunction.setBounds(10, 10, 200, 25);
-    this.add(selectFunction);
+    //add(selectFunction);
 
     addFunction("XOR", inputs ->
         inputs.get(0) ^ inputs.get(1));
@@ -81,7 +80,7 @@ class NetLab extends JPanel implements KeyListener {
     functions.put(name, function);
   }
 
-  boolean training = false;
+  boolean training = true;
   boolean svd = false;
   public void run() {
     Throttle t = new Throttle(100); // 100fps max
@@ -120,13 +119,13 @@ class NetLab extends JPanel implements KeyListener {
   public void trainRandom() {
     // choose an input and calculate correct output
     state = Util.randomBits(2);
-    Boolean target = f.apply(state);
+    List<Boolean> target = ImmutableList.of(f.apply(state));
     // check the network's answer
-    Boolean answer = adapter.process(state);
+    List<Boolean> answer = adapter.netApply(state);
     // train the neural network
-    adapter.backpropagate(state, target);
+    adapter.netBackpropagate(state, target);
     // DEBUG
-    if (answer == target) {
+    if (answer.equals(target)) {
       correct++;
     } else {
       incorrect++;
@@ -139,17 +138,10 @@ class NetLab extends JPanel implements KeyListener {
   private int correct = 0, incorrect = 0;
   private boolean displayHelp = false;
   public void keyPressed(KeyEvent e) {
+    logger.info("keyPressed");
     switch (e.getKeyCode()) {
-      case KeyEvent.VK_L:
-        NeuralNet newNet = Json.load("patient.json", NeuralNet.class);
-        if (newNet != null) { adapter.setNet(newNet); }
-        repaint();
-        break;
       case KeyEvent.VK_R:
         correct = incorrect = 0;
-        break;
-      case KeyEvent.VK_S:
-        Json.save(adapter.getNet(), "patient.json");
         break;
       case KeyEvent.VK_T:
         training = !training;

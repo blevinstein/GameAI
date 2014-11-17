@@ -1,7 +1,6 @@
 package com.blevinstein.house;
 
 import com.blevinstein.net.BinaryConverter;
-import com.blevinstein.net.ListConverter;
 import com.blevinstein.net.NetPopulation;
 import com.blevinstein.net.NeuralNet;
 import com.blevinstein.util.Throttle;
@@ -144,16 +143,17 @@ class PopLab extends JPanel implements KeyListener {
     // TODO(blevinstein): implement ListConverter somehow, and fix this
     @Override
     public double getFitness(NeuralNet individual) {
-      NetAdapter<List<Boolean>, Boolean> adapter = individual.getAdapter();
+      NeuralNet.NetAdapter<List<Boolean>, List<Boolean>> adapter = individual.getAdapter(
+          new BinaryConverter(), new BinaryConverter().reverse());
       List<List<Boolean>> cases = ImmutableList.of(ImmutableList.of(false, false),
           ImmutableList.of(false, true),
           ImmutableList.of(true, false),
           ImmutableList.of(true, true));
       double score = 0.0;
       for (List<Boolean> kase : cases) {
-        boolean expected = function.apply(kase);
-        boolean actual = adapter.process(kase);
-        if (actual == expected) { score += 1; }
+        List<Boolean> expected = ImmutableList.of(function.apply(kase));
+        List<Boolean> actual = adapter.netApply(kase);
+        if (actual.equals(expected)) { score += 1; }
       }
       return score;
     }

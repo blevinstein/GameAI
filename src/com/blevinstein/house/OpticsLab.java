@@ -2,6 +2,7 @@ package com.blevinstein.house;
 
 import com.blevinstein.image.ImageClassifier;
 import com.blevinstein.image.ValueChannel;
+import com.blevinstein.net.EnumConverter;
 import com.blevinstein.net.LetterConverter;
 import com.blevinstein.net.NeuralNet;
 import com.blevinstein.util.Json;
@@ -40,8 +41,9 @@ class OpticsLab extends JPanel implements KeyListener {
     "T to start/stop training of the net. " +
     "R to reset correct % stats. ";
 
-  private ImageClassifier<String> _classifier =
-    new ImageClassifier<>(new ValueChannel(4, 4), new LetterConverter());
+  private ImageClassifier _classifier =
+    new ImageClassifier(NeuralNet.create(16, 26), new ValueChannel(4, 4), new EnumConverter(26).reverse());
+  private LetterConverter letterConverter = new LetterConverter();
 
   private BufferedImage image = null;
   private String guess = "?";
@@ -96,10 +98,10 @@ class OpticsLab extends JPanel implements KeyListener {
     String target = testCase.getRight();
 
     // query the network
-    guess = _classifier.process(image);
+    guess = letterConverter.reverse().convert(_classifier.getAdapter().netApply(image));
 
     // then give it the correct answer
-    _classifier.backpropagate(image, target);
+    _classifier.getAdapter().netBackpropagate(image, letterConverter.convert(target));
 
     // tabulate correct/incorrect answers
     if (guess.equals(target)) {
@@ -146,7 +148,7 @@ class OpticsLab extends JPanel implements KeyListener {
                   w, h, null);
 
       // network on the right
-      _classifier.drawState(g, image,
+      _classifier.getAdapter().drawState(g, image,
                             getWidth() / 2 + 10, 10,
                             getWidth() / 2 - 20, getHeight() - 20);
     }
@@ -177,6 +179,7 @@ class OpticsLab extends JPanel implements KeyListener {
       case KeyEvent.VK_R:
         correct = incorrect = 0;
         break;
+      /*
       case KeyEvent.VK_S:
         Json.save(_classifier.getNet(), "classifier.json");
         break;
@@ -184,6 +187,7 @@ class OpticsLab extends JPanel implements KeyListener {
         NeuralNet newNet = Json.load("classifier.json", NeuralNet.class);
         if (newNet != null) { _classifier.setNet(newNet); }
         break;
+      */
       case KeyEvent.VK_T:
         training = !training;
         break;
