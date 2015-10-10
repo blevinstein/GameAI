@@ -53,7 +53,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
       world.add(newPlayer);
       // put the player in the city
       newCity.add(newPlayer, 1);
-      
+
       // give the user a player to control
       if (i == 0) {
         MouseStrategy strategy = new MouseStrategy(world, newPlayer, camera);
@@ -77,7 +77,7 @@ class Xade extends JPanel implements KeyListener, ComponentListener {
     // Clear the screen
     g.setColor(Color.BLACK);
     g.fillRect(0, 0, getWidth(), getHeight());
-    
+
     // Print current fps
     g.setColor(Color.WHITE);
     Util.placeText(g, Align.NW, "" + ticker.tick(), 20, 20);
